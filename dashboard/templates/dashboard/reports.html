@@ -1,0 +1,211 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-chart-bar text-primary me-2"></i>Reports & Analytics
+        </h1>
+        <div>
+            <a href="{% url 'dashboard:export_excel' %}" class="btn btn-success btn-sm me-2">
+                <i class="fas fa-file-excel me-2"></i>Export Excel
+            </a>
+            <a href="{% url 'dashboard:export_pdf' %}" class="btn btn-danger btn-sm">
+                <i class="fas fa-file-pdf me-2"></i>Export PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left-color: #3b82f6;">
+                <div class="stat-value">{{ total_students }}</div>
+                <div class="stat-label">Total Registrations</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left-color: #10b981;">
+                <div class="stat-value">{{ approved_count }}</div>
+                <div class="stat-label">Certificates Issued</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="border-left-color: #f59e0b;">
+                <div class="stat-value">{{ pending_count }}</div>
+                <div class="stat-label">Pending Approvals</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Daily Registrations Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Daily Registrations (Last 30 Days)</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Category Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Course Enrollment Chart -->
+        <div class="col-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Course Enrollment Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="courseChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h6 class="mb-0"><i class="fas fa-download me-2"></i>Export Options</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <a href="{% url 'dashboard:export_excel' %}" class="btn btn-outline-success w-100 py-3">
+                        <i class="fas fa-file-excel fa-2x mb-2 d-block"></i>
+                        Export to Excel
+                        <small class="d-block text-muted">Download complete student data in Excel format</small>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'dashboard:export_pdf' %}" class="btn btn-outline-danger w-100 py-3">
+                        <i class="fas fa-file-pdf fa-2x mb-2 d-block"></i>
+                        Export to PDF
+                        <small class="d-block text-muted">Download report in PDF format</small>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <button onclick="window.print()" class="btn btn-outline-info w-100 py-3">
+                        <i class="fas fa-print fa-2x mb-2 d-block"></i>
+                        Print Report
+                        <small class="d-block text-muted">Print this page</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Daily Registrations Chart
+    const dates = {{ dates|safe }};
+    const counts = {{ counts|safe }};
+    
+    new Chart(document.getElementById('dailyChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Registrations',
+                data: counts,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+
+    // Category Distribution Chart
+    const categoryLabels = {{ category_labels|safe }};
+    const categoryData = {{ category_data|safe }};
+    
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryData,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Course Enrollment Chart
+    const courseLabels = {{ course_labels|safe }};
+    const courseData = {{ course_data|safe }};
+    
+    new Chart(document.getElementById('courseChart'), {
+        type: 'bar',
+        data: {
+            labels: courseLabels,
+            datasets: [{
+                label: 'Number of Students',
+                data: courseData,
+                backgroundColor: '#3b82f6',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+</script>
+
+<style>
+    @media print {
+        .btn, .main-nav, .dashboard-sidebar, .sidebar-toggle-btn, .card-header .btn {
+            display: none !important;
+        }
+        .dashboard-content {
+            margin-left: 0 !important;
+            padding: 0 !important;
+        }
+        .stat-card {
+            break-inside: avoid;
+        }
+    }
+</style>
+{% endblock %}

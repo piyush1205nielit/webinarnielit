@@ -1,0 +1,99 @@
+{% extends 'public/base.html' %}
+
+{% block title %}All Courses - NIELIT{% endblock %}
+
+{% block content %}
+<section class="bg-light py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                <li class="breadcrumb-item active">Courses</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold text-primary">Our Courses</h1>
+        <p class="lead text-secondary">Choose from a wide range of professional courses designed for career success</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search courses..." value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="mode" class="form-select">
+                        <option value="">All Modes</option>
+                        {% for mode_value, mode_label in modes %}
+                        <option value="{{ mode_value }}" {% if request.GET.mode == mode_value %}selected{% endif %}>{{ mode_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="type" class="form-select">
+                        <option value="">All Types</option>
+                        {% for status_value, status_label in status_choices %}
+                        <option value="{{ status_value }}" {% if request.GET.type == status_value %}selected{% endif %}>{{ status_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Grid -->
+    <div class="row g-4">
+        {% for course in page_obj %}
+        <div class="col-md-6 col-lg-4">
+            {% include 'course/course_card.html' with course=course %}
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-book-open fa-4x text-muted mb-3 d-block"></i>
+            <h4>No courses found</h4>
+            <p>Try adjusting your search criteria.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}">
+                    Previous
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}">
+                    Next
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,714 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Home - NIELIT Course Registration Portal{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════
+     TOP GOVERNMENT IDENTITY BAR
+════════════════════════════════════════════════ -->
+<div class="gov-bar">
+  <div class="container">
+    <div class="gov-bar-inner">
+      <div class="gov-logos">
+        <!-- Replace src with actual logo paths -->
+        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="National Emblem of India" class="gov-emblem" />
+        <div class="gov-divider"></div>
+        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="gov-logo" />
+        <div class="gov-divider"></div>
+        <img src="{% static 'assets/digital_india.png' %}" alt="Digital India" class="gov-logo" />
+      </div>
+      <div class="gov-identity">
+        <p class="gov-ministry">Ministry of Electronics &amp; Information Technology, Government of India</p>
+        <p class="gov-tagline">An Autonomous Scientific Society under MeitY</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════════ -->
+<section class="hero-section">
+  <div class="hero-pattern"></div>
+  <div class="container hero-container">
+    <div class="hero-content">
+      <div class="hero-badge-row">
+        <span class="hero-badge"><i class="fas fa-shield-alt me-1"></i> Government of India Initiative</span>
+        <span class="hero-badge hero-badge-gold"><i class="fas fa-award me-1"></i> ISO 9001:2015 Certified</span>
+      </div>
+      <h1 class="hero-title">
+        National Institute of<br>
+        <span class="hero-title-accent">Electronics &amp; Information</span><br>
+        Technology
+      </h1>
+      <p class="hero-subtitle">
+        NIELIT is a premier autonomous body under the Ministry of Electronics &amp; Information Technology (MeitY), Government of India. Established to spearhead IT education and training, NIELIT offers nationally recognised certifications, professional development programmes, and skill enhancement courses across India.
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'public:courses' %}" class="btn-hero-primary">
+          <i class="fas fa-book-open me-2"></i>Browse Courses
+        </a>
+        <a href="{% url 'registration:user_profile' %}" class="btn-hero-outline">
+          <i class="fas fa-id-card me-2"></i>Student Portal
+        </a>
+        <a href="{% url 'public:contact' %}" class="btn-hero-outline">
+          <i class="fas fa-headset me-2"></i>Contact Us
+        </a>
+      </div>
+    </div>
+   
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     NOTICE / ANNOUNCEMENT TICKER
+════════════════════════════════════════════════ -->
+<div class="notice-bar">
+  <div class="container">
+    <div class="notice-inner">
+      <span class="notice-label"><i class="fas fa-bullhorn me-2"></i>Notice</span>
+      <div class="notice-ticker-wrap">
+        <div class="notice-ticker">
+          <span>Registrations open for upcoming CCC / BCC batches — Apply Now</span>
+          <span class="ticker-sep">|</span>
+          <span>New workshop on Artificial Intelligence &amp; Machine Learning — Limited Seats</span>
+          <span class="ticker-sep">|</span>
+          <span>NIELIT Delhi Centres now accepting enrollments for Full Stack Web Development</span>
+          <span class="ticker-sep">|</span>
+          <span>Walk-in interview for Junior Resource Person — Visit nielit.gov.in for details</span>
+          <span class="ticker-sep">|</span>
+          <span>Heavy Testing Goingg... </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ABOUT NIELIT STRIP
+════════════════════════════════════════════════ -->
+<section class="about-strip">
+  <div class="container">
+    <div class="about-strip-grid">
+      <div class="about-strip-item">
+        <div class="about-icon"><i class="fas fa-landmark"></i></div>
+        <div>
+          <h4>Statutory Body</h4>
+          <p>Autonomous scientific society under MeitY, GoI — operating since 1994</p>
+        </div>
+      </div>
+      <div class="about-strip-item">
+        <div class="about-icon"><i class="fas fa-certificate"></i></div>
+        <div>
+          <h4>Nationally Recognised</h4>
+          <p>Certificates accepted by Government departments, PSUs &amp; private sector</p>
+        </div>
+      </div>
+      <div class="about-strip-item">
+        <div class="about-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div>
+          <h4>Skill India Partner</h4>
+          <p>Empowering youth through PM Kaushal Vikas Yojana &amp; Digital India mission</p>
+        </div>
+      </div>
+      <div class="about-strip-item">
+        <div class="about-icon"><i class="fas fa-network-wired"></i></div>
+        <div>
+          <h4>Pan-India Presence</h4>
+          <p>40+ Centres &amp; 6,000+ Accredited Institutes across all states &amp; UTs</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     FEATURED COURSES
+════════════════════════════════════════════════ -->
+<section class="section-standard">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Academic Programmes</div>
+      <h2 class="section-title">Featured Courses</h2>
+      <p class="section-desc">Industry-aligned professional courses designed by experts from academia and the IT sector, leading to Government-recognised certifications.</p>
+    </div>
+    <div class="row g-4">
+      {% for course in featured_courses %}
+      <div class="col-md-6 col-lg-4">
+        {% include 'course/course_card.html' with course=course %}
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <i class="fas fa-book-open fa-3x text-muted mb-3 d-block"></i>
+        <p class="text-muted">Course listings will appear here shortly.</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-5">
+      <a href="{% url 'public:courses' %}" class="btn-standard-outline">
+        View All Courses <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     UPCOMING COURSES
+════════════════════════════════════════════════ -->
+{% if upcoming_courses %}
+<section class="section-tinted">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Upcoming Batches</div>
+      <h2 class="section-title">Upcoming Courses</h2>
+      <p class="section-desc">Plan ahead with our scheduled workshops, seminars, and certification batches.</p>
+    </div>
+    <div class="row g-4">
+      {% for course in upcoming_courses %}
+      <div class="col-md-6 col-lg-3">
+        <div class="upcoming-card">
+          <div class="upcoming-card-header">
+            <span class="badge-upcoming"><i class="fas fa-calendar-alt me-1"></i>Upcoming</span>
+            <h6>{{ course.course_name }}</h6>
+            <p>{{ course.course_duration|default:course.get_course_type_display }}</p>
+          </div>
+          <div class="upcoming-card-body">
+            <div class="upcoming-meta">
+              <span class="mode-badge">{{ course.get_mode_display }}</span>
+              <strong class="upcoming-fee">{{ course.display_fees }}</strong>
+            </div>
+            {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
+              {% if course.event_date %}
+              <div class="upcoming-date">
+                <i class="fas fa-calendar-day me-1"></i>
+                Event: <strong>{{ course.event_date|date:"d M Y" }}</strong>
+              </div>
+              {% endif %}
+            {% else %}
+              {% if course.start_date %}
+              <div class="upcoming-date">
+                <i class="fas fa-calendar-day me-1"></i>
+                Starts: <strong>{{ course.start_date|date:"d M Y" }}</strong>
+              </div>
+              {% endif %}
+            {% endif %}
+          </div>
+          <div class="upcoming-card-footer">
+            <a href="{% url 'public:course_detail' course.slug %}" class="btn-card-outline">
+              View Details <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════
+     NIELIT DELHI TRAINING CENTRES (HARDCODED)
+════════════════════════════════════════════════ -->
+<section class="section-standard">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">NIELIT Delhi</div>
+      <h2 class="section-title">Our Training Centres in Delhi</h2>
+      <p class="section-desc">NIELIT Delhi operates three campuses across the capital, providing accessible quality IT education and training for all.</p>
+    </div>
+    <div class="row g-4">
+
+      
+
+      <!-- West Campus - Janakpuri -->
+      <div class="col-md-6 col-lg-4">
+        <div class="centre-card">
+          <div class="centre-card-top centre-west">
+            <div class="centre-icon"><i class="fas fa-building"></i></div>
+            <div>
+              <span class="centre-type-badge">West Campus</span>
+              <h5>NIELIT Delhi — Janakpuri</h5>
+              <p>West Delhi</p>
+            </div>
+          </div>
+          <div class="centre-card-body">
+            <div class="centre-detail"><i class="fas fa-map-marker-alt"></i><span>IETE Building, Institutional Area, 16/1-2, Pankha Road, Near Sagarpur Police Station, D Block, Janakpuri, New Delhi – 110058</span></div>
+            <div class="centre-detail"><i class="fas fa-mobile-alt"></i><span>9891555904</span></div>
+            <div class="centre-detail"><i class="fas fa-phone"></i><span>011-49878223</span></div>
+            <div class="centre-detail"><i class="fas fa-envelope"></i><span>delhi.west@nielit.gov.in</span></div>
+          </div>
+          <div class="centre-card-footer">
+            <a href="https://maps.app.goo.gl/TbBMGAVEoUeZagH36" target="_blank" rel="noopener" class="btn-map">
+              <i class="fas fa-map me-1"></i>View on Map
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- North Campus - Inderlok -->
+      <div class="col-md-6 col-lg-4">
+        <div class="centre-card">
+          <div class="centre-card-top centre-north">
+            <div class="centre-icon"><i class="fas fa-building"></i></div>
+            <div>
+              <span class="centre-type-badge">North Campus</span>
+              <h5>NIELIT Delhi — Inderlok</h5>
+              <p>North Delhi</p>
+            </div>
+          </div>
+          <div class="centre-card-body">
+            <div class="centre-detail"><i class="fas fa-map-marker-alt"></i><span>2nd Floor, Parsvnath Metro Mall, Near Inderlok Metro Station, Inderlok, Delhi – 110052</span></div>
+            <div class="centre-detail"><i class="fas fa-mobile-alt"></i><span>8447795337</span></div>
+            <div class="centre-detail"><i class="fas fa-phone"></i><span>011-23644849</span></div>
+            <div class="centre-detail"><i class="fas fa-envelope"></i><span>delhi.north@nielit.gov.in</span></div>
+          </div>
+          <div class="centre-card-footer">
+            <a href="https://maps.app.goo.gl/HT8DrahpXQBu9Rwb6" target="_blank" rel="noopener" class="btn-map">
+              <i class="fas fa-map me-1"></i>View on Map
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- East Campus - Karkardooma -->
+      <div class="col-md-6 col-lg-4">
+        <div class="centre-card">
+          <div class="centre-card-top centre-east">
+            <div class="centre-icon"><i class="fas fa-building"></i></div>
+            <div>
+              <span class="centre-type-badge">East Campus</span>
+              <h5>NIELIT Delhi — Karkardooma</h5>
+              <p>East Delhi</p>
+            </div>
+          </div>
+          <div class="centre-card-body">
+            <div class="centre-detail"><i class="fas fa-map-marker-alt"></i><span>30X, FC-18, Institutional Area, Near Kendriya Vidyalaya, Karkardooma, Delhi – 110092</span></div>
+            <div class="centre-detail"><i class="fas fa-mobile-alt"></i><span>7042864055</span></div>
+            <div class="centre-detail"><i class="fas fa-phone"></i><span>011-20824140</span></div>
+            <div class="centre-detail"><i class="fas fa-envelope"></i><span>delhi.east@nielit.gov.in</span></div>
+          </div>
+          <div class="centre-card-footer">
+            <a href="https://maps.app.goo.gl/th38J68p3cbECNYP9" target="_blank" rel="noopener" class="btn-map">
+              <i class="fas fa-map me-1"></i>View on Map
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     WHY NIELIT
+════════════════════════════════════════════════ -->
+<section class="section-tinted">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Our Strengths</div>
+      <h2 class="section-title">Why Choose NIELIT?</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon why-blue"><i class="fas fa-landmark"></i></div>
+        <h5>Government Recognised</h5>
+        <p>NIELIT certificates are recognised by central &amp; state government departments, PSUs, and hundreds of top private sector employers across India.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon why-green"><i class="fas fa-chalkboard-teacher"></i></div>
+        <h5>Expert Faculty</h5>
+        <p>Learn from qualified scientists, industry practitioners, and experienced academicians with deep expertise in electronics, IT, and emerging technologies.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon why-orange"><i class="fas fa-laptop-code"></i></div>
+        <h5>Industry-Ready Curriculum</h5>
+        <p>Syllabi updated in consultation with industry bodies like NASSCOM to ensure skills that are relevant, current, and immediately applicable on the job.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon why-purple"><i class="fas fa-users"></i></div>
+        <h5>Placement Assistance</h5>
+        <p>Dedicated placement cells at each centre conduct campus drives, mock interviews, and connect graduates with hiring partners across the country.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon why-teal"><i class="fas fa-rupee-sign"></i></div>
+        <h5>Affordable Fees</h5>
+        <p>Subsidised and government-funded programmes under PM Kaushal Vikas Yojana make quality IT education accessible for all economic backgrounds.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon why-red"><i class="fas fa-file-certificate"></i></div>
+        <h5>Stackable Certifications</h5>
+        <p>From O Level to B4 Level — NIELIT's progressive certification framework lets you build credentials step-by-step at your own pace.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ═══════════════════════════════════════════════
+     STYLES
+════════════════════════════════════════════════ -->
+<style>
+/* ── Variables ── */
+:root {
+  --navy: #0d2461;
+  --navy-mid: #1a3a7a;
+  --navy-light: #2a5298;
+  --gold: #c8922a;
+  --gold-light: #e6b44a;
+  --off-white: #f7f8fc;
+  --border: #dde3f0;
+  --text-primary: #1a1f36;
+  --text-secondary: #5a6280;
+  --text-light: #8892b0;
+  --green-gov: #1a6b3c;
+}
+
+/* ── Gov bar ── */
+.gov-bar {
+  background: #fff;
+  border-bottom: 3px solid var(--gold);
+  padding: 10px 0;
+}
+.gov-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.gov-logos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gov-emblem { height: 52px; width: auto; object-fit: contain; }
+.gov-logo   { height: 44px; width: auto; object-fit: contain; }
+.gov-divider { width: 1px; height: 40px; background: var(--border); }
+.gov-identity { border-left: 2px solid var(--gold); padding-left: 14px; }
+.gov-ministry { margin: 0; font-size: 13px; font-weight: 600; color: var(--navy); }
+.gov-tagline  { margin: 0; font-size: 11px; color: var(--text-secondary); }
+
+/* ── Hero ── */
+.hero-section {
+  background: linear-gradient(135deg, #0a1d56 0%, #1a3a7a 45%, #1e5799 100%);
+  color: #fff;
+  padding: 70px 0 50px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-pattern {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,.03) 40px, rgba(255,255,255,.03) 41px),
+                    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,.03) 40px, rgba(255,255,255,.03) 41px);
+  pointer-events: none;
+}
+.hero-container { position: relative; z-index: 1; }
+.hero-badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.hero-badge {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff;
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.hero-badge-gold {
+  background: rgba(200,146,42,.2);
+  border-color: var(--gold-light);
+  color: var(--gold-light);
+}
+.hero-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 18px;
+  letter-spacing: -.5px;
+}
+.hero-title-accent { color: var(--gold-light); }
+.hero-subtitle {
+  font-size: 15px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.82);
+  max-width: 680px;
+  margin-bottom: 28px;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+.btn-hero-primary {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s;
+}
+.btn-hero-primary:hover { background: var(--gold-light); color: #fff; }
+.btn-hero-outline {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,.5);
+  padding: 11px 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color .2s, background .2s;
+}
+.btn-hero-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); color: #fff; }
+.hero-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 6px;
+  overflow: hidden;
+  max-width: 700px;
+}
+.hero-stat {
+  background: rgba(255,255,255,.06);
+  padding: 18px 16px;
+  text-align: center;
+}
+.stat-num   { display: block; font-size: 1.6rem; font-weight: 700; color: #fff; }
+.stat-label { display: block; font-size: 11px; color: rgba(255,255,255,.65); margin-top: 3px; }
+
+/* ── Notice bar ── */
+.notice-bar {
+  background: var(--navy);
+  color: #fff;
+  padding: 9px 0;
+  overflow: hidden;
+}
+.notice-inner { display: flex; align-items: center; gap: 0; }
+.notice-label {
+  background: var(--gold);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-right: 16px;
+}
+.notice-ticker-wrap { overflow: hidden; flex: 1; }
+.notice-ticker {
+  display: inline-flex;
+  gap: 0;
+  white-space: nowrap;
+  font-size: 13px;
+  color: rgba(255,255,255,.85);
+  animation: ticker 35s linear infinite;
+}
+.notice-ticker span { padding: 0 24px; }
+.ticker-sep { color: var(--gold-light); padding: 0 !important; }
+@keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+/* ── About strip ── */
+.about-strip { background: #fff; padding: 32px 0; border-bottom: 1px solid var(--border); }
+.about-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.about-strip-item { display: flex; align-items: flex-start; gap: 14px; }
+.about-icon {
+  width: 42px; height: 42px; border-radius: 6px;
+  background: var(--navy);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.about-strip-item h4 { font-size: 13px; font-weight: 700; margin: 0 0 4px; color: var(--text-primary); }
+.about-strip-item p  { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+
+/* ── Section commons ── */
+.section-standard { padding: 64px 0; background: #fff; }
+.section-tinted   { padding: 64px 0; background: var(--off-white); }
+.section-header   { text-align: center; margin-bottom: 40px; }
+.section-label    { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.section-title    { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+.section-desc     { font-size: 15px; color: var(--text-secondary); max-width: 620px; margin: 0 auto; line-height: 1.7; }
+
+/* ── Standard buttons ── */
+.btn-standard-outline {
+  border: 2px solid var(--navy);
+  color: var(--navy);
+  padding: 10px 28px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: background .2s, color .2s;
+}
+.btn-standard-outline:hover { background: var(--navy); color: #fff; }
+
+/* ── Upcoming cards ── */
+.upcoming-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow .2s;
+}
+.upcoming-card:hover { box-shadow: 0 4px 20px rgba(13,36,97,.1); }
+.upcoming-card-header { padding: 18px 18px 12px; background: #f0f4ff; border-bottom: 1px solid var(--border); }
+.upcoming-card-header h6 { font-size: 14px; font-weight: 700; color: var(--navy); margin: 6px 0 4px; }
+.upcoming-card-header p  { font-size: 12px; color: var(--text-secondary); margin: 0; }
+.badge-upcoming { font-size: 11px; background: var(--navy); color: #fff; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+.upcoming-card-body  { padding: 14px 18px; flex: 1; }
+.upcoming-meta  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.mode-badge     { font-size: 11px; background: #e8f0fe; color: var(--navy-mid); padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+.upcoming-fee   { font-size: 14px; color: var(--green-gov); font-weight: 700; }
+.upcoming-date  { font-size: 12px; color: var(--text-secondary); }
+.upcoming-card-footer { padding: 12px 18px; border-top: 1px solid var(--border); }
+.btn-card-outline {
+  font-size: 12px; font-weight: 600; color: var(--navy);
+  text-decoration: none; display: block; text-align: center;
+  padding: 7px; border: 1.5px solid var(--navy); border-radius: 4px;
+  transition: background .2s, color .2s;
+}
+.btn-card-outline:hover { background: var(--navy); color: #fff; }
+
+/* ── Centre cards ── */
+.centre-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow .2s, transform .2s;
+}
+.centre-card:hover { box-shadow: 0 6px 24px rgba(13,36,97,.12); transform: translateY(-3px); }
+.centre-card-top {
+  padding: 18px 18px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.centre-hq    { background: linear-gradient(135deg, #0d2461, #1a3a7a); color: #fff; }
+.centre-west  { background: linear-gradient(135deg, #1a3a7a, #2a5298); color: #fff; }
+.centre-north { background: linear-gradient(135deg, #0f5132, #1a6b3c); color: #fff; }
+.centre-east  { background: linear-gradient(135deg, #7a1a1a, #9e2c2c); color: #fff; }
+.centre-icon {
+  width: 44px; height: 44px; background: rgba(255,255,255,.2);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #fff; flex-shrink: 0;
+}
+.centre-card-top h5 { font-size: 14px; font-weight: 700; margin: 6px 0 2px; color: #fff; }
+.centre-card-top p  { font-size: 12px; margin: 0; color: rgba(255,255,255,.75); }
+.centre-type-badge  { font-size: 10px; background: rgba(255,255,255,.25); color: #fff; padding: 2px 8px; border-radius: 20px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.centre-card-body   { padding: 16px 18px; flex: 1; }
+.centre-detail {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  align-items: flex-start;
+}
+.centre-detail i { color: var(--navy); font-size: 12px; margin-top: 3px; flex-shrink: 0; }
+.centre-detail a { color: var(--navy-light); text-decoration: none; }
+.centre-detail a:hover { text-decoration: underline; }
+.centre-card-footer { padding: 12px 18px; border-top: 1px solid var(--border); }
+.btn-map {
+  display: block; text-align: center;
+  font-size: 13px; font-weight: 600;
+  background: var(--off-white); color: var(--navy);
+  border: 1.5px solid var(--border);
+  padding: 8px; border-radius: 4px;
+  text-decoration: none;
+  transition: background .2s, border-color .2s;
+}
+.btn-map:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* ── Why grid ── */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.why-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  transition: box-shadow .2s;
+}
+.why-card:hover { box-shadow: 0 4px 18px rgba(13,36,97,.09); }
+.why-icon {
+  width: 48px; height: 48px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #fff; margin-bottom: 14px;
+}
+.why-blue   { background: var(--navy); }
+.why-green  { background: var(--green-gov); }
+.why-orange { background: #b35900; }
+.why-purple { background: #5a2d82; }
+.why-teal   { background: #0f6e6e; }
+.why-red    { background: #9e1a1a; }
+.why-card h5 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.why-card p  { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+/* ── CTA ── */
+.cta-section { background: linear-gradient(135deg, #0a1d56, #1a3a7a); padding: 60px 0; }
+.cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+.cta-text h2 { font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 700; color: #fff; margin-bottom: 10px; }
+.cta-text p  { font-size: 15px; color: rgba(255,255,255,.8); margin-bottom: 24px; }
+.cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-cta-primary {
+  background: var(--gold); color: #fff;
+  border: none; padding: 11px 24px; border-radius: 4px;
+  font-size: 14px; font-weight: 700; text-decoration: none;
+  transition: background .2s;
+}
+.btn-cta-primary:hover { background: var(--gold-light); color: #fff; }
+.btn-cta-outline {
+  background: transparent; color: #fff;
+  border: 1.5px solid rgba(255,255,255,.5);
+  padding: 11px 24px; border-radius: 4px;
+  font-size: 14px; font-weight: 500; text-decoration: none;
+  transition: border-color .2s, background .2s;
+}
+.btn-cta-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); color: #fff; }
+.cta-seals { display: flex; flex-direction: column; gap: 12px; }
+.seal {
+  display: flex; align-items: center; gap: 10px;
+  color: rgba(255,255,255,.75); font-size: 13px; font-weight: 500;
+}
+.seal i { color: var(--gold-light); font-size: 16px; }
+
+/* ── Responsive ── */
+@media (max-width: 991px) {
+  .hero-stats-grid    { grid-template-columns: repeat(2, 1fr); }
+  .about-strip-grid   { grid-template-columns: repeat(2, 1fr); }
+  .why-grid           { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 767px) {
+  .hero-stats-grid    { grid-template-columns: repeat(2, 1fr); }
+  .about-strip-grid   { grid-template-columns: 1fr; }
+  .why-grid           { grid-template-columns: 1fr; }
+  .cta-inner          { flex-direction: column; }
+  .cta-seals          { flex-direction: row; flex-wrap: wrap; }
+  .gov-bar-inner      { gap: 12px; }
+  .gov-identity       { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 8px; }
+}
+</style>
+
+{% endblock %}

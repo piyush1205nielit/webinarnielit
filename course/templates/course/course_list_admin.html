@@ -1,0 +1,100 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Manage Courses - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-book text-primary me-2"></i>Manage Courses
+        </h1>
+        <a href="{% url 'course:course_create' %}" class="btn btn-success btn-sm">
+            <i class="fas fa-plus me-2"></i>Add New Course
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="coursesTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Course Name</th>
+                            <th>Duration</th>
+                            <th>Fees</th>
+                            <th>Status</th>
+                            <th>Mode</th>
+                            <th>Seats</th>
+                            <th>Featured</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                        <tr>
+                            <td>
+                                <strong>{{ course.course_name }}</strong><br>
+                                <small class="text-muted">{{ course.course_desc|truncatewords:10 }}</small>
+                            </td>
+                            <td>{{ course.course_duration }}</td>
+                            <td>
+                                {% if course.is_free %}
+                                    <span class="badge bg-success">Free</span>
+                                {% else %}
+                                    <strong class="text-primary">₹{{ course.course_fees }}</strong>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if course.course_status == 'active' or course.course_status == 'open' %}bg-success{% elif course.course_status == 'ongoing' %}bg-info{% elif course.course_status == 'closed' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    {{ course.get_course_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ course.get_mode_display }}</td>
+                            <td>{{ course.max_seats|default:"Unlimited" }}</td>
+                            <td>
+                                {% if course.is_featured %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="fas fa-star text-secondary"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'course:course_edit' course.id %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'course:course_delete' course.id %}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fas fa-book fa-3x mb-2 d-block text-muted"></i>
+                                <p class="text-muted">No courses found. Click "Add New Course" to create one.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#coursesTable').DataTable({
+            pageLength: 10,
+            order: [[0, 'asc']],
+            language: {
+                search: "Search:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries"
+            }
+        });
+    });
+</script>
+{% endblock %}

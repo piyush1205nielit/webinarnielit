@@ -1,0 +1,207 @@
+{% extends 'public/base.html' %}
+
+{% block title %}{{ course.course_name }} - NIELIT{% endblock %}
+
+{% block content %}
+<section class="bg-light py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'public:courses' %}">Courses</a></li>
+                <li class="breadcrumb-item active">{{ course.course_name }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold text-primary mb-3">{{ course.course_name }}</h1>
+            
+            <div class="mb-4">
+                <span class="badge bg-primary fs-6 me-2">{{ course.get_mode_display }}</span>
+                {% if course.course_duration %}
+                <span class="badge bg-secondary fs-6 me-2">{{ course.course_duration }}</span>
+                {% endif %}
+                <span class="badge bg-success fs-6">{{ course.display_fees }}</span>
+                {% if course.course_type != 'regular' %}
+                <span class="badge bg-info fs-6 me-2">{{ course.get_course_type_display }}</span>
+                {% endif %}
+            </div>
+            
+            <!-- Course Description -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Course Description</h4>
+                    <p>{{ course.course_desc|linebreaks }}</p>
+                </div>
+            </div>
+            
+            <!-- Course Modules / Syllabus -->
+            {% if course.modules_info %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="text-primary mb-3"><i class="fas fa-book me-2"></i>Course Modules / Syllabus</h4>
+                    <div>{{ course.modules_info|linebreaks }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Syllabus PDF Download Section -->
+            {% if course.syllabus_file %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="text-primary mb-3"><i class="fas fa-file-pdf me-2"></i>Course Syllabus</h4>
+                    <div class="p-4 bg-light rounded">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-pdf text-danger fa-3x me-3"></i>
+                            <div class="flex-grow-1">
+                                <strong>Detailed Syllabus Document</strong><br>
+                                <small class="text-muted">Download the complete syllabus for more information</small>
+                            </div>
+                            <a href="{{ course.syllabus_file.url }}" class="btn btn-danger" target="_blank">
+                                <i class="fas fa-download me-2"></i>Download Syllabus (PDF)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Prerequisites -->
+            {% if course.prerequisites %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="text-primary mb-3"><i class="fas fa-check-circle me-2"></i>Prerequisites</h4>
+                    <p>{{ course.prerequisites|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Learning Outcomes -->
+            {% if course.learning_outcomes %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="text-primary mb-3"><i class="fas fa-star me-2"></i>Learning Outcomes</h4>
+                    <p>{{ course.learning_outcomes|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Course Info Sidebar -->
+            <div class="card shadow-sm " style="top: 100px;">
+                {% if course.image %}
+                <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.course_name }}">
+                {% endif %}
+                
+                <div class="card-body">
+                    <h4 class="text-primary mb-3">Course Information</h4>
+                    <hr>
+                    
+                    <!-- Fees -->
+                    <div class="mb-3">
+                        <strong><i class="fas fa-tag me-2 text-primary"></i>Fees:</strong><br>
+                        <span class="fs-3 text-success fw-bold">{{ course.display_fees }}</span>
+                    </div>
+                    
+                    <!-- Duration -->
+                    {% if course.course_duration %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-clock me-2 text-primary"></i>Duration:</strong><br>
+                        {{ course.course_duration }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Schedule / Date -->
+                    <div class="mb-3">
+                        <strong><i class="fas fa-calendar-alt me-2 text-primary"></i>Schedule:</strong><br>
+                        {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
+                            {% if course.event_date %}
+                                <span class="fs-6">{{ course.event_date|date:"l, d F Y" }}</span>
+                            {% else %}
+                                <span class="text-muted">Date to be announced</span>
+                            {% endif %}
+                        {% else %}
+                            {% if course.start_date %}
+                                {% if course.end_date %}
+                                    <span class="fs-6">{{ course.start_date|date:"d F Y" }} - {{ course.end_date|date:"d F Y" }}</span>
+                                {% else %}
+                                    <span class="fs-6">Starts: {{ course.start_date|date:"d F Y" }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Dates to be announced</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Registration Deadline -->
+                    {% if course.registration_deadline %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-hourglass-end me-2 text-primary"></i>Registration Deadline:</strong><br>
+                        {{ course.registration_deadline|date:"d F Y" }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Seats Available -->
+                    {% comment %} {% if course.max_seats and course.max_seats > 0 %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-chair me-2 text-primary"></i>Seats Available:</strong><br>
+                        {% if course.get_seats_available > 0 %}
+                        <span class="badge bg-success fs-6">{{ course.get_seats_available }} seats</span>
+                        {% else %}
+                        <span class="badge bg-danger fs-6">Full</span>
+                        {% endif %}
+                    </div>
+                    {% endif %} {% endcomment %}
+                    
+                    <!-- Mode -->
+                    <div class="mb-3">
+                        <strong><i class="fas fa-globe me-2 text-primary"></i>Mode:</strong><br>
+                        {{ course.get_mode_display }}
+                    </div>
+                    
+                    <!-- Course Type -->
+                    {% if course.course_type != 'regular' %}
+                    <div class="mb-3">
+                        <strong><i class="fas fa-tag me-2 text-primary"></i>Course Type:</strong><br>
+                        {{ course.get_course_type_display }}
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <!-- Registration Button -->
+                    {% if course.is_available_for_registration %}
+                    <a href="{% url 'registration:register_with_course' course.id %}" class="btn btn-success btn-lg w-100 mb-2">
+                        <i class="fas fa-pencil-alt me-2"></i>Register Now
+                    </a>
+                    {% else %}
+                    <button class="btn btn-secondary btn-lg w-100 mb-2" disabled>
+                        <i class="fas fa-times-circle me-2"></i>Registration Closed
+                    </button>
+                    {% endif %}
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Courses -->
+    {% if related_courses %}
+    <div class="mt-5">
+        <h3 class="fw-bold text-primary mb-4">Related Courses</h3>
+        <div class="row g-4">
+            {% for related in related_courses %}
+            <div class="col-md-4">
+                {% include 'course/course_card.html' with course=related %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

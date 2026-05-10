@@ -1,0 +1,113 @@
+{% extends 'public/base.html' %}
+
+{% block title %}About Us - NIELIT{% endblock %}
+
+{% block content %}
+<section class="bg-light py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                <li class="breadcrumb-item active">About Us</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-primary">About NIELIT</h1>
+                <p class="lead">National Institute of Electronics & Information Technology</p>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="text-primary">Our Vision</h3>
+                    <p>To be a global leader in the field of electronics and information technology education, training, and research, empowering individuals and organizations to excel in the digital age.</p>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="text-primary">Our Mission</h3>
+                    <p>To provide quality education and training in electronics and information technology to meet the growing demands of the industry and society, fostering innovation and excellence in all our endeavors.</p>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="text-primary">Why Choose NIELIT?</h3>
+                    <div class="row mt-3">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Government Recognition</strong>
+                                    <p class="small text-muted">An autonomous scientific society under MeitY, Government of India</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Industry-Relevant Curriculum</strong>
+                                    <p class="small text-muted">Courses designed in consultation with industry experts</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Experienced Faculty</strong>
+                                    <p class="small text-muted">Learn from highly qualified and experienced instructors</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Placement Assistance</strong>
+                                    <p class="small text-muted">Dedicated placement cell to help you start your career</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>State-of-the-Art Infrastructure</strong>
+                                    <p class="small text-muted">Modern labs and facilities for hands-on learning</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Affordable Fees</strong>
+                                    <p class="small text-muted">Quality education at competitive prices with scholarship options</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-body p-4 text-center">
+                    <h3 class="text-primary">Contact Us</h3>
+                    <p>Have questions? We're here to help.</p>
+                    <a href="{% url 'public:contact' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-envelope me-2"></i>Get in Touch
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

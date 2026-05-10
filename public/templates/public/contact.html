@@ -1,0 +1,117 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Contact Us - NIELIT{% endblock %}
+
+{% block content %}
+<section class="bg-light py-4">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                <li class="breadcrumb-item active">Contact Us</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto text-center mb-5">
+            <h1 class="display-5 fw-bold text-primary">Contact Us</h1>
+            <p class="lead">Get in touch with us for any queries or assistance</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h3 class="text-primary mb-4">Get in Touch</h3>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="fas fa-map-marker-alt text-primary fa-2x me-3"></i>
+                            <div>
+                                <strong>Visit Us</strong><br>
+                                <span class="small">NIELIT Delhi,<br>Electronics Niketan,<br>6, CGO Complex,<br>Lodhi Road, New Delhi - 110003</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="fas fa-phone text-primary fa-2x me-3"></i>
+                            <div>
+                                <strong>Call Us</strong><br>
+                                <span class="small">+91-11-12345678<br>+91-11-87654321</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="fas fa-envelope text-primary fa-2x me-3"></i>
+                            <div>
+                                <strong>Email Us</strong><br>
+                                <span class="small">info@nielit.gov.in<br>support@nielit.gov.in</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-clock text-primary fa-2x me-3"></i>
+                            <div>
+                                <strong>Working Hours</strong><br>
+                                <span class="small">Monday to Friday: 9:00 AM - 6:00 PM<br>Saturday: 9:00 AM - 2:00 PM<br>Sunday: Closed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="text-primary mb-4">Send us a Message</h3>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" name="mobile" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Subject *</label>
+                            <input type="text" name="subject" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Message *</label>
+                            <textarea name="message" class="form-control" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Map Section -->
+    <div class="mt-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+               <iframe 
+    src="https://www.google.com/maps?q=NIELIT+Delhi+Centre+Inderlok,+Parsvnath+Metro+Mall,+Inderlok+Metro+Station&output=embed"
+    width="100%" 
+    height="400" 
+    style="border:0; border-radius: 8px;" 
+    allowfullscreen="" 
+    loading="lazy">
+</iframe>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

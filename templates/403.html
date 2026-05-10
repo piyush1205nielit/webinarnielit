@@ -1,0 +1,66 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Access Denied - NIELIT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    }
+    
+    .error-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 600px;
+        width: 100%;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .error-header {
+        background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .error-code {
+        font-size: 120px;
+        font-weight: 800;
+        color: white;
+        text-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+    }
+    
+    .error-body {
+        padding: 40px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-header">
+            <div class="error-code">403</div>
+        </div>
+        <div class="error-body">
+            <div class="error-title">
+                <i class="fas fa-lock text-warning me-2"></i>
+                Access Denied
+            </div>
+            <div class="error-message">
+                <p>You don't have permission to access this page.</p>
+            </div>
+            <a href="{% url 'public:home' %}" class="btn-home">
+                <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
