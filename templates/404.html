@@ -1,0 +1,479 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}404 - Page Not Found | NIELIT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Animated Background Circles */
+    .circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        animation: float 20s infinite ease-in-out;
+    }
+    
+    .circle-1 {
+        width: 300px;
+        height: 300px;
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+    
+    .circle-2 {
+        width: 500px;
+        height: 500px;
+        bottom: -200px;
+        right: -150px;
+        animation-delay: 5s;
+    }
+    
+    .circle-3 {
+        width: 150px;
+        height: 150px;
+        top: 30%;
+        left: 10%;
+        animation-delay: 2s;
+    }
+    
+    .circle-4 {
+        width: 200px;
+        height: 200px;
+        bottom: 20%;
+        right: 15%;
+        animation-delay: 7s;
+    }
+    
+    .circle-5 {
+        width: 80px;
+        height: 80px;
+        top: 60%;
+        left: 80%;
+        animation-delay: 3s;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0) rotate(0deg);
+        }
+        33% {
+            transform: translateY(-30px) rotate(5deg);
+        }
+        66% {
+            transform: translateY(20px) rotate(-5deg);
+        }
+    }
+    
+    /* Main Error Card */
+    .error-card {
+        background: white;
+        border-radius: 40px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        overflow: hidden;
+        max-width: 550px;
+        width: 90%;
+        position: relative;
+        z-index: 10;
+        animation: slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes slideIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.8) translateY(-50px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    /* Animated Emoji Section */
+    .emoji-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 50px 30px 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .emoji-wrapper {
+        position: relative;
+        display: inline-block;
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    .main-emoji {
+        font-size: 120px;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        animation: rotate 3s ease-in-out infinite;
+    }
+    
+    @keyframes rotate {
+        0%, 100% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(15deg);
+        }
+        75% {
+            transform: rotate(-15deg);
+        }
+    }
+    
+    .floating-emojis {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+    }
+    
+    .floating-emoji {
+        position: absolute;
+        font-size: 30px;
+        animation: floatEmoji 8s ease-in-out infinite;
+        opacity: 0.6;
+    }
+    
+    @keyframes floatEmoji {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0;
+        }
+        20% {
+            opacity: 0.6;
+        }
+        80% {
+            opacity: 0.6;
+        }
+        100% {
+            transform: translateY(-150px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    .floating-emoji-1 { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-emoji-2 { top: 60%; right: 15%; animation-delay: 2s; }
+    .floating-emoji-3 { top: 40%; left: 80%; animation-delay: 4s; }
+    .floating-emoji-4 { top: 70%; left: 20%; animation-delay: 1s; }
+    .floating-emoji-5 { top: 30%; right: 30%; animation-delay: 3s; }
+    
+    /* 404 Number Section */
+    .number-section {
+        padding: 40px 30px 20px;
+        text-align: center;
+        background: white;
+    }
+    
+    .error-number {
+        font-size: 100px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: pulse 2s ease-in-out infinite;
+        letter-spacing: 10px;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.7;
+            transform: scale(1.05);
+        }
+    }
+    
+    .error-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 10px 0;
+        animation: slideInRight 0.8s ease-out;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .error-message {
+        color: #64748b;
+        margin: 20px 0;
+        line-height: 1.6;
+        animation: slideInLeft 0.8s ease-out;
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 30px 0 20px;
+        animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .btn-home {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-home:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .btn-home:hover:before {
+        left: 100%;
+    }
+    
+    .btn-home:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        color: white;
+    }
+    
+    .btn-back {
+        border: 2px solid #e2e8f0;
+        background: white;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #475569;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateX(-3px);
+    }
+    
+    /* Fun Facts Section */
+    .fun-fact {
+        background: #f8fafc;
+        margin: 30px -30px -30px;
+        padding: 20px 30px;
+        border-top: 1px solid #e5e7eb;
+        animation: fadeIn 1s ease-out 0.6s both;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    .fun-fact-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        margin-bottom: 8px;
+        display: inline-block;
+        animation: blink 2s ease-in-out infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    .fun-fact-text {
+        color: #475569;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .fun-fact-text i {
+        animation: wiggle 3s ease-in-out infinite;
+    }
+    
+    @keyframes wiggle {
+        0%, 100% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(10deg);
+        }
+        75% {
+            transform: rotate(-10deg);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .main-emoji {
+            font-size: 80px;
+        }
+        .error-number {
+            font-size: 60px;
+        }
+        .error-title {
+            font-size: 22px;
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .btn-home, .btn-back {
+            justify-content: center;
+        }
+        .floating-emoji {
+            font-size: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <!-- Animated Background Circles -->
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+    <div class="circle circle-4"></div>
+    <div class="circle circle-5"></div>
+    
+    <!-- Main Content Card -->
+    <div class="error-card">
+        <!-- Emoji Section with Animations -->
+        <div class="emoji-section">
+            <div class="floating-emojis">
+                <div class="floating-emoji floating-emoji-1">🔍</div>
+                <div class="floating-emoji floating-emoji-2">❓</div>
+                <div class="floating-emoji floating-emoji-3">😕</div>
+                <div class="floating-emoji floating-emoji-4">💡</div>
+                <div class="floating-emoji floating-emoji-5">🌟</div>
+            </div>
+            <div class="emoji-wrapper">
+                <div class="main-emoji">🤔</div>
+            </div>
+            <div class="emoji-wrapper" style="position: absolute; bottom: 20px; right: 30px; animation-delay: 0.5s;">
+                <div class="main-emoji" style="font-size: 40px;">🔎</div>
+            </div>
+        </div>
+        
+        <!-- Number Section -->
+        <div class="number-section">
+            <div class="error-number">404</div>
+            <div class="error-title">
+                <i class="fas fa-map-signs text-primary me-2"></i>
+                Oops! Page Not Found
+            </div>
+            <div class="error-message">
+                <p>Looks like this page took a little detour!<br>
+                Don't worry, we'll help you find your way back.</p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="javascript:history.back()" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Go Back
+                </a>
+                <a href="{% url 'public:home' %}" class="btn-home">
+                    <i class="fas fa-home"></i>
+                    Back to Home
+                </a>
+            </div>
+            
+            <!-- Fun Fact Section -->
+            <div class="fun-fact">
+                <div class="fun-fact-title">
+                    <i class="fas fa-lightbulb"></i> DID YOU KNOW?
+                </div>
+                <div class="fun-fact-text">
+                    <i class="fas fa-smile-wink"></i>
+                    <span>NIELIT has trained over 1 million students across India since its establishment!</span>
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

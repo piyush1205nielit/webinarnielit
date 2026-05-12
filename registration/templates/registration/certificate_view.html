@@ -1,0 +1,38 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Certificate - NIELIT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body text-center p-5">
+                    <div class="border p-5">
+                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" style="width: 80px; margin-bottom: 20px;">
+                        <h2 class="text-primary">NIELIT Delhi</h2>
+                        <h3 class="mt-4">Certificate of Completion</h3>
+                        <p class="mt-4">This certificate is proudly presented to</p>
+                        <h4 class="mt-2">{{ student.name }}</h4>
+                        <p>for successfully completing the course</p>
+                        <h5>{{ student.course_enrolled.course_name }}</h5>
+                        <p>with registration number: {{ student.registration_number }}</p>
+                        <p>Issue Date: {{ certificate.issue_date|date:"d M Y" }}</p>
+                        <p>Certificate Number: {{ certificate.certificate_number }}</p>
+                        
+                        <hr class="my-4">
+                        
+                        <a href="#" class="btn btn-success btn-lg" onclick="window.print(); return false;">
+                            <i class="fas fa-print me-2"></i>Print Certificate
+                        </a>
+                        <a href="{% url 'registration:user_profile' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

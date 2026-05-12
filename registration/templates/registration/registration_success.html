@@ -1,0 +1,39 @@
+{% extends 'public/base.html' %}
+
+{% block title %}Registration Successful - NIELIT{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success fa-5x"></i>
+                    </div>
+                    <h1 class="display-6 mb-3">Registration Successful!</h1>
+                    <p class="lead">Thank you for registering with NIELIT.</p>
+                    
+                    <div class="alert alert-info mt-4">
+                        <strong>Your Registration Number:</strong><br>
+                        <code class="fs-4">{{ student.registration_number }}</code>
+                    </div>
+                    
+                    <p class="mt-3">Please save this registration number for future reference.</p>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'registration:user_profile' %}" class="btn btn-primary">
+                            <i class="fas fa-id-card me-2"></i>View My Profile
+                        </a>
+                        <a href="{% url 'public:courses' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-book-open me-2"></i>Browse More Courses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

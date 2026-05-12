@@ -1,0 +1,506 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}{{ title }} - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'course:course_list' %}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-{% if 'Create' in title %}plus{% else %}edit{% endif %} text-primary me-2"></i>{{ title }}
+        </h1>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data" id="courseForm">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Please correct the following errors:</strong>
+                    <ul class="mb-0 mt-2">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field|title }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Basic Information -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white py-2">
+                                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Course Name *</label>
+                                    {{ form.course_name }}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Course Description *</label>
+                                    {{ form.course_desc }}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold small">Course Duration *</label>
+                                        {{ form.course_duration }}
+                                        <small class="text-muted">e.g., 3 months, 6 weeks</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold small">Course Status</label>
+                                        {{ form.course_status }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                     <!-- Dates and Fees -->
+<div class="card mb-3">
+    <div class="card-header bg-primary text-white py-2">
+        <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Schedule & Fees</h6>
+    </div>
+    <div class="card-body">
+        <!-- Course Type Selection -->
+        <div class="mb-3">
+            <label class="form-label fw-bold small">Course Type *</label>
+            {{ form.course_type }}
+            <small class="text-muted d-block mt-1">Select whether this is a regular course or a single-day event</small>
+        </div>
+        
+        <!-- Dynamic Date Fields based on Course Type -->
+        <div id="regularDatesDiv">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold small">Start Date</label>
+                    {{ form.start_date }}
+                    <small class="text-muted">Leave empty if not applicable</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold small">End Date</label>
+                    {{ form.end_date }}
+                    <small class="text-muted">Leave empty for single-day events</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold small">Registration Deadline</label>
+                    {{ form.registration_deadline }}
+                    <small class="text-muted">Leave empty if no deadline</small>
+                </div>
+            </div>
+        </div>
+        
+        <div id="eventDateDiv" style="display: none;">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold small">Event Date *</label>
+                    {{ form.event_date }}
+                    <small class="text-muted">For workshops, seminars, and single-day events</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold small">Registration Deadline</label>
+                    {{ form.registration_deadline }}
+                    <small class="text-muted">Leave empty if no deadline</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold small">Course Fees (₹)</label>
+                {{ form.course_fees }}
+                <small class="text-muted">Enter 0 for free courses</small>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold small">Maximum Seats</label>
+                {{ form.max_seats }}
+                <small class="text-muted">Leave empty for unlimited seats</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+                        <!-- Course Content -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white py-2">
+                                <h6 class="mb-0"><i class="fas fa-book-open me-2"></i>Course Content</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Modules / Syllabus</label>
+                                    {{ form.modules_info }}
+                                    <small class="text-muted">Enter detailed module information, topics covered, etc.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Prerequisites</label>
+                                    {{ form.prerequisites }}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Learning Outcomes</label>
+                                    {{ form.learning_outcomes }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <!-- Settings -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white py-2">
+                                <h6 class="mb-0"><i class="fas fa-cog me-2"></i>Settings</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Mode of Delivery</label>
+                                    {{ form.mode }}
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label small">Active (visible to public)</label>
+                                </div>
+                                <div class="form-check">
+                                    {{ form.is_featured }}
+                                    <label class="form-check-label small">Featured on homepage</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Available Centres with Enhanced UI -->
+                        <div class="card mb-3" id="centresCard">
+                            <div class="card-header bg-primary text-white py-2">
+                                <h6 class="mb-0"><i class="fas fa-building me-2"></i>Available Centres</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="centresHelp" class="small mb-3 p-2 rounded" style="background-color: #f8f9fa;">
+                                    <i class="fas fa-info-circle text-primary me-1"></i> 
+                                    <span id="centresHelpText">Select centres where this course will be offered</span>
+                                </div>
+                                
+                                <!-- Select All / Deselect All Controls -->
+                                <div id="centreControls" style="display: none;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                        <span class="small fw-bold">
+                                            <i class="fas fa-check-square me-1"></i> Centre Selection
+                                        </span>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary" id="selectAllCentres">
+                                                <i class="fas fa-check-double me-1"></i> Select All
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" id="deselectAllCentres">
+                                                <i class="fas fa-times-circle me-1"></i> Deselect All
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Centres List with Checkboxes -->
+                                <div id="centresList" class="centres-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
+                                    <div class="text-muted text-center py-3">
+                                        <i class="fas fa-spinner fa-spin me-2"></i> Loading centres...
+                                    </div>
+                                </div>
+                                
+                                <div id="noCentresMsg" class="alert alert-warning small mt-2 mb-0" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    No centres available. Please add centres first.
+                                </div>
+                                
+                                <!-- Hidden field to store selected centres -->
+                                <select multiple name="available_centres" id="id_available_centres" style="display: none;">
+                                    {% for centre in form.available_centres.field.queryset %}
+                                    <option value="{{ centre.id }}" {% if centre in form.instance.available_centres.all %}selected{% endif %}>
+                                        {{ centre.centre_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <div class="mt-2" id="selectionStats" style="display: none;">
+                                    <small class="text-muted">
+                                        <i class="fas fa-chart-simple me-1"></i>
+                                        <span id="selectedCount">0</span> centres selected
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Media -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white py-2">
+                                <h6 class="mb-0"><i class="fas fa-image me-2"></i>Media</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Course Image</label>
+                                    {{ form.image }}
+                                    <small class="text-muted d-block mt-1">Recommended size: 800x600px</small>
+                                    {% if form.instance.image %}
+                                    <div class="mt-2">
+                                        <img src="{{ form.instance.image.url }}" alt="Current Image" class="img-thumbnail" style="max-height: 80px;">
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Syllabus File (PDF)</label>
+                                    {{ form.syllabus_file }}
+                                    <small class="text-muted d-block mt-1">Upload detailed syllabus document</small>
+                                    {% if form.instance.syllabus_file %}
+                                    <div class="mt-2">
+                                        <a href="{{ form.instance.syllabus_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <a href="{% url 'course:course_list' %}" class="btn btn-secondary btn-sm">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-sm" id="submitBtn">
+                        <i class="fas fa-save me-2"></i>Save Course
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .centres-container {
+        scrollbar-width: thin;
+    }
+    
+    .centres-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .centres-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .centres-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    
+    .centres-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    
+    .centre-checkbox-item {
+        transition: background-color 0.2s ease;
+        border-radius: 6px;
+    }
+    
+    .centre-checkbox-item:hover {
+        background-color: #f8fafc;
+    }
+    
+    .centre-checkbox-item label {
+        cursor: pointer;
+        width: 100%;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modeSelect       = document.getElementById('id_mode');
+    const centresCard      = document.getElementById('centresCard');
+    const centresHelpText  = document.getElementById('centresHelpText');
+    const centresList      = document.getElementById('centresList');
+    const centreControls   = document.getElementById('centreControls');
+    const selectionStats   = document.getElementById('selectionStats');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const noCentresMsg     = document.getElementById('noCentresMsg');
+    const hiddenSelect     = document.getElementById('id_available_centres');
+
+    let allCentres = [];
+
+    function loadCentres() {
+        fetch('/course/api/get-all-centres/')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.centres && Array.isArray(data.centres)) {
+                    allCentres = data.centres;
+                    renderCentresList();
+                } else {
+                    throw new Error('Invalid response format');
+                }
+            })
+            .catch(error => {
+                centresList.innerHTML = '<div class="text-danger text-center py-3"><i class="fas fa-exclamation-circle me-2"></i>Error loading centres. Please refresh.</div>';
+            });
+    }
+
+    function renderCentresList() {
+        if (allCentres.length === 0) {
+            centresList.innerHTML = '<div class="text-muted text-center py-3"><i class="fas fa-building me-2"></i>No centres available.</div>';
+            centreControls.style.display = 'none';
+            selectionStats.style.display = 'none';
+            noCentresMsg.style.display = 'block';
+            return;
+        }
+
+        noCentresMsg.style.display = 'none';
+
+        const selectedValues = Array.from(hiddenSelect.options)
+            .filter(o => o.selected)
+            .map(o => o.value);
+
+        let html = '<div class="centre-list">';
+        allCentres.forEach(centre => {
+            const centreName    = centre.centre_name || centre.name || 'Unknown Centre';
+            const centreAddress = centre.centre_address || centre.address || '';
+            const centreId      = centre.id;
+            const isChecked     = selectedValues.includes(centreId.toString());
+            html += `
+                <div class="centre-checkbox-item p-2 mb-1 border rounded">
+                    <label class="d-flex align-items-start cursor-pointer mb-0">
+                        <input type="checkbox" class="centre-checkbox me-3 mt-1"
+                               value="${centreId}" data-name="${escapeHtml(centreName)}"
+                               ${isChecked ? 'checked' : ''}>
+                        <div>
+                            <strong class="small">${escapeHtml(centreName)}</strong><br>
+                            <small class="text-muted">${escapeHtml(centreAddress.substring(0, 80))}${centreAddress.length > 80 ? '…' : ''}</small>
+                        </div>
+                    </label>
+                </div>`;
+        });
+        html += '</div>';
+        centresList.innerHTML = html;
+
+        document.querySelectorAll('.centre-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateHiddenSelect);
+        });
+
+        centreControls.style.display = 'block';
+        selectionStats.style.display = 'block';
+        updateSelectionStats();
+    }
+
+    function updateHiddenSelect() {
+        const selectedIds = Array.from(document.querySelectorAll('.centre-checkbox:checked')).map(cb => cb.value);
+        Array.from(hiddenSelect.options).forEach(o => {
+            o.selected = selectedIds.includes(o.value);
+        });
+        updateSelectionStats();
+    }
+
+    function updateSelectionStats() {
+        const n = document.querySelectorAll('.centre-checkbox:checked').length;
+        selectedCountSpan.textContent = n;
+        if (n === 0)                { selectedCountSpan.style.color = '#dc2626'; selectedCountSpan.style.fontWeight = 'normal'; }
+        else if (n === allCentres.length) { selectedCountSpan.style.color = '#10b981'; selectedCountSpan.style.fontWeight = 'bold'; }
+        else                        { selectedCountSpan.style.color = '#3b82f6'; selectedCountSpan.style.fontWeight = 'normal'; }
+    }
+
+    function selectAllCentres() {
+        document.querySelectorAll('.centre-checkbox').forEach(cb => cb.checked = true);
+        updateHiddenSelect();
+    }
+
+    function deselectAllCentres() {
+        document.querySelectorAll('.centre-checkbox').forEach(cb => cb.checked = false);
+        updateHiddenSelect();
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+
+    // ── KEY CHANGE: hide card for online, show for offline/hybrid ────────────
+    function updateCentresVisibility() {
+        if (!modeSelect) return;
+        if (modeSelect.value === 'online') {
+            centresCard.style.display = 'none';
+        } else {
+            centresCard.style.display  = 'block';
+            centresCard.style.opacity  = '1';
+            centresHelpText.innerHTML  = '<i class="fas fa-building me-1"></i> <strong>Required:</strong> Select centres where this course will be offered.';
+        }
+    }
+
+    // Form validation
+    const courseForm = document.getElementById('courseForm');
+    if (courseForm) {
+        courseForm.addEventListener('submit', function(e) {
+            if (!modeSelect) return;
+            // Skip centre validation entirely for online courses
+            if (modeSelect.value !== 'online') {
+                const n = document.querySelectorAll('.centre-checkbox:checked').length;
+                if (n === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one centre for offline/hybrid courses.');
+                    centresCard.style.display = 'block';   // make sure it's visible before scrolling
+                    centresCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    centresCard.style.border = '2px solid #dc2626';
+                    setTimeout(() => { centresCard.style.border = ''; }, 2000);
+                    return false;
+                }
+            }
+        });
+    }
+
+    // Init
+    if (modeSelect) {
+        modeSelect.addEventListener('change', updateCentresVisibility);
+        loadCentres();
+        updateCentresVisibility();   // run immediately on page load to set correct initial state
+
+        document.getElementById('selectAllCentres')?.addEventListener('click', selectAllCentres);
+        document.getElementById('deselectAllCentres')?.addEventListener('click', deselectAllCentres);
+    }
+});
+
+// Toggle date fields based on course type
+const courseTypeSelect = document.getElementById('id_course_type');
+const regularDatesDiv = document.getElementById('regularDatesDiv');
+const eventDateDiv = document.getElementById('eventDateDiv');
+
+function toggleDateFields() {
+    if (courseTypeSelect) {
+        const courseType = courseTypeSelect.value;
+        if (courseType === 'workshop' || courseType === 'seminar' || courseType === 'webinar') {
+            regularDatesDiv.style.display = 'none';
+            eventDateDiv.style.display = 'block';
+            // Make event date required
+            const eventDateInput = document.getElementById('id_event_date');
+            if (eventDateInput) eventDateInput.required = true;
+            // Clear start/end dates if present
+            const startDate = document.getElementById('id_start_date');
+            const endDate = document.getElementById('id_end_date');
+            if (startDate) startDate.value = '';
+            if (endDate) endDate.value = '';
+        } else {
+            regularDatesDiv.style.display = 'block';
+            eventDateDiv.style.display = 'none';
+            // Make event date not required
+            const eventDateInput = document.getElementById('id_event_date');
+            if (eventDateInput) eventDateInput.required = false;
+            if (eventDateInput) eventDateInput.value = '';
+        }
+    }
+}
+
+if (courseTypeSelect) {
+    courseTypeSelect.addEventListener('change', toggleDateFields);
+    toggleDateFields();
+}
+</script>
+
+
+{% endblock %}

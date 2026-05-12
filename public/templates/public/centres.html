@@ -1,0 +1,360 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Our Training Centres — NIELIT Delhi{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="background: linear-gradient(135deg, #0a1d56 0%, #1a3a7a 100%); padding: 40px 0 28px;">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-2">
+      <ol class="breadcrumb mb-0" style="font-size:13px;">
+        <li class="breadcrumb-item">
+          <a href="{% url 'public:home' %}" class="text-white-50 text-decoration-none">Home</a>
+        </li>
+        <li class="breadcrumb-item active text-white">Training Centres</li>
+      </ol>
+    </nav>
+    <h1 class="fw-bold text-white mb-1" style="font-size: clamp(1.4rem, 3vw, 2rem);">
+      NIELIT Delhi — Training Centres
+    </h1>
+    <p class="mb-0" style="color:rgba(255,255,255,.75); font-size:14px;">
+      <i class="fas fa-map-marker-alt me-2" style="color:#e6b44a;"></i>
+      3 Campuses across Delhi — Inderlok · Janakpuri · Karkardooma
+    </p>
+  </div>
+</div>
+
+
+
+<!-- CENTRES -->
+<section class="py-5 bg-light">
+  <div class="container">
+
+    <!-- ════════════════════════════════════
+         CENTRE 1 — INDERLOK (North Campus)
+    ════════════════════════════════════ -->
+    <div class="card border-0 shadow-sm mb-5 overflow-hidden">
+
+      <!-- Card Header -->
+      <div class="card-header border-0 py-3"
+           style="background: linear-gradient(135deg, #0d2461, #1a3a7a);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width:46px; height:46px; background:rgba(255,255,255,.15);">
+            <i class="fas fa-building text-white fs-5"></i>
+          </div>
+          <div>
+            <span class="badge mb-1 fw-normal"
+                  style="background:rgba(255,255,255,.2); font-size:10px; letter-spacing:.8px;">
+              NORTH CAMPUS
+            </span>
+            <h4 class="mb-0 fw-bold text-white" style="font-size: clamp(.95rem, 2.5vw, 1.2rem);">
+              NIELIT Delhi — Inderlok
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Body: details + map -->
+      <div class="row g-0">
+
+        <!-- Details col -->
+        <div class="col-lg-5 p-4 bg-white centre-details-col">
+    
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-map-marker-alt mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Address</p>
+              <p class="mb-0 text-muted" style="font-size:13px; line-height:1.65;">
+                2nd Floor, Parsvnath Metro Mall,<br>
+                Near Inderlok Metro Station,<br>
+                Inderlok, Delhi – 110052
+              </p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-phone mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Phone</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">
+                Mobile: <a href="tel:8447795337" class="text-muted text-decoration-none">8447795337</a><br>
+                Landline: <a href="tel:01123644849" class="text-muted text-decoration-none">011-23644849</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-envelope mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Email</p>
+              <a href="mailto:delhi.north@nielit.gov.in" class="text-muted text-decoration-none" style="font-size:13px;">
+                delhi.north@nielit.gov.in
+              </a>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-subway mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Nearest Metro</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">Inderlok Station (Green Line) — Inside the metro mall</p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-4 align-items-start">
+            <i class="fas fa-book-open mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Key Programmes</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">O Level, A Level, CCC, Android App Development, Embedded Systems, e-Governance, Digital India</p>
+            </div>
+          </div>
+
+       
+        </div>
+
+        <!-- Map col -->
+        <div class="col-lg-7 d-flex flex-column">
+       <iframe
+    src="https://www.google.com/maps?q=NIELIT+Delhi+Centre+Inderlok+Parsvnath+Metro+Mall+Delhi&output=embed"
+    width="100%"
+    height="350"
+    style="border:0; border-radius:18px;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+          <div class="p-3 bg-white border-top d-flex align-items-center gap-2">
+            <i class="fas fa-info-circle text-primary" style="font-size:13px;"></i>
+            <span class="text-muted" style="font-size:12px;">
+              Located inside Parsvnath Metro Mall, directly accessible from Inderlok Metro Station (Green Line / Red Line interchange)
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════
+         CENTRE 2 — JANAKPURI (West Campus)
+    ════════════════════════════════════ -->
+    <div class="card border-0 shadow-sm mb-5 overflow-hidden">
+
+      <div class="card-header border-0 py-3"
+            style="background: linear-gradient(135deg, #0d2461, #1a3a7a);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width:46px; height:46px; background:rgba(255,255,255,.15);">
+            <i class="fas fa-building text-white fs-5"></i>
+          </div>
+          <div>
+            <span class="badge mb-1 fw-normal"
+                  style="background:rgba(255,255,255,.2); font-size:10px; letter-spacing:.8px;">
+              WEST CAMPUS
+            </span>
+            <h4 class="mb-0 fw-bold text-white" style="font-size: clamp(.95rem, 2.5vw, 1.2rem);">
+              NIELIT Delhi — Janakpuri
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-0">
+
+        <div class="col-lg-5 p-4 bg-white centre-details-col">
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-map-marker-alt mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Address</p>
+              <p class="mb-0 text-muted" style="font-size:13px; line-height:1.65;">
+                IETE Building, Institutional Area,<br>
+                16/1-2, Pankha Road, Near Sagarpur Police Station,<br>
+                D Block, Janakpuri, New Delhi – 110058
+              </p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-phone mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Phone</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">
+                Mobile: <a href="tel:9891555904" class="text-muted text-decoration-none">9891555904</a><br>
+                Landline: <a href="tel:01149878223" class="text-muted text-decoration-none">011-49878223</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-envelope mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Email</p>
+              <a href="mailto:delhi.west@nielit.gov.in" class="text-muted text-decoration-none" style="font-size:13px;">
+                delhi.west@nielit.gov.in
+              </a>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-subway mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Nearest Metro</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">Janakpuri West (Blue Line) — approx. 10 min walk</p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-4 align-items-start">
+            <i class="fas fa-book-open mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Key Programmes</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">CCC, BCC, O Level, IT Literacy, Short-term Workshops, PMKVY courses</p>
+            </div>
+          </div>
+
+         
+        </div>
+
+        <div class="col-lg-7 d-flex flex-column">
+       <iframe
+    src="https://maps.google.com/maps?q=IETE%20Building,%20Institutional%20Area,%20Pankha%20Road,%20Janakpuri,%20New%20Delhi%20110058&t=&z=16&ie=UTF8&iwloc=&output=embed"
+    width="100%"
+    height="350"
+    style="border:0; border-radius:18px;"
+    allowfullscreen=""
+    loading="lazy">
+</iframe>
+          <div class="p-3 bg-white border-top d-flex align-items-center gap-2">
+            <i class="fas fa-info-circle text-primary" style="font-size:13px;"></i>
+            <span class="text-muted" style="font-size:12px;">
+              Located in IETE Building, Pankha Road, near Sagarpur Police Station — accessible by bus and metro
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ════════════════════════════════════
+         CENTRE 3 — KARKARDOOMA (East Campus)
+    ════════════════════════════════════ -->
+    <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+
+      <div class="card-header border-0 py-3"
+            style="background: linear-gradient(135deg, #0d2461, #1a3a7a);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width:46px; height:46px; background:rgba(255,255,255,.15);">
+            <i class="fas fa-building text-white fs-5"></i>
+          </div>
+          <div>
+            <span class="badge mb-1 fw-normal"
+                  style="background:rgba(255,255,255,.2); font-size:10px; letter-spacing:.8px;">
+              EAST CAMPUS
+            </span>
+            <h4 class="mb-0 fw-bold text-white" style="font-size: clamp(.95rem, 2.5vw, 1.2rem);">
+              NIELIT Delhi — Karkardooma
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-0">
+
+        <div class="col-lg-5 p-4 bg-white centre-details-col">
+       
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-map-marker-alt mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Address</p>
+              <p class="mb-0 text-muted" style="font-size:13px; line-height:1.65;">
+                30X, FC-18, Institutional Area,<br>
+                Near Kendriya Vidyalaya,<br>
+                Karkardooma, Delhi – 110092
+              </p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-phone mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Phone</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">
+                Mobile: <a href="tel:7042864055" class="text-muted text-decoration-none">7042864055</a><br>
+                Landline: <a href="tel:01120824140" class="text-muted text-decoration-none">011-20824140</a>
+              </p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-envelope mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Email</p>
+              <a href="mailto:delhi.east@nielit.gov.in" class="text-muted text-decoration-none" style="font-size:13px;">
+                delhi.east@nielit.gov.in
+              </a>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-3 align-items-start">
+            <i class="fas fa-subway mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Nearest Metro</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">Karkardooma Court (Blue Line / Pink Line) — approx. 8 min walk</p>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-4 align-items-start">
+            <i class="fas fa-book-open mt-1 flex-shrink-0 text-primary" style="font-size:13px; width:16px;"></i>
+            <div>
+              <p class="mb-0 fw-semibold" style="font-size:12px; color:#1a1f36; text-transform:uppercase; letter-spacing:.5px;">Key Programmes</p>
+              <p class="mb-0 text-muted" style="font-size:13px;">CCC, BCC, O Level, A Level, Full Stack Development, Cyber Security, AI/ML Workshops</p>
+            </div>
+          </div>
+
+         
+        </div>
+
+        <div class="col-lg-7 d-flex flex-column">
+        <iframe
+    src="https://maps.google.com/maps?q=NIELIT%20Delhi%20Karkardooma%20FC-18%20Institutional%20Area%20Delhi&t=&z=16&ie=UTF8&iwloc=&output=embed"
+    width="100%"
+    height="350"
+    style="border:0; border-radius:18px;"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+          <div class="p-3 bg-white border-top d-flex align-items-center gap-2">
+            <i class="fas fa-info-circle text-primary" style="font-size:13px;"></i>
+            <span class="text-muted" style="font-size:12px;">
+              Located in FC-18, Institutional Area, Karkardooma — near Kendriya Vidyalaya and Karkardooma Court Metro
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- Mobile: stack map below details -->
+<style>
+  @media (max-width: 991px) {
+    .centre-details-col {
+      border-right: none !important;
+      border-bottom: 1px solid #dee2e6;
+    }
+  }
+</style>
+
+{% endblock %}

@@ -1,0 +1,391 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}All Students - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-users text-primary me-2"></i>All Students
+        </h1>
+        <div class="text-muted small">Total: {{ page_obj.paginator.count }} students</div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body py-3">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Course</label>
+                    <select name="course" class="form-select form-select-sm">
+                        <option value="">All Courses</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if selected_course|stringformat:"s" == course.id|stringformat:"s" %}selected{% endif %}>
+                            {{ course.course_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Center</label>
+                    <select name="center" class="form-select form-select-sm">
+                        <option value="">All Centers</option>
+                        {% for centre in centres %}
+                        <option value="{{ centre.id }}" {% if selected_center|stringformat:"s" == centre.id|stringformat:"s" %}selected{% endif %}>
+                            {{ centre.centre_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold mb-1">Status</label>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Status</option>
+                        <option value="pending"   {% if selected_status == 'pending'   %}selected{% endif %}>Pending</option>
+                        <option value="confirmed" {% if selected_status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if selected_status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Search</label>
+                    <input type="text" name="search" class="form-control form-control-sm"
+                           placeholder="Name, Mobile, Email, Reg No..."
+                           value="{{ search_query|default:'' }}">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Bulk Actions Bar ── hidden via class, shown by JS when rows selected -->
+    <div id="bulkActionsBar" class="card mb-3 border-0 bg-primary text-white shadow" style="display:none;">
+        <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-check-square fa-lg"></i>
+                    <span class="fw-bold fs-6">
+                        <span id="selectedCount">0</span> student(s) selected
+                    </span>
+                    <button type="button" class="btn btn-sm btn-light text-primary py-0 px-2" id="clearSelectionBtn">
+                        <i class="fas fa-times me-1"></i>Clear
+                    </button>
+                </div>
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <!-- Confirm Registration -->
+                    <button type="button" class="btn btn-sm btn-light fw-semibold" id="bulkConfirmBtn">
+                        <i class="fas fa-check-circle text-success me-1"></i>Confirm Registration
+                    </button>
+                    <!-- Approve Certificate -->
+                    <button type="button" class="btn btn-sm btn-warning fw-semibold" id="bulkApproveBtn">
+                        <i class="fas fa-certificate me-1"></i>Approve Certificate
+                    </button>
+                    <!-- Delete -->
+                    <button type="button" class="btn btn-sm btn-danger fw-semibold" id="bulkDeleteBtn">
+                        <i class="fas fa-trash me-1"></i>Delete
+                    </button>
+                    <!-- Status dropdown -->
+                    <div class="input-group input-group-sm" style="width:auto;">
+                        <select id="bulkStatusSelect" class="form-select form-select-sm">
+                            <option value="">Set status…</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn btn-light text-primary fw-semibold" id="bulkUpdateStatusBtn" type="button">
+                            <i class="fas fa-sync-alt me-1"></i>Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+
+            <!-- Hidden bulk form — populated and submitted by JS -->
+            <form id="bulkActionForm" method="post" action="">
+                {% csrf_token %}
+                <div id="extraInputs"></div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="studentsTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="40" class="text-center">
+                                <input type="checkbox" id="selectAll" class="form-check-input mt-0" title="Select all">
+                            </th>
+                            <th>Reg. Number</th>
+                            <th>Student Name</th>
+                            <th>Contact</th>
+                            <th>Course</th>
+                            <th>Center</th>
+                            <th>Status</th>
+                            <th>Certificate</th>
+                            <th>Registered On</th>
+                            <th width="60" class="text-center">View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in page_obj %}
+                        <tr class="student-row" data-id="{{ student.id }}">
+                            <td class="text-center">
+                                <input type="checkbox"
+                                       class="form-check-input mt-0 student-checkbox"
+                                       value="{{ student.id }}">
+                            </td>
+                            <!-- Reg number as link -->
+                            <td>
+                                <a href="{% url 'dashboard:student_detail' student.id %}"
+                                   class="text-decoration-none fw-semibold text-primary font-monospace small">
+                                    {{ student.registration_number }}
+                                </a>
+                            </td>
+                            <!-- Name as link -->
+                            <td>
+                                <a href="{% url 'dashboard:student_detail' student.id %}"
+                                   class="text-decoration-none text-dark fw-bold">
+                                    {{ student.name }}
+                                </a><br>
+                                <small class="text-muted">{{ student.father_name }}</small>
+                            </td>
+                            <td>
+                                <span class="small">{{ student.mobile_number }}</span><br>
+                                <small class="text-muted">{{ student.email_id|truncatechars:22 }}</small>
+                            </td>
+                            <td class="small">{{ student.course_enrolled.course_name|truncatechars:28 }}</td>
+                            <td class="small">{{ student.preferred_centre.centre_name|truncatechars:20 }}</td>
+                            <td>
+                                {% if student.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif student.status == 'confirmed' %}
+                                    <span class="badge bg-primary">Confirmed</span>
+                                {% elif student.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif student.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ student.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if student.is_approved %}
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Issued</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ student.registration_date|date:"d M Y" }}</td>
+                            <td class="text-center">
+                                <a href="{% url 'dashboard:student_detail' student.id %}"
+                                   class="btn btn-sm btn-outline-info" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="text-center py-5">
+                                <i class="fas fa-users fa-3x mb-3 d-block text-muted"></i>
+                                <p class="text-muted mb-0">No students found matching your filters.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white border-top">
+            <nav>
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_course %}&course={{ selected_course }}{% endif %}{% if selected_center %}&center={{ selected_center }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if selected_course %}&course={{ selected_course }}{% endif %}{% if selected_center %}&center={{ selected_center }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_course %}&course={{ selected_course }}{% endif %}{% if selected_center %}&center={{ selected_center }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+// Wait for full DOM — works whether jQuery loads in <head> or end of <body>
+(function waitForJQuery() {
+    if (typeof $ === 'undefined') {
+        setTimeout(waitForJQuery, 50);
+        return;
+    }
+    initBulkSelect();
+})();
+
+function initBulkSelect() {
+
+    // ── core helpers ─────────────────────────────────────────────────────────
+
+    function getChecked() {
+        return document.querySelectorAll('.student-checkbox:checked');
+    }
+
+    function syncBar() {
+        const checked = getChecked();
+        const total   = document.querySelectorAll('.student-checkbox').length;
+        const n       = checked.length;
+
+        // Show / hide bar
+        document.getElementById('bulkActionsBar').style.display = n > 0 ? 'block' : 'none';
+        document.getElementById('selectedCount').textContent = n;
+
+        // selectAll header state
+        const sa = document.getElementById('selectAll');
+        if (n === 0)          { sa.checked = false; sa.indeterminate = false; }
+        else if (n === total) { sa.checked = true;  sa.indeterminate = false; }
+        else                  { sa.checked = false; sa.indeterminate = true;  }
+
+        // Row highlight
+        document.querySelectorAll('.student-row').forEach(function(row) {
+            const cb = row.querySelector('.student-checkbox');
+            row.classList.toggle('table-active', cb && cb.checked);
+        });
+    }
+
+    function submitBulk(actionUrl, extras) {
+        // Collect checked IDs fresh from DOM
+        var form = document.getElementById('bulkActionForm');
+        var extra = document.getElementById('extraInputs');
+        extra.innerHTML = '';   // clear previous
+
+        // Re-add student_ids from currently checked boxes
+        getChecked().forEach(function(cb) {
+            var inp = document.createElement('input');
+            inp.type  = 'hidden';
+            inp.name  = 'student_ids';
+            inp.value = cb.value;
+            extra.appendChild(inp);
+        });
+
+        // Add any extra fields (e.g. status)
+        if (extras) {
+            Object.entries(extras).forEach(function([name, val]) {
+                var inp = document.createElement('input');
+                inp.type  = 'hidden';
+                inp.name  = name;
+                inp.value = val;
+                extra.appendChild(inp);
+            });
+        }
+
+        form.action = actionUrl;
+        form.submit();
+    }
+
+    // ── select all checkbox ──────────────────────────────────────────────────
+
+    document.getElementById('selectAll').addEventListener('change', function() {
+        document.querySelectorAll('.student-checkbox').forEach(function(cb) {
+            cb.checked = document.getElementById('selectAll').checked;
+        });
+        syncBar();
+    });
+
+    // ── individual row checkboxes ─────────────────────────────────────────────
+
+    document.getElementById('studentsTable').addEventListener('change', function(e) {
+        if (e.target.classList.contains('student-checkbox')) {
+            syncBar();
+        }
+    });
+
+    // ── click anywhere on row to toggle (except links/buttons/checkbox cell) ─
+
+    document.getElementById('studentsTable').addEventListener('click', function(e) {
+        var row = e.target.closest('.student-row');
+        if (!row) return;
+        // Ignore clicks on interactive elements
+        if (e.target.closest('a, button, input, select')) return;
+        var cb = row.querySelector('.student-checkbox');
+        if (cb) {
+            cb.checked = !cb.checked;
+            syncBar();
+        }
+    });
+
+    // ── clear selection ───────────────────────────────────────────────────────
+
+    document.getElementById('clearSelectionBtn').addEventListener('click', function() {
+        document.querySelectorAll('.student-checkbox').forEach(function(cb) { cb.checked = false; });
+        document.getElementById('selectAll').checked = false;
+        syncBar();
+    });
+
+    // ── Confirm Registration (set status → confirmed) ─────────────────────────
+
+    document.getElementById('bulkConfirmBtn').addEventListener('click', function() {
+        var n = getChecked().length;
+        if (n === 0) { alert('No students selected.'); return; }
+        if (confirm('Confirm registration for ' + n + ' student(s)?\nThis will set their status to "Confirmed".')) {
+            submitBulk('{% url "dashboard:update_status_bulk" %}', { status: 'confirmed' });
+        }
+    });
+
+    // ── Approve Certificate ───────────────────────────────────────────────────
+
+    document.getElementById('bulkApproveBtn').addEventListener('click', function() {
+        var n = getChecked().length;
+        if (n === 0) { alert('No students selected.'); return; }
+        if (confirm('Approve certificate for ' + n + ' student(s)?\nOnly students with "Confirmed" status will be approved.')) {
+            submitBulk('{% url "dashboard:approve_bulk" %}');
+        }
+    });
+
+    // ── Delete ────────────────────────────────────────────────────────────────
+
+    document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
+        var n = getChecked().length;
+        if (n === 0) { alert('No students selected.'); return; }
+        if (confirm('PERMANENTLY DELETE ' + n + ' student record(s)?\n\nThis will also remove their certificates and CANNOT be undone.')) {
+            submitBulk('{% url "dashboard:delete_bulk" %}');
+        }
+    });
+
+    // ── Set Status (dropdown + update button) ─────────────────────────────────
+
+    document.getElementById('bulkUpdateStatusBtn').addEventListener('click', function() {
+        var status = document.getElementById('bulkStatusSelect').value;
+        var n = getChecked().length;
+        if (!status) { alert('Please choose a status from the dropdown.'); return; }
+        if (n === 0)  { alert('No students selected.'); return; }
+        if (confirm('Set status to "' + status.toUpperCase() + '" for ' + n + ' student(s)?')) {
+            submitBulk('{% url "dashboard:update_status_bulk" %}', { status: status });
+        }
+    });
+}
+</script>
+{% endblock %}

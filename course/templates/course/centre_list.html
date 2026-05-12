@@ -1,0 +1,67 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Manage Centers - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-building text-primary me-2"></i>Manage Centers
+        </h1>
+        <a href="{% url 'course:centre_create' %}" class="btn btn-success btn-sm">
+            <i class="fas fa-plus me-2"></i>Add New Center
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for centre in centres %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-2">
+                    <h6 class="mb-0"><i class="fas fa-building me-2"></i>{{ centre.centre_name }}</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2 small">
+                        <i class="fas fa-map-marker-alt text-secondary me-2"></i>
+                        {{ centre.centre_address|truncatewords:20 }}
+                    </p>
+                    <p class="mb-2 small">
+                        <i class="fas fa-phone text-secondary me-2"></i>
+                        {{ centre.centre_contact }}
+                    </p>
+                    <p class="mb-2 small">
+                        <i class="fas fa-envelope text-secondary me-2"></i>
+                        {{ centre.centre_email }}
+                    </p>
+                    {% if centre.centre_desc %}
+                    <hr>
+                    <p class="small text-muted mb-0">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {{ centre.centre_desc|truncatewords:30 }}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="btn-group w-100" role="group">
+                        <a href="{% url 'course:centre_edit' centre.id %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <a href="{% url 'course:centre_delete' centre.id %}" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center py-5">
+                <i class="fas fa-building fa-3x mb-3 d-block"></i>
+                <h5>No Centers Found</h5>
+                <p>Click "Add New Center" to create your first training center.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

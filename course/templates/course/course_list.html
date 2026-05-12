@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to NIELIT Delhi - Course Registration{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeInUp">
+                    Welcome to Workshops Registration Portal
+                </h1>
+                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                    Your Gateway to Quality Education and Professional Certification
+                </p>
+                <div class="d-flex justify-content-center gap-3 animate__animated animate__fadeInUp animate__delay-2s">
+                    <a href="#courses" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-book-open me-2"></i> Explore Courses
+                    </a>
+                    <a href="{% url 'registration:register' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i> Register Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Courses Section -->
+<section id="courses" class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold">Active Workshops You Can Register</h2>
+                <p class="lead text-muted">Choose from a wide range of professional courses</p>
+            </div>
+        </div>
+        <div class="row">
+            {% for course in courses %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm hover-card">
+                        {% if forloop.counter == 1 %}
+                        <div class="position-absolute top-0 end-0 mt-2 me-2">
+                            <span class="badge bg-warning text-dark">Popular</span>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title text-center fw-bold">{{ course.course_name }}</h5>
+                            <p class="card-text text-muted">{{ course.course_desc|truncatewords:25 }}</p>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <small><i class="fas fa-clock text-primary"></i> Duration</small>
+                                <strong>{{ course.course_duration }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <small><i class="fas fa-tag text-primary"></i> Fees</small>
+                                <strong class="text-success">₹{{ course.course_fees }}</strong>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'registration:register' %}" class="btn btn-primary">
+                                    Enroll Now <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">No courses available at the moment.</div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'public_courses' %}" class="btn btn-outline-primary btn-lg">
+                View All Courses <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold">Why Enrolling in these Courses?</h2>
+                <p class="lead text-muted">We provide industry-leading training with guaranteed certification</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-chalkboard-teacher fa-3x"></i>
+                    </div>
+                    <h5>Expert Faculty</h5>
+                    <p class="text-muted">Learn from industry experts with years of experience</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-certificate fa-3x"></i>
+                    </div>
+                    <h5>Govt. Certified</h5>
+                    <p class="text-muted">Get recognized certificates from NIELIT</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-laptop-code fa-3x"></i>
+                    </div>
+                    <h5>Practical Training</h5>
+                    <p class="text-muted">Hands-on projects and real-world scenarios</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="text-primary mb-3">
+                        <i class="fas fa-briefcase fa-3x"></i>
+                    </div>
+                    <h5>Placement Support</h5>
+                    <p class="text-muted">100% placement assistance after completion</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Centers Section -->
+{% if centres %}
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold">Our Training Centers</h2>
+                <p class="lead text-muted">State-of-the-art facilities across multiple locations</p>
+            </div>
+        </div>
+        <div class="row">
+            {% for centre in centres|slice:":3" %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="text-primary mb-3">
+                                <i class="fas fa-building fa-2x"></i>
+                            </div>
+                            <h5 class="card-title">{{ centre.centre_name }}</h5>
+                            <p class="card-text text-muted small">
+                                <i class="fas fa-map-marker-alt me-1"></i> {{ centre.centre_address|truncatewords:15 }}
+                            </p>
+                            <p><i class="fas fa-phone me-1"></i> {{ centre.centre_contact }}</p>
+                            <p><i class="fas fa-envelope me-1"></i> {{ centre.centre_email }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'public_centres' %}" class="btn btn-link">View All Centers <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Statistics Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-3 mb-md-0">
+                <div class="counter">
+                    <h2 class="display-4 fw-bold" data-target="5000">0</h2>
+                    <p>Students Trained</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <div class="counter">
+                    <h2 class="display-4 fw-bold" data-target="50">0</h2>
+                    <p>Expert Faculty</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <div class="counter">
+                    <h2 class="display-4 fw-bold" data-target="30">0</h2>
+                    <p>Courses Offered</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="counter">
+                    <h2 class="display-4 fw-bold" data-target="100">0</h2>
+                    <p>Placement Record %</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h3 class="display-6">Ready to Start Your Journey?</h3>
+                <p class="lead mb-4">Join thousands of successful students who have transformed their careers with us</p>
+                <a href="{% url 'registration:register' %}" class="btn btn-primary btn-lg px-5">
+                    Register Now <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    
+    .counter h2 {
+        animation: countUp 2s ease-out;
+    }
+    
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+    }
+</style>
+
+<script>
+    // Counter animation
+    function animateCounter() {
+        const counters = document.querySelectorAll('.counter h2');
+        counters.forEach(counter => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            let current = 0;
+            const increment = target / 50;
+            const updateCounter = () => {
+                if (current < target) {
+                    current += increment;
+                    counter.innerText = Math.ceil(current);
+                    setTimeout(updateCounter, 20);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCounter();
+        });
+    }
+    
+    // Trigger counter when in viewport
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter();
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    const statsSection = document.querySelector('.bg-primary');
+    if (statsSection) {
+        observer.observe(statsSection);
+    }
+</script>
+{% endblock %}
