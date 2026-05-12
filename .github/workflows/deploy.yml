@@ -30,7 +30,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: test          # only deploys if tests pass
+    needs: test
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
@@ -45,7 +45,7 @@ jobs:
             set -e
 
             echo "=== Navigating to project ==="
-            cd /home/ubuntu/NIELIT-Workshop-Registration-Portal
+            cd /home/ubuntu/webinarnielit
 
             echo "=== Commit BEFORE pull ==="
             git log --oneline -1
@@ -58,7 +58,7 @@ jobs:
             git log --oneline -1
 
             echo "=== Activating venv ==="
-            source venv/bin/activate
+            source /home/ubuntu/venv/bin/activate
 
             echo "=== Installing dependencies ==="
             pip install -r requirements.txt
@@ -74,4 +74,3 @@ jobs:
             sudo systemctl restart nginx
 
             echo "=== Deployment successful ==="
-                  
