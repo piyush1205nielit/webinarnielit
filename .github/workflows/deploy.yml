@@ -70,7 +70,7 @@ jobs:
             python manage.py collectstatic --noinput
 
             echo "=== Restarting services ==="
-            sudo systemctl restart gunicorn
+            sudo systemctl restart webinarnielit
             sudo systemctl restart nginx
 
             echo "=== Deployment successful ==="
