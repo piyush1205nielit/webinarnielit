@@ -17,12 +17,10 @@
     <div class="hero-content">
 
       <h1 class="hero-title">
-        National Institute of
-        <span class="hero-title-accent">Electronics &amp; Information</span>
-        Technology
+        National Institute of <span class="hero-title-accent">Electronics &amp; Information</span> Technology
       </h1>
       <p class="hero-subtitle">
-        NIELIT is a premier autonomous body under the Ministry of Electronics &amp; Information Technology (MeitY), Government of India. Established to spearhead IT education and training, NIELIT offers nationally recognised certifications, professional development programmes, and skill enhancement courses across India.
+        To facilitate seamless registration, management, and delivery of webinars for skill development, training, and knowledge dissemination.
       </p>
       <div class="hero-actions">
         <a href="{% url 'public:courses' %}" class="btn-hero-primary">
@@ -39,7 +37,6 @@
    
   </div>
 </section>
-
 <!-- ═══════════════════════════════════════════════
      NOTICE / ANNOUNCEMENT TICKER
 ════════════════════════════════════════════════ -->
@@ -49,15 +46,9 @@
       <span class="notice-label"><i class="fas fa-bullhorn me-2"></i>Notice</span>
       <div class="notice-ticker-wrap">
         <div class="notice-ticker">
-          <span>Registrations open for upcoming CCC / BCC batches — Apply Now</span>
+          <span>Registrations open for Cyber Security Webinar — Apply Now</span>
           <span class="ticker-sep">|</span>
-          <span>New workshop on Artificial Intelligence &amp; Machine Learning — Limited Seats</span>
-          <span class="ticker-sep">|</span>
-          <span>NIELIT Delhi Centres now accepting enrollments for Full Stack Web Development</span>
-          <span class="ticker-sep">|</span>
-          <span>Walk-in interview for Junior Resource Person — Visit nielit.gov.in for details</span>
-          <span class="ticker-sep">|</span>
-          <span>Heavy Testing Goingg... </span>
+          <span>Registrations Now Open: Career Guidance on Full Stack Development — Limited Seats</span>  
         </div>
       </div>
     </div>
@@ -131,61 +122,6 @@
     </div>
   </div>
 </section>
-
-<!-- ═══════════════════════════════════════════════
-     UPCOMING COURSES
-════════════════════════════════════════════════ -->
-{% if upcoming_courses %}
-<section class="section-tinted">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-label">Upcoming Batches</div>
-      <h2 class="section-title">Upcoming Courses</h2>
-      <p class="section-desc">Plan ahead with our scheduled workshops, seminars, and certification batches.</p>
-    </div>
-    <div class="row g-4">
-      {% for course in upcoming_courses %}
-      <div class="col-md-6 col-lg-3">
-        <div class="upcoming-card">
-          <div class="upcoming-card-header">
-            <span class="badge-upcoming"><i class="fas fa-calendar-alt me-1"></i>Upcoming</span>
-            <h6>{{ course.course_name }}</h6>
-            <p>{{ course.course_duration|default:course.get_course_type_display }}</p>
-          </div>
-          <div class="upcoming-card-body">
-            <div class="upcoming-meta">
-              <span class="mode-badge">{{ course.get_mode_display }}</span>
-              <strong class="upcoming-fee">{{ course.display_fees }}</strong>
-            </div>
-            {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
-              {% if course.event_date %}
-              <div class="upcoming-date">
-                <i class="fas fa-calendar-day me-1"></i>
-                Event: <strong>{{ course.event_date|date:"d M Y" }}</strong>
-              </div>
-              {% endif %}
-            {% else %}
-              {% if course.start_date %}
-              <div class="upcoming-date">
-                <i class="fas fa-calendar-day me-1"></i>
-                Starts: <strong>{{ course.start_date|date:"d M Y" }}</strong>
-              </div>
-              {% endif %}
-            {% endif %}
-          </div>
-          <div class="upcoming-card-footer">
-            <a href="{% url 'public:course_detail' course.slug %}" class="btn-card-outline">
-              View Details <i class="fas fa-arrow-right ms-1"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
-
 <!-- ═══════════════════════════════════════════════
      NIELIT DELHI TRAINING CENTRES (HARDCODED)
 ════════════════════════════════════════════════ -->
