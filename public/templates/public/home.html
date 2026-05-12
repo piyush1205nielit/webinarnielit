@@ -12,25 +12,34 @@
      HERO SECTION
 ════════════════════════════════════════════════ -->
 <section class="hero-section">
-  <div class="hero-pattern"></div>
-  <div class="container hero-container">
-    <div class="hero-content">
-      <h6 class="hero-title">
-        National Institute of <span class="hero-title-accent">Electronics &amp; Information</span> Technology
-      </h6>
-      <p class="hero-subtitle">
-        To facilitate seamless registration, management, and delivery of webinars for skill development, training, and knowledge dissemination.
-      </p>
-      <div class="hero-actions">
-        <a href="{% url 'public:courses' %}" class="btn-hero-primary">
-          <i class="fas fa-book-open me-2"></i>Browse Courses
-        </a>
-        <a href="{% url 'registration:user_profile' %}" class="btn-hero-outline">
-          <i class="fas fa-id-card me-2"></i>Student Portal
-        </a>
-      </div>
+    <div class="hero-pattern"></div>
+
+    <div class="container hero-container">
+        <div class="hero-content text-center">
+
+            <h2 class="hero-title">
+                National Institute of
+                <span class="hero-title-accent">
+                    Electronics &amp; Information Technology
+                </span>
+            </h2>
+
+            <p class="hero-subtitle">
+                Seamless webinar registration and digital skill development for professional growth.
+            </p>
+
+            <div class="hero-actions justify-content-center">
+                <a href="{% url 'public:courses' %}" class="btn-hero-primary">
+                    <i class="fas fa-book-open me-2"></i>Browse Courses
+                </a>
+
+                <a href="{% url 'registration:user_profile' %}" class="btn-hero-outline">
+                    <i class="fas fa-id-card me-2"></i>Student Portal
+                </a>
+            </div>
+
+        </div>
     </div>
-  </div>
 </section>
 <!-- ═══════════════════════════════════════════════
      NOTICE / ANNOUNCEMENT TICKER
