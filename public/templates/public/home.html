@@ -52,11 +52,11 @@
      FEATURED COURSES
 ════════════════════════════════════════════════ -->
 <section class="section-standard bg-primary" style="margin-top: 0">
-  <div class="container bg-success">
-    <div class="section-header bg-danger">
+  <div class="bg-success" style="width: 90%;min-height: 94%; margin-left: auto;margin-right: auto;">
+    <div class="section-header">
       <h2 class="section-title"> Registration Portal : Details of Offered Courses</h2>
     </div>
-    <div class="row g-3 bg-danger">
+    <div class="row g-3 bg-secondary">
       {% for course in featured_courses %}
       <div class="col-md-4 col-lg-3">
         {% include 'course/course_card.html' with course=course %}
