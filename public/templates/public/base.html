@@ -465,12 +465,12 @@
                     <a href="{% url 'public:courses' %}" class="nav-link">
                         <i class="fas fa-book me-1"></i> Courses
                     </a>
-                    <a href="{% url 'public:centres' %}" class="nav-link">
+                    <!-- <a href="{% url 'public:centres' %}" class="nav-link">
                         <i class="fas fa-building me-1"></i> Centers
-                    </a>
-                    <a href="{% url 'public:about' %}" class="nav-link">
+                    </a> -->
+                    <!-- <a href="{% url 'public:about' %}" class="nav-link">
                         <i class="fas fa-info-circle me-1"></i> About
-                    </a>
+                    </a> -->
                     <a href="{% url 'public:contact' %}" class="nav-link">
                         <i class="fas fa-envelope me-1"></i> Contact
                     </a>
@@ -503,15 +503,15 @@
             <a href="{% url 'public:courses' %}" class="nav-link">
                 <i class="fas fa-book me-2"></i> Courses
             </a>
-            <a href="{% url 'public:centres' %}" class="nav-link">
+            <!-- <a href="{% url 'public:centres' %}" class="nav-link">
                 <i class="fas fa-building me-2"></i> Centers
-            </a>
+            </a> -->
             <!-- <a href="{% url 'public:about' %}" class="nav-link">
                 <i class="fas fa-info-circle me-2"></i> About
             </a> -->
-            <!-- <a href="{% url 'public:contact' %}" class="nav-link">
+            <a href="{% url 'public:contact' %}" class="nav-link">
                 <i class="fas fa-envelope me-2"></i> Contact
-            </a> -->
+            </a>
             <a href="{% url 'registration:user_profile' %}" class="nav-link">
                 <i class="fas fa-user me-2"></i> Student Portal
             </a>
@@ -520,7 +520,7 @@
     <!-- Content Block -->
     <div class="content">
         {% if messages %}
-            <div class="container mt-3">
+            <div class="container mt-2">
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm animate-fade-in" role="alert">
                         <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
