@@ -558,7 +558,6 @@
                     </div>
                 </div> -->
             </div> 
-
             <!-- Quick Links Row - Clean, minimal -->
             <div class="row g-4 justify-content-center border-top border-light pt-4">
                 <div class="col-md-8">
@@ -574,9 +573,7 @@
                     </div>
                 </div>
             </div>
-            
             <hr class="my-4 bg-secondary opacity-25">
-            
             <!-- Copyright and Development Info -->
             <div class="row">
                 <div class="col-12 text-center">
@@ -590,12 +587,10 @@
             </div>
         </div>
     </footer>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-    
     <script>
         // Navbar scroll effect
         window.addEventListener('scroll', function() {
@@ -610,13 +605,11 @@
                 mainNav.classList.remove('scrolled');
             }
         });
-        
         // Mobile menu toggle with scroll fix
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileMenu = document.getElementById('mobileMenu');
         const mobileOverlay = document.getElementById('mobileOverlay');
         const closeMobileMenu = document.getElementById('closeMobileMenu');
-        
         function openMobileMenu() {
             mobileMenu.classList.add('active');
             mobileOverlay.classList.add('active');
@@ -624,7 +617,6 @@
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
         }
-        
         function closeMobileMenuFunc() {
             mobileMenu.classList.remove('active');
             mobileOverlay.classList.remove('active');
@@ -632,7 +624,6 @@
             document.body.style.position = '';
             document.body.style.width = '';
         }
-        
         if (mobileMenuBtn) {
             mobileMenuBtn.addEventListener('click', openMobileMenu);
         }
@@ -649,7 +640,6 @@
                 closeMobileMenuFunc();
             }
         });
-        
         // Add active class to current nav link
         const currentLocation = window.location.pathname;
         const navLinks = document.querySelectorAll('.nav-link');
