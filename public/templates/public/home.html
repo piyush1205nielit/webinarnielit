@@ -51,14 +51,14 @@
 <!-- ═══════════════════════════════════════════════
      FEATURED COURSES
 ════════════════════════════════════════════════ -->
-<section class="section-standard bg-primary" style="margin-top: 0">
-  <div class="bg-success" style="width: 90%;min-height: 94%; margin-left: auto;margin-right: auto;">
+<section class="section-standard" style="margin-top: 0">
+  <div class="container" style="width: 96%;min-height: 96%; margin-left: auto;margin-right: auto; margin-top: 3px; margin-bottom: 3px;">
     <div class="section-header">
       <h2 class="section-title"> Registration Portal : Details of Offered Courses</h2>
     </div>
-    <div class="row g-3 bg-secondary">
+    <div class="row g-3">
       {% for course in featured_courses %}
-      <div class="col-md-4 col-lg-3">
+      <div class="col-md-4 col-lg-3 shadow">
         {% include 'course/course_card.html' with course=course %}
       </div>
       {% empty %}
