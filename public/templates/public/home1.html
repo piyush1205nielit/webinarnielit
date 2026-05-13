@@ -29,11 +29,12 @@
 <!-- ═══════════════════════════════════════════════
      NOTICE / ANNOUNCEMENT TICKER
 ════════════════════════════════════════════════ -->
-<div class="notice-bar">
-  <div class="container">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<div class="notice-bar mb-1 pb-1">
+  <div class="container mb-1 pb-1">
     <div class="notice-inner">
       <span class="notice-label"><i class="fas fa-bullhorn me-2"></i>Notice</span>
-      <div class="notice-ticker-wrap">
+      <div class="notice-ticker-wrap mb-1 pb-1">
         <div class="notice-ticker">
           <span>Registrations open for Cyber Security Webinar — Apply Now</span>
           <span class="ticker-sep">|</span>
@@ -51,32 +52,34 @@
      FEATURED COURSES
 ════════════════════════════════════════════════ -->
 <section class="section-standard">
-  <div class="container">
+  <div class="container" style="width: 92%;min-height: 96%; margin-left: auto;margin-right: auto; margin-top: 3px; margin-bottom: 3px;">
     <div class="section-header">
-      <div class="section-label">Webinar Registration</div>
-      <h2 class="section-title">Featured Domain</h2>
+      <h2 class="section-title"> Registration Portal : Details of Offered Courses</h2>
     </div>
-    <div class="row g-4">
+    <div class="row g-3">
       {% for course in featured_courses %}
-      <div class="col-md-6 col-lg-4">
+      <div class="col-md-4 col-lg-3 shadow">
         {% include 'course/course_card.html' with course=course %}
       </div>
       {% empty %}
-      <div class="col-12 text-center py-5">
+      <div class="col-12 text-center py-3">
         <i class="fas fa-book-open fa-3x text-muted mb-3 d-block"></i>
         <p class="text-muted">Course listings will appear here shortly.</p>
       </div>
       {% endfor %}
     </div>
-    <div class="text-center mt-5">
+    <!-- <div class="text-center mt-5">
       <a href="{% url 'public:courses' %}" class="btn-standard-outline">
         View All Courses <i class="fas fa-arrow-right ms-2"></i>
       </a>
-    </div>
+    </div> -->
   </div>
 </section>
-<section class="about-strip">
-  <div class="container">
+<section class="about-strip mt-1 pt-1">
+  <div class="container" style="width: 92%;min-height: 96%; margin-left: auto;margin-right: auto; margin-top: 3px; margin-bottom: 3px;">
+    <div class="section-header">
+      <h2 class="section-title"> Admission Activities</h2>
+    </div>
     <div class="about-strip-grid">
       <div class="about-strip-item">
         <div class="about-icon"><i class="fas fa-landmark"></i></div>
@@ -117,14 +120,13 @@
 <!-- ═══════════════════════════════════════════════
      NIELIT DELHI TRAINING CENTRES (HARDCODED)
 ════════════════════════════════════════════════ -->
-<section class="section-standard">
+<section class="section-standard mt-1 pt-1" style="width: 92%;min-height: 96%; margin-left: auto;margin-right: auto; margin-top: 3px; margin-bottom: 3px;">
   <div class="container">
     <div class="section-header">
-      <div class="section-label">NIELIT Delhi</div>
       <h2 class="section-title">Our Training Centres in Delhi</h2>
       <p class="section-desc">NIELIT Delhi operates three campuses across the capital, providing accessible quality IT education and training for all.</p>
     </div>
-    <div class="row g-4">
+    <div class="row g-3">
       <!-- West Campus - Janakpuri -->
       <div class="col-md-6 col-lg-4">
         <div class="centre-card">
@@ -205,8 +207,10 @@
 <!-- ═══════════════════════════════════════════════
      WHY NIELIT
 ════════════════════════════════════════════════ -->
-<section class="section-tinted">
-  <div class="container">
+
+
+<section class="section-tinted my-1 py-1" style="margin-top: 2px;">
+  <div class="container" style="width: 92%;min-height: 96%; margin-left: auto;margin-right: auto; margin-top: 3px; margin-bottom: 3px;">
     <div class="section-header">
       <div class="section-label">Our Strengths</div>
       <h2 class="section-title">Why Choose NIELIT?</h2>
@@ -229,18 +233,18 @@
       </div>
       <div class="why-card">
         <div class="why-icon why-purple"><i class="fas fa-users"></i></div>
-        <h5>Placement Assistance</h5>
-        <p>Dedicated placement cells at each centre conduct campus drives, mock interviews, and connect graduates with hiring partners across the country.</p>
+        <h5>Job Fair Event</h5>
+        <p>NIELIT Delhi conducts job fairs connecting learners with employers</p>
       </div>
       <div class="why-card">
         <div class="why-icon why-teal"><i class="fas fa-rupee-sign"></i></div>
         <h5>Affordable Fees</h5>
-        <p>Subsidised and government-funded programmes under PM Kaushal Vikas Yojana make quality IT education accessible for all economic backgrounds.</p>
+        <p>NIELIT offers affordable IT education with free NSQF training for eligible SC/ST candidates.</p>
       </div>
       <div class="why-card">
         <div class="why-icon why-red"><i class="fas fa-file-certificate"></i></div>
         <h5>Stackable Certifications</h5>
-        <p>From O Level to B4 Level — NIELIT's progressive certification framework lets you build credentials step-by-step at your own pace.</p>
+        <p>NCVT-approved NSQF courses with nationally recognised certifications</p>
       </div>
     </div>
   </div>
