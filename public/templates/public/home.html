@@ -46,6 +46,35 @@
 <!-- ═══════════════════════════════════════════════
      ABOUT NIELIT STRIP
 ════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════
+     FEATURED COURSES
+════════════════════════════════════════════════ -->
+<section class="section-standard">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Webinar Registration</div>
+      <h2 class="section-title">Featured Domain</h2>
+    </div>
+    <div class="row g-4">
+      {% for course in featured_courses %}
+      <div class="col-md-6 col-lg-4">
+        {% include 'course/course_card.html' with course=course %}
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-5">
+        <i class="fas fa-book-open fa-3x text-muted mb-3 d-block"></i>
+        <p class="text-muted">Course listings will appear here shortly.</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-5">
+      <a href="{% url 'public:courses' %}" class="btn-standard-outline">
+        View All Courses <i class="fas fa-arrow-right ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
 <section class="about-strip">
   <div class="container">
     <div class="about-strip-grid">
@@ -84,35 +113,7 @@
     </div>
   </div>
 </section>
-<!-- ═══════════════════════════════════════════════
-     FEATURED COURSES
-════════════════════════════════════════════════ -->
-<section class="section-standard">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-label">Academic Programmes</div>
-      <h2 class="section-title">Featured Courses</h2>
-      <p class="section-desc">Industry-aligned professional courses designed by experts from academia and the IT sector, leading to Government-recognised certifications.</p>
-    </div>
-    <div class="row g-4">
-      {% for course in featured_courses %}
-      <div class="col-md-6 col-lg-4">
-        {% include 'course/course_card.html' with course=course %}
-      </div>
-      {% empty %}
-      <div class="col-12 text-center py-5">
-        <i class="fas fa-book-open fa-3x text-muted mb-3 d-block"></i>
-        <p class="text-muted">Course listings will appear here shortly.</p>
-      </div>
-      {% endfor %}
-    </div>
-    <div class="text-center mt-5">
-      <a href="{% url 'public:courses' %}" class="btn-standard-outline">
-        View All Courses <i class="fas fa-arrow-right ms-2"></i>
-      </a>
-    </div>
-  </div>
-</section>
+
 <!-- ═══════════════════════════════════════════════
      NIELIT DELHI TRAINING CENTRES (HARDCODED)
 ════════════════════════════════════════════════ -->
