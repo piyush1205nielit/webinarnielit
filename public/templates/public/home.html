@@ -2,6 +2,13 @@
 {% load static %}
 {% block title %}Home - NIELIT Webinar Registration Portal{% endblock %}
 {% block content %}
+
+<!-- Include Carousel -->
+{% include 'public/includes/carousel.html' %}
+
+<!-- Include Announcements -->
+{% include 'public/includes/announcements.html' %}
+
 <!-- ═══════════════════════════════════════════════
      TOP GOVERNMENT IDENTITY BAR
 ════════════════════════════════════════════════ -->
@@ -29,21 +36,7 @@
 <!-- ═══════════════════════════════════════════════
      NOTICE / ANNOUNCEMENT TICKER
 ════════════════════════════════════════════════ -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-<div class="my-2 py-1">
-  <div class="container mb-1 pb-1">
-    <div class="notice-inner">
-      <span class="notice-label"><i class="fas fa-bullhorn me-2"></i>Notice</span>
-      <div class="notice-ticker-wrap mb-1 pb-1">
-        <div class="notice-ticker">
-          <span class="text-danger fw-bold">Registrations open for Future Skills Webinar — Apply Now</span>
-          <span class="ticker-sep">|</span>
-          <span class="text-danger fw-bold">Registrations Now Open: Career Guidance on Full Stack Development — Limited Seats</span>  
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+
 <!-- ═══════════════════════════════════════════════
      ABOUT NIELIT STRIP
 ════════════════════════════════════════════════ -->

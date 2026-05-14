@@ -1,0 +1,262 @@
+{% load static %}
+{% if carousel_images %}
+<div class="carousel-wrapper">
+    <div class="carousel-container">
+        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+
+            <div class="carousel-indicators">
+                {% for image in carousel_images %}
+                <button type="button" data-bs-target="#featuredCarousel"
+                        data-bs-slide-to="{{ forloop.counter0 }}"
+                        {% if forloop.first %}class="active"{% endif %}
+                        aria-label="Slide {{ forloop.counter }}"></button>
+                {% endfor %}
+            </div>
+
+            <div class="carousel-inner">
+                {% for image in carousel_images %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <div class="carousel-image-wrapper">
+                        {% if image.link_url %}
+                        <a href="{{ image.link_url }}" target="_blank">
+                            <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}">
+                        </a>
+                        {% else %}
+                        <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}">
+                        {% endif %}
+                    </div>
+                   
+                </div>
+                {% endfor %}
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .carousel-wrapper {
+        background: linear-gradient(135deg, #f0f2f5 0%, #e8edf5 100%);
+        padding: 30px 0;
+    }
+
+    .carousel-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    #featuredCarousel {
+        background: #1a1a2e;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+    }
+
+    /* ── Slide transition: Bootstrap .slide uses translateX.
+          We keep that and just tune the timing. ── */
+    #featuredCarousel .carousel-item {
+        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ── Images ── */
+    .carousel-image-wrapper {
+        overflow: hidden;
+        line-height: 0;   /* removes gap below inline img */
+    }
+
+    .carousel-image {
+        height: 500px;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        /* NO background/animation here — that was overriding the image */
+    }
+
+    /* Skeleton shown only while image hasn't loaded */
+    .carousel-image-wrapper::before {
+        content: '';
+        display: block;
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, #e8e8e8 25%, #d0d0d0 50%, #e8e8e8 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        z-index: 0;
+    }
+
+    .carousel-image-wrapper {
+        position: relative;
+    }
+
+    .carousel-image {
+        position: relative;
+        z-index: 1;   /* sits above the skeleton */
+    }
+
+    @keyframes shimmer {
+        from { background-position: 200% 0; }
+        to   { background-position: -200% 0; }
+    }
+
+    /* ── Caption ── */
+    .carousel-caption {
+        background: linear-gradient(0deg, rgba(0,0,0,0.72) 0%, transparent 100%);
+        border-radius: 0 0 20px 20px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 48px 40px 28px;
+    }
+
+    .carousel-caption h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .carousel-caption p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    /* Animate caption in when slide becomes active */
+    .carousel-item.active .carousel-caption h3 {
+        animation: captionUp 0.5s ease 0.2s both;
+    }
+    .carousel-item.active .carousel-caption p {
+        animation: captionUp 0.5s ease 0.35s both;
+    }
+
+    @keyframes captionUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Controls ── */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 8%;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #featuredCarousel:hover .carousel-control-prev,
+    #featuredCarousel:hover .carousel-control-next {
+        opacity: 1;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(30, 58, 138, 0.85);
+        border-radius: 50%;
+        padding: 24px;
+        background-size: 50%;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .carousel-control-prev-icon:hover,
+    .carousel-control-next-icon:hover {
+        background-color: #1e3a8a;
+        transform: scale(1.1);
+    }
+
+    /* ── Indicators ── */
+    .carousel-indicators {
+        bottom: 18px;
+        margin-bottom: 0;
+        gap: 6px;
+    }
+
+    .carousel-indicators button {
+        width: 36px;
+        height: 4px;
+        background: rgba(255,255,255,0.45);
+        border: none;
+        border-radius: 2px;
+        margin: 0;
+        transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    .carousel-indicators button.active {
+        width: 60px;
+        background: #f59e0b;
+    }
+
+    /* ── Responsive ── */
+    @media (min-width: 1400px) {
+        .carousel-image { height: 580px; }
+    }
+
+    @media (max-width: 1024px) {
+        .carousel-image { height: 420px; }
+        .carousel-caption h3 { font-size: 1.4rem; }
+    }
+
+    @media (max-width: 768px) {
+        .carousel-wrapper { padding: 15px 0; }
+        .carousel-image { height: 280px; }
+        .carousel-caption { padding: 32px 20px 16px; }
+        .carousel-caption h3 { font-size: 1.1rem; margin-bottom: 4px; }
+        .carousel-caption p { font-size: 0.78rem; }
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon { padding: 16px; background-size: 40%; }
+        .carousel-indicators button { width: 22px; height: 3px; }
+        .carousel-indicators button.active { width: 36px; }
+    }
+
+    @media (max-width: 576px) {
+        .carousel-image { height: 220px; }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // ── Skeleton removal ──────────────────────────────────
+    document.querySelectorAll('.carousel-image').forEach(function (img) {
+        function markLoaded() {
+            const wrapper = img.closest('.carousel-image-wrapper');
+            if (wrapper) wrapper.classList.add('loaded');
+        }
+        if (img.complete && img.naturalWidth > 0) {
+            markLoaded();
+        } else {
+            img.addEventListener('load', markLoaded);
+        }
+    });
+
+    // ── Explicit Bootstrap Carousel init (fixes auto-scroll) ──
+    const el = document.getElementById('featuredCarousel');
+    if (el && typeof bootstrap !== 'undefined') {
+        const carousel = new bootstrap.Carousel(el, {
+            interval: 4000,
+            ride:     'carousel',
+            wrap:     true,
+            touch:    true
+        });
+
+        // Restart auto-scroll after manual interaction
+        el.addEventListener('click', function (e) {
+            if (e.target.closest('.carousel-control-prev, .carousel-control-next, .carousel-indicators button')) {
+                carousel.cycle();
+            }
+        });
+    }
+});
+</script>
+
+<style>
+    /* Stop skeleton shimmer once image is loaded */
+    .carousel-image-wrapper.loaded::before {
+        display: none;
+    }
+</style>
+{% endif %}

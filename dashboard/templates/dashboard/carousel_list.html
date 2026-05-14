@@ -1,0 +1,183 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Manage Carousel - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-images text-primary me-2"></i>Carousel Images
+        </h1>
+        <a href="{% url 'dashboard:carousel_create' %}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Add Image
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                <i class="fas fa-arrows-alt me-1"></i>
+                <strong>Drag and drop</strong> to reorder images. Order will update automatically.
+            </p>
+            
+            <div class="row" id="sortableContainer">
+                {% for image in images %}
+                <div class="col-md-3 mb-3 sortable-item" data-id="{{ image.id }}">
+                    <div class="card h-100">
+                        <div class="drag-handle text-center p-2 bg-light" style="cursor: grab;">
+                            <i class="fas fa-grip-vertical text-muted"></i> Drag to reorder
+                        </div>
+                        {% if image.image %}
+                        <img src="{{ image.image.url }}" class="card-img-top" alt="Carousel image" style="height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 150px;">
+                            <i class="fas fa-image fa-3x text-white"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <p class="card-text small">
+                                <strong>Order:</strong> {{ image.order }}<br>
+                                <strong>Status:</strong>
+                                {% if image.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                                <br>
+                                <strong>Uploaded:</strong> {{ image.created_at|date:"d M Y" }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="btn-group w-100">
+                                <a href="{% url 'dashboard:carousel_edit' image.id %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{% url 'dashboard:carousel_delete' image.id %}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-images fa-3x mb-2 d-block text-muted"></i>
+                    <p class="text-muted">No carousel images found. Click "Add Image" to create one.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sortable-item {
+        cursor: grab;
+    }
+    
+    .sortable-item:active {
+        cursor: grabbing;
+    }
+    
+    .dragging {
+        opacity: 0.5;
+    }
+    
+    .drag-handle {
+        cursor: grab;
+    }
+    
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('sortableContainer');
+    let draggedItem = null;
+    
+    if (container) {
+        const items = container.querySelectorAll('.sortable-item');
+        
+        items.forEach(item => {
+            item.setAttribute('draggable', 'true');
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragend', handleDragEnd);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+        });
+        
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedItem = null;
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetItem = this;
+            
+            if (draggedItem && targetItem !== draggedItem) {
+                const allItems = Array.from(container.querySelectorAll('.sortable-item'));
+                const draggedIndex = allItems.indexOf(draggedItem);
+                const targetIndex = allItems.indexOf(targetItem);
+                
+                if (draggedIndex < targetIndex) {
+                    targetItem.insertAdjacentElement('afterend', draggedItem);
+                } else {
+                    targetItem.insertAdjacentElement('beforebegin', draggedItem);
+                }
+                
+                // Update order numbers
+                updateOrderNumbers();
+            }
+        }
+        
+        function updateOrderNumbers() {
+            const allItems = container.querySelectorAll('.sortable-item');
+            const updates = [];
+            
+            allItems.forEach((item, index) => {
+                const imageId = item.getAttribute('data-id');
+                const orderSpan = item.querySelector('.card-body .small');
+                if (orderSpan) {
+                    orderSpan.innerHTML = orderSpan.innerHTML.replace(/Order: \d+/, `Order: ${index}`);
+                }
+                updates.push({ id: imageId, order: index });
+            });
+            
+            // Send update to server
+            fetch('{% url "dashboard:carousel_reorder" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ items: updates })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Order updated successfully');
+                } else {
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+});
+</script>
+{% endblock %}

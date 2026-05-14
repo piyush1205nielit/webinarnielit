@@ -4,7 +4,7 @@ from django.db import models
 from course.models import Course, Centre
 from registration.models import Student
 from django.utils import timezone
-
+from public.models import Announcement, CarouselImage
 from django.http import HttpResponse, Http404
 from django.conf import settings
 from django.views.static import serve
@@ -12,7 +12,7 @@ import os
 
 def home(request):
     """Public home page with hero section and featured content"""
-    featured_courses = Course.objects.filter(is_active=True, is_featured=True)[:6]
+    featured_courses = Course.objects.filter(is_active=True, is_featured=True)[:4]
     upcoming_courses = Course.objects.filter(
         is_active=True, 
         course_status__in=['open', 'active']
@@ -23,15 +23,22 @@ def home(request):
     total_students = Student.objects.count()
     total_courses = Course.objects.count()
     total_centres = Centre.objects.count()
+
+    # Get active announcements (not expired)
+    announcements = Announcement.objects.filter(is_active=True).exclude(expires_at__lt=timezone.now())[:5]
+    
+    # Get active carousel images ordered by order field
+    carousel_images = CarouselImage.objects.filter(is_active=True)
     
     context = {
         'featured_courses': featured_courses,
         'upcoming_courses': upcoming_courses,
-        'popular_courses': popular_courses,
         'centres': centres,
         'total_students': total_students,
         'total_courses': total_courses,
         'total_centres': total_centres,
+        'announcements': announcements,
+        'carousel_images': carousel_images,
     }
     return render(request, 'public/home.html', context)
 
@@ -129,3 +136,14 @@ def serve_media(request, path):
         with open(file_path, 'rb') as f:
             return HttpResponse(f.read(), content_type='image/jpeg')
     raise Http404("File not found")
+
+def announcements(request):
+    """Announcements page"""
+    from public.models import Announcement
+    
+    # Get all announcements, ordered by creation date (newest first)
+    announcements_list = Announcement.objects.filter(is_active=True).order_by('-created_at')
+    
+    context = {'announcements': announcements_list,}
+    
+    return render(request, 'public/announcements.html', context)

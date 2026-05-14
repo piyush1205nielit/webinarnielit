@@ -10,6 +10,10 @@ from datetime import datetime, timedelta
 import json
 import pandas as pd
 from io import BytesIO
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from public.models import Announcement, CarouselImage
+from .forms import AnnouncementForm, CarouselImageForm
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -292,3 +296,128 @@ def export_students_pdf(request):
     elements.append(table)
     doc.build(elements)
     return response
+
+
+@user_passes_test(is_admin)
+def announcement_list(request):
+    """List all announcements with drag-drop ordering"""
+    announcements = Announcement.objects.all()
+    return render(request, 'dashboard/announcement_list.html', {'announcements': announcements})
+
+@user_passes_test(is_admin)
+def announcement_create(request):
+    """Create new announcement"""
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST)
+        if form.is_valid():
+            announcement = form.save()
+            messages.success(request, 'Announcement created successfully!')
+            return redirect('dashboard:announcement_list')
+    else:
+        form = AnnouncementForm()
+    
+    return render(request, 'dashboard/announcement_form.html', {'form': form, 'title': 'Create Announcement'})
+
+@user_passes_test(is_admin)
+def announcement_edit(request, pk):
+    """Edit announcement"""
+    announcement = get_object_or_404(Announcement, pk=pk)
+    
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST, instance=announcement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Announcement updated successfully!')
+            return redirect('dashboard:announcement_list')
+    else:
+        form = AnnouncementForm(instance=announcement)
+    
+    return render(request, 'dashboard/announcement_form.html', {'form': form, 'title': 'Edit Announcement'})
+
+@user_passes_test(is_admin)
+def announcement_delete(request, pk):
+    """Delete announcement"""
+    announcement = get_object_or_404(Announcement, pk=pk)
+    
+    if request.method == 'POST':
+        announcement.delete()
+        messages.success(request, 'Announcement deleted successfully!')
+        return redirect('dashboard:announcement_list')
+    
+    return render(request, 'dashboard/announcement_confirm_delete.html', {'object': announcement})
+
+@csrf_exempt
+@require_http_methods(["POST"])
+@user_passes_test(is_admin)
+def announcement_reorder(request):
+    """Reorder announcements via drag and drop"""
+    try:
+        data = json.loads(request.body)
+        for item in data.get('items', []):
+            Announcement.objects.filter(id=item['id']).update(order=item['order'])
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+# ==================== CAROUSEL VIEWS ====================
+
+@user_passes_test(is_admin)
+def carousel_list(request):
+    """List all carousel images with drag-drop ordering"""
+    images = CarouselImage.objects.all()
+    return render(request, 'dashboard/carousel_list.html', {'images': images})
+
+@user_passes_test(is_admin)
+def carousel_create(request):
+    """Add new carousel image"""
+    if request.method == 'POST':
+        form = CarouselImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.save()
+            messages.success(request, 'Carousel image added successfully!')
+            return redirect('dashboard:carousel_list')
+    else:
+        form = CarouselImageForm()
+    
+    return render(request, 'dashboard/carousel_form.html', {'form': form, 'title': 'Add Carousel Image'})
+
+@user_passes_test(is_admin)
+def carousel_edit(request, pk):
+    """Edit carousel image"""
+    image = get_object_or_404(CarouselImage, pk=pk)
+    
+    if request.method == 'POST':
+        form = CarouselImageForm(request.POST, request.FILES, instance=image)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Carousel image updated successfully!')
+            return redirect('dashboard:carousel_list')
+    else:
+        form = CarouselImageForm(instance=image)
+    
+    return render(request, 'dashboard/carousel_form.html', {'form': form, 'title': 'Edit Carousel Image'})
+
+@user_passes_test(is_admin)
+def carousel_delete(request, pk):
+    """Delete carousel image"""
+    image = get_object_or_404(CarouselImage, pk=pk)
+    
+    if request.method == 'POST':
+        image.delete()
+        messages.success(request, 'Carousel image deleted successfully!')
+        return redirect('dashboard:carousel_list')
+    
+    return render(request, 'dashboard/carousel_confirm_delete.html', {'object': image})
+
+@csrf_exempt
+@require_http_methods(["POST"])
+@user_passes_test(is_admin)
+def carousel_reorder(request):
+    """Reorder carousel images via drag and drop"""
+    try:
+        data = json.loads(request.body)
+        for item in data.get('items', []):
+            CarouselImage.objects.filter(id=item['id']).update(order=item['order'])
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

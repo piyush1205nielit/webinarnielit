@@ -1,117 +1,327 @@
 {% extends 'public/base.html' %}
+{% load static %}
 
 {% block title %}Contact Us - NIELIT{% endblock %}
 
-{% block content %}
-<section class="bg-light py-4">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
-                <li class="breadcrumb-item active">Contact Us</li>
-            </ol>
-        </nav>
-    </div>
-</section>
+{% block extra_css %}
+<style>
+    .contact-page {
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+        min-height: calc(100vh - 300px);
+    }
 
-<section class="container py-5">
-    <div class="row">
-        <div class="col-lg-6 mx-auto text-center mb-5">
-            <h1 class="display-5 fw-bold text-primary">Contact Us</h1>
-            <p class="lead">Get in touch with us for any queries or assistance</p>
+    /* ── Banner ─────────────────────────────────── */
+    .page-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 40px 0 36px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -8%;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+    }
+
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%; left: -5%;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+    }
+
+    .page-banner h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-banner p {
+        font-size: 0.98rem;
+        opacity: 0.88;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .breadcrumb-custom { background: transparent; padding: 0; margin-bottom: 14px; }
+    .breadcrumb-custom .breadcrumb-item a {
+        color: rgba(255,255,255,0.78);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+    .breadcrumb-custom .breadcrumb-item a:hover { color: white; }
+    .breadcrumb-custom .breadcrumb-item.active { color: #f59e0b; font-size: 0.88rem; font-weight: 500; }
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.45); }
+
+    /* ── Cards ───────────────────────────────────── */
+    .contact-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        height: 100%;
+    }
+
+    .contact-card .card-body { padding: 28px; }
+
+    .contact-card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 22px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* ── Info items ──────────────────────────────── */
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-item:first-child { padding-top: 0; }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #eff6ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .info-icon i { font-size: 1rem; color: #2563eb; }
+
+    .info-text strong {
+        display: block;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 3px;
+    }
+
+    .info-text span {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    /* ── Form ────────────────────────────────────── */
+    .form-label {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        font-size: 0.92rem;
+        padding: 10px 13px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        outline: none;
+    }
+
+    textarea.form-control { resize: vertical; min-height: 120px; }
+
+    .btn-send {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        width: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+    }
+
+    .btn-send:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(30,58,138,0.28);
+        color: white;
+    }
+
+    /* ── Map ─────────────────────────────────────── */
+    .map-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    .map-card iframe {
+        display: block;
+        width: 100%;
+        height: 380px;
+        border: none;
+    }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 768px) {
+        .page-banner       { padding: 28px 0 24px; }
+        .page-banner h1    { font-size: 1.5rem; }
+        .contact-card .card-body { padding: 20px; }
+        .map-card iframe   { height: 280px; }
+    }
+
+    @media (max-width: 576px) {
+        .page-banner h1 { font-size: 1.3rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+
+    <!-- Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'public:home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Contact Us</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-envelope me-2"></i>Contact Us</h1>
+            <p>Get in touch with us for any queries or assistance</p>
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-5">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body p-4">
-                    <h3 class="text-primary mb-4">Get in Touch</h3>
-                    
-                    <div class="mb-4">
-                        <div class="d-flex align-items-start mb-3">
-                            <i class="fas fa-map-marker-alt text-primary fa-2x me-3"></i>
-                            <div>
-                                <strong>Visit Us</strong><br>
-                                <span class="small">NIELIT Delhi,<br>Electronics Niketan,<br>6, CGO Complex,<br>Lodhi Road, New Delhi - 110003</span>
+    <div class="container py-4">
+        <div class="row g-4">
+
+            <!-- Left: Contact Info -->
+            <div class="col-lg-5">
+                <div class="contact-card">
+                    <div class="card-body">
+                        <h3><i class="fas fa-address-book me-2"></i>Get in Touch</h3>
+
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <div class="info-text">
+                                <strong>Visit Us</strong>
+                                <span>NIELIT Delhi, Electronics Niketan,<br>
+                                      6, CGO Complex, Lodhi Road,<br>
+                                      New Delhi – 110003</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-start mb-3">
-                            <i class="fas fa-phone text-primary fa-2x me-3"></i>
-                            <div>
-                                <strong>Call Us</strong><br>
-                                <span class="small">+91-11-12345678<br>+91-11-87654321</span>
+
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                            <div class="info-text">
+                                <strong>Call Us</strong>
+                                <span>+91-11-12345678<br>+91-11-87654321</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-start mb-3">
-                            <i class="fas fa-envelope text-primary fa-2x me-3"></i>
-                            <div>
-                                <strong>Email Us</strong><br>
-                                <span class="small">info@nielit.gov.in<br>support@nielit.gov.in</span>
+
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                            <div class="info-text">
+                                <strong>Email Us</strong>
+                                <span>info@nielit.gov.in<br>support@nielit.gov.in</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-start">
-                            <i class="fas fa-clock text-primary fa-2x me-3"></i>
-                            <div>
-                                <strong>Working Hours</strong><br>
-                                <span class="small">Monday to Friday: 9:00 AM - 6:00 PM<br>Saturday: 9:00 AM - 2:00 PM<br>Sunday: Closed</span>
+
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fas fa-clock"></i></div>
+                            <div class="info-text">
+                                <strong>Working Hours</strong>
+                                <span>Mon – Fri: 9:00 AM – 6:00 PM<br>
+                                      Saturday: 9:00 AM – 2:00 PM<br>
+                                      Sunday: Closed</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-lg-7">
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <h3 class="text-primary mb-4">Send us a Message</h3>
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Full Name *</label>
-                            <input type="text" name="name" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email Address *</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Mobile Number</label>
-                            <input type="tel" name="mobile" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Subject *</label>
-                            <input type="text" name="subject" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Message *</label>
-                            <textarea name="message" class="form-control" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                            <i class="fas fa-paper-plane me-2"></i>Send Message
-                        </button>
-                    </form>
+
+            <!-- Right: Contact Form -->
+            <div class="col-lg-7">
+                <div class="contact-card">
+                    <div class="card-body">
+                        <h3><i class="fas fa-paper-plane me-2"></i>Send us a Message</h3>
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control"
+                                           placeholder="Your full name" required>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Mobile Number</label>
+                                    <input type="tel" name="mobile" class="form-control"
+                                           placeholder="+91-XXXXXXXXXX">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" name="email" class="form-control"
+                                           placeholder="you@example.com" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Subject <span class="text-danger">*</span></label>
+                                    <input type="text" name="subject" class="form-control"
+                                           placeholder="How can we help?" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Message <span class="text-danger">*</span></label>
+                                    <textarea name="message" class="form-control"
+                                              rows="5" placeholder="Write your message here…" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn-send">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
+
         </div>
-    </div>
-    
-    <!-- Map Section -->
-    <div class="mt-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-               <iframe 
-    src="https://www.google.com/maps?q=NIELIT+Delhi+Centre+Inderlok,+Parsvnath+Metro+Mall,+Inderlok+Metro+Station&output=embed"
-    width="100%" 
-    height="400" 
-    style="border:0; border-radius: 8px;" 
-    allowfullscreen="" 
-    loading="lazy">
-</iframe>
-            </div>
+
+        <!-- Map -->
+        <div class="mt-4 map-card">
+            <iframe
+                src="https://www.google.com/maps?q=NIELIT+Delhi+Centre+Inderlok,+Parsvnath+Metro+Mall,+Inderlok+Metro+Station&output=embed"
+                allowfullscreen=""
+                loading="lazy"
+                title="NIELIT Delhi Location">
+            </iframe>
         </div>
+
     </div>
-</section>
+</div>
 {% endblock %}
