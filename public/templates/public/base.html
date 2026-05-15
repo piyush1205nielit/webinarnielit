@@ -212,7 +212,6 @@
             padding-left: 24px;
             color: var(--primary);
         }
-
         /* ── Alert messages ──────────────────────────────── */
         .alert {
             font-size: 0.92rem;
@@ -234,7 +233,6 @@
             font-size: 0.88rem;
             transition: color 0.2s ease;
         }
-
         footer a:hover { color: white; }
 
         footer .copyright {
@@ -254,7 +252,6 @@
             transform: translateY(-4px);
             box-shadow: 0 12px 28px rgba(0,0,0,0.1);
         }
-
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-12px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -265,12 +262,10 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-
     <!-- ── Top Header ──────────────────────────────────── -->
     <div class="top-header" id="topHeader">
         <div class="container">
             <div class="row align-items-center gy-2">
-
                 <!-- NIELIT Logo + Name -->
                 <div class="col-md-4 col-12">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -283,14 +278,12 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Digital India -->
                 <div class="col-md-4 col-12 text-center">
                     <img src="{% static 'assets/digital_india.png' %}" alt="Digital India"
                          style="height:50px;width:auto;object-fit:contain;"
                          onerror="this.src='https://via.placeholder.com/120x50?text=Digital+India'">
                 </div>
-
                 <!-- MeitY + Emblem -->
                 <div class="col-md-4 col-12">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
@@ -309,7 +302,6 @@
             </div>
         </div>
     </div>
-
     <!-- ── Main Navigation ─────────────────────────────── -->
     <nav class="main-nav" id="mainNav">
         <div class="container">
@@ -347,7 +339,6 @@
             </div>
         </div>
     </nav>
-
     <!-- ── Mobile Menu ─────────────────────────────────── -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <div class="mobile-menu" id="mobileMenu">
@@ -367,7 +358,6 @@
             <a href="{% url 'registration:user_profile' %}"    class="nav-link"><i class="fas fa-user fa-fw"></i>Student Portal</a>
         </div>
     </div>
-
     <!-- ── Page Content ────────────────────────────────── -->
     <main class="flex-grow-1">
         {% if messages %}
@@ -384,7 +374,6 @@
 
         {% block content %}{% endblock %}
     </main>
-
     <!-- ── Footer ──────────────────────────────────────── -->
     <footer>
         <div class="container py-1">
