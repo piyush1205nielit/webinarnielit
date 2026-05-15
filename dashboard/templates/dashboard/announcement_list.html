@@ -1,0 +1,198 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Manage Announcements - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-bullhorn text-primary me-2"></i>Announcements
+        </h1>
+        <a href="{% url 'dashboard:announcement_create' %}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Add Announcement
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p class="text-muted mb-3">
+                <i class="fas fa-arrows-alt me-1"></i>
+                <strong>Drag and drop</strong> to reorder announcements. Order will update automatically.
+            </p>
+            
+            <div class="table-responsive">
+                <table class="table table-hover" id="announcementTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 50px"></th>
+                            <th>Content</th>
+                            <th>Status</th>
+                            <th>Expires</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sortableTableBody">
+                        {% for announcement in announcements %}
+                        <tr data-id="{{ announcement.id }}">
+                            <td class="drag-handle" style="cursor: grab; text-align: center;">
+                                <i class="fas fa-grip-vertical text-muted"></i>
+                            </td>
+                            <td>
+                                {{ announcement.content|truncatewords:20 }}
+                                <br>
+                                <small class="text-muted">Order: {{ announcement.order }}</small>
+                            </td>
+                            <td>
+                                {% if announcement.is_expired %}
+                                    <span class="badge bg-secondary">Expired</span>
+                                {% elif announcement.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ announcement.expires_at|date:"d M Y"|default:"Never" }}</td>
+                            <td>{{ announcement.created_at|date:"d M Y" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'dashboard:announcement_edit' announcement.id %}" class="btn btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'dashboard:announcement_delete' announcement.id %}" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-bullhorn fa-3x mb-2 d-block text-muted"></i>
+                                <p class="text-muted">No announcements found. Click "Add Announcement" to create one.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dragging {
+        opacity: 0.5;
+        background: #f0f0f0 !important;
+    }
+    
+    .drag-handle {
+        cursor: grab;
+    }
+    
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+    
+    #sortableTableBody tr {
+        transition: background-color 0.2s;
+    }
+    
+    #sortableTableBody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.getElementById('sortableTableBody');
+    let draggedRow = null;
+    let draggedIndex = null;
+    
+    if (tbody) {
+        const rows = tbody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            row.setAttribute('draggable', 'true');
+            row.addEventListener('dragstart', handleDragStart);
+            row.addEventListener('dragend', handleDragEnd);
+            row.addEventListener('dragover', handleDragOver);
+            row.addEventListener('drop', handleDrop);
+        });
+        
+        function handleDragStart(e) {
+            draggedRow = this;
+            draggedIndex = Array.from(tbody.children).indexOf(this);
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedRow = null;
+            draggedIndex = null;
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetRow = this;
+            
+            if (draggedRow && targetRow !== draggedRow) {
+                const allRows = Array.from(tbody.querySelectorAll('tr'));
+                const draggedIndex = allRows.indexOf(draggedRow);
+                const targetIndex = allRows.indexOf(targetRow);
+                
+                if (draggedIndex < targetIndex) {
+                    targetRow.insertAdjacentElement('afterend', draggedRow);
+                } else {
+                    targetRow.insertAdjacentElement('beforebegin', draggedRow);
+                }
+                
+                // Update order numbers
+                updateOrderNumbers();
+            }
+        }
+        
+        function updateOrderNumbers() {
+            const allRows = tbody.querySelectorAll('tr');
+            const updates = [];
+            
+            allRows.forEach((row, index) => {
+                const announcementId = row.getAttribute('data-id');
+                const newOrder = index;
+                const orderSpan = row.querySelector('td:nth-child(2) small');
+                if (orderSpan) {
+                    orderSpan.textContent = `Order: ${newOrder}`;
+                }
+                updates.push({ id: announcementId, order: newOrder });
+            });
+            
+            // Send update to server
+            fetch('{% url "dashboard:announcement_reorder" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ items: updates })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Order updated successfully');
+                } else {
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -4,541 +4,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}NIELIT - Webinar Registration Platform{% endblock %}</title>
+    <title>{% block title %}NIELIT - Course Registration Platform{% endblock %}</title>
+
+    <!-- BS5 only — no BS3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        /* ── Tokens ──────────────────────────────────────── */
         :root {
-            --primary-color: #0f2b6d;
-            --primary-dark: #0a1f4f;
+            --primary:       #0f2b6d;
+            --primary-dark:  #0a1f4f;
             --primary-light: #1e40af;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --info-color: #06b6d4;
-            --footer-bg: #0a1a2f;
-            --footer-dark: #051220;
+            --accent:        #f59e0b;
+            --footer-bg:     #0a1a2f;
         }
-        
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-        
+
+        /* ── Base ────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
-            padding-top: 0;
-            background-color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            background: #f8fafc;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            padding-top: 0;
+            color: #1e293b;
         }
-        
-        /* Top Header Section - WHITE BACKGROUND */
+
+        /* ── Top Header ──────────────────────────────────── */
         .top-header {
             background: white;
-            color: #1f2937;
-            padding: 12px 0;
-            transition: all 0.3s ease;
             border-bottom: 1px solid #e5e7eb;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            padding: 10px 0;
+            transition: padding 0.3s ease;
         }
-        
-        .top-header.scrolled {
-            padding: 5px 0;
-        }
-        
+
+        .top-header.scrolled { padding: 6px 0; }
+
         .top-header .logo-img {
-            transition: all 0.3s ease;
+            height: 56px;
             width: auto;
-            height: 55px;
             object-fit: contain;
+            transition: height 0.3s ease;
         }
-        
-        .top-header.scrolled .logo-img {
-            height: 45px;
-        }
-        
+
+        .top-header.scrolled .logo-img { height: 44px; }
+
         .top-header .main-title {
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 0;
             color: #1e3a8a;
+            margin: 0;
             line-height: 1.3;
         }
-        
-        .top-header.scrolled .main-title {
-            font-size: 0.75rem;
-        }
-        
+
         .top-header .sub-title {
-            transition: all 0.3s ease;
-            font-size: 0.65rem;
-            opacity: 0.8;
-            color: #4b5563;
-            margin-bottom: 0;
+            font-size: 0.78rem;
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.4;
         }
-        
-        .top-header.scrolled .sub-title {
-            font-size: 0.55rem;
+
+        @media (max-width: 768px) {
+            .top-header .logo-img   { height: 40px; }
+            .top-header .main-title { font-size: 0.82rem; }
+            .top-header .sub-title  { font-size: 0.68rem; }
         }
-        
-        /* Main Navigation - DARKER BLUE BACKGROUND */
+
+        @media (max-width: 576px) {
+            .top-header .logo-img   { height: 34px; }
+            .top-header .main-title { font-size: 0.72rem; }
+            .top-header .sub-title  { font-size: 0.6rem; }
+        }
+
+        /* ── Main Nav ────────────────────────────────────── */
         .main-nav {
             background: linear-gradient(135deg, #0a1f4f 0%, #0f2b6d 100%);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             position: sticky;
             top: 0;
             z-index: 1000;
+            transition: box-shadow 0.3s ease;
         }
-        
-        .main-nav.scrolled {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
+
+        .main-nav.scrolled { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
         .navbar-brand {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: white !important;
-            transition: all 0.3s ease;
             text-decoration: none;
-        }
-        
-        .navbar-brand i {
-            color: white;
-        }
-        
-        .main-nav.scrolled .navbar-brand {
-            font-size: 1.2rem;
-        }
-        
-        .nav-link {
-            font-weight: 500;
-            color: white !important;
-            transition: all 0.3s ease;
-            position: relative;
-            margin: 0 5px;
-            opacity: 0.95;
-            text-decoration: none;
-            padding: 8px 16px;
-        }
-        .nav-link:hover {
-            color: white !important;
-            opacity: 1;
-            transform: translateY(-1px);
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 50%;
-            background-color: white;
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            width: 80%;
-        }
-        .nav-link.active {
-            color: white !important;
-            font-weight: 600;
-            opacity: 1;
-        }
-        .btn-nav {
-            border-radius: 8px;
-            padding: 8px 20px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-nav-primary {
-            background: white;
-            color: var(--primary-color);
-            border: none;
-        }
-        .btn-nav-primary:hover {
-            background: #f3f4f6;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            color: var(--primary-dark);
-        }
-        
-        .btn-nav-outline {
-            border: 2px solid white;
-            color: white;
-            background: transparent;
-        }
-        
-        .btn-nav-outline:hover {
-            background: white;
-            color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-        
-        .user-dropdown .dropdown-toggle::after {
-            display: none;
-        }
-        
-        .user-dropdown .btn {
-            color: white !important;
-        }
-        
-        .user-dropdown .btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--primary-color);
-            font-weight: 600;
-            transition: all 0.3s ease;
+            gap: 10px;
         }
-        
-        .main-nav.scrolled .user-avatar {
-            width: 35px;
-            height: 35px;
-            font-size: 0.9rem;
-        }
-        
-        /* Mobile Menu */
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 80%;
-            max-width: 400px;
-            height: 100vh;
-            background: white;
-            z-index: 1050;
-            transition: right 0.3s ease;
-            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        
-        .mobile-menu.active {
-            right: 0;
-        }
-        
-        .mobile-menu-header {
-            background: linear-gradient(135deg, #0a1f4f 0%, #0f2b6d 100%);
-            color: white;
-            padding: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .mobile-menu .nav-link {
-            padding: 12px 20px;
-            display: block;
-            border-bottom: 1px solid #e5e7eb;
-            color: #374151 !important;
+
+        /* Desktop nav links */
+        .main-nav .nav-link {
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9) !important;
+            padding: 8px 14px;
+            border-radius: 6px;
+            position: relative;
+            transition: color 0.2s ease, background 0.2s ease;
             text-decoration: none;
         }
-        
-        .mobile-menu .nav-link:hover {
-            background: #f3f4f6;
-            color: var(--primary-color) !important;
+
+        .main-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: white;
+            border-radius: 1px;
+            transition: width 0.25s ease;
         }
-        
+
+        .main-nav .nav-link:hover,
+        .main-nav .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .main-nav .nav-link:hover::after,
+        .main-nav .nav-link.active::after {
+            width: 60%;
+        }
+
+        /* ── Mobile Menu ─────────────────────────────────── */
+        #mobileMenuBtn {
+            background: none;
+            border: none;
+            color: white;
+            padding: 6px 10px;
+        }
+
+        #mobileMenuBtn i { font-size: 1.4rem; color: white; }
+
         .mobile-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: rgba(0,0,0,0.5);
             z-index: 1040;
             display: none;
         }
-        
-        .mobile-overlay.active {
-            display: block;
+        .mobile-overlay.active { display: block; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: min(80%, 360px);
+            height: 100vh;
+            background: white;
+            z-index: 1050;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+            box-shadow: -4px 0 16px rgba(0,0,0,0.12);
         }
-        
-        /* Dropdown Menu */
+        .mobile-menu.active { right: 0; }
+
+        .mobile-menu-header {
+            background: linear-gradient(135deg, #0a1f4f, #0f2b6d);
+            color: white;
+            padding: 18px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-menu-header h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .mobile-menu-body .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #374151 !important;
+            border-bottom: 1px solid #f3f4f6;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .mobile-menu-body .nav-link:hover {
+            background: #f0f4ff;
+            color: var(--primary) !important;
+        }
+
+        /* ── Dropdown ────────────────────────────────────── */
         .dropdown-menu {
             border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            margin-top: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 6px 0;
+            min-width: 180px;
         }
-        
+
         .dropdown-item {
-            padding: 8px 20px;
-            transition: all 0.2s ease;
-            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 9px 18px;
+            transition: background 0.15s ease, padding-left 0.15s ease;
         }
-        
+
         .dropdown-item:hover {
-            background: #f3f4f6;
-            padding-left: 25px;
+            background: #f0f4ff;
+            padding-left: 24px;
+            color: var(--primary);
         }
-        
-        /* Footer - Dark Theme */
+
+        /* ── Alert messages ──────────────────────────────── */
+        .alert {
+            font-size: 0.92rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        /* ── Footer ──────────────────────────────────────── */
         footer {
             background: linear-gradient(135deg, #0a1a2f 0%, #051220 100%);
             color: #9ca3af;
             margin-top: auto;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        
-        .footer-links a {
-            color: #9ca3af;
+
+        footer a {
+            color: rgba(255,255,255,0.55);
             text-decoration: none;
-            transition: color 0.3s ease;
+            font-size: 0.88rem;
+            transition: color 0.2s ease;
         }
-        
-        .footer-links a:hover {
-            color: white;
+
+        footer a:hover { color: white; }
+
+        footer .copyright {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.45);
         }
-        
-        /* White Card for Logos */
-        .logo-card {
-            background: white;
-            border-radius: 16px;
-            padding: 15px 25px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+        footer .copyright strong {
+            color: rgba(255,255,255,0.7);
         }
-        
-        .logo-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .logo-card-img {
-            height: 55px;
-            width: auto;
-            object-fit: contain;
-        }
-        
-        .logo-card-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #0a1f4f;
-            margin-bottom: 0;
-        }
-        
-        .logo-card-subtitle {
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-bottom: 0;
-            line-height: 1.3;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        /* Mobile menu button */
-        #mobileMenuBtn {
-            color: white !important;
-        }
-        
-        #mobileMenuBtn i {
-            color: white;
-        }
-        
-        /* Custom Card Hover Effect */
+
+        /* ── Utility ─────────────────────────────────────── */
         .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
-        
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
         }
-        
-        /* Fix for mobile scroll */
-        .mobile-menu-body {
-            padding-bottom: 30px;
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        /* Responsive */
-        @media (max-width: 768px) {
-            .top-header .main-title {
-                font-size: 0.7rem;
-            }
-            .top-header .sub-title {
-                font-size: 0.55rem;
-            }
-            .top-header .logo-img {
-                height: 45px;
-            }
-            .logo-card-img {
-                height: 40px;
-            }
-            .logo-card {
-                padding: 12px 18px;
-            }
-            .logo-card-title {
-                font-size: 0.75rem;
-            }
-            .logo-card-subtitle {
-                font-size: 0.6rem;
-            }
-        }
-        @media (max-width: 576px) {
-            .top-header .main-title {
-                font-size: 0.6rem;
-            }
-            .top-header .sub-title {
-                font-size: 0.45rem;
-            }
-            .top-header .logo-img {
-                height: 35px;
-            }
-        }
+        .animate-fade-in { animation: fadeInDown 0.3s ease; }
     </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Top Header with Government Logos - WHITE BACKGROUND -->
+
+    <!-- ── Top Header ──────────────────────────────────── -->
     <div class="top-header" id="topHeader">
         <div class="container">
-            <div class="row align-items-center g-2">
-                <div class="col-md-4 col-12 text-center text-md-start">
+            <div class="row align-items-center gy-2">
+
+                <!-- NIELIT Logo + Name -->
+                <div class="col-md-4 col-12">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
-                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/70?text=NIELIT'">
+                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo"
+                             class="logo-img"
+                             onerror="this.src='https://via.placeholder.com/70?text=NIELIT'">
                         <div>
-                            <h1 class="main-title mb-0">National Institute of Electronics<br>& Information Technology</h1>
-                            <p class="sub-title mb-0">राष्ट्रीय इलेक्ट्रॉनिकी एवं सूचना प्रौद्योगिकी संस्थान</p>
+                            <p class="main-title">National Institute of Electronics<br>&amp; Information Technology</p>
+                            <p class="sub-title">राष्ट्रीय इलेक्ट्रॉनिकी एवं सूचना प्रौद्योगिकी संस्थान</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Digital India -->
                 <div class="col-md-4 col-12 text-center">
-                    <div class="d-flex align-items-center justify-content-center gap-3">
-                        <img src="{% static 'assets/digital_india.png' %}" alt="Digital India Logo" class="logo-img" style="height: 55px;" onerror="this.src='https://via.placeholder.com/60?text=Digital+India'">
-                    </div>
+                    <img src="{% static 'assets/digital_india.png' %}" alt="Digital India"
+                         style="height:50px;width:auto;object-fit:contain;"
+                         onerror="this.src='https://via.placeholder.com/120x50?text=Digital+India'">
                 </div>
-                <div class="col-md-4 col-12 text-center text-md-end">
+
+                <!-- MeitY + Emblem -->
+                <div class="col-md-4 col-12">
                     <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
-                        <div>
-                            <p class="mb-0 fw-bold small">Ministry of Electronics &<br>Information Technology</p>
-                            <p class="mb-0 small text-muted">Government of India</p>
+                        <div class="text-center text-md-end">
+                            <p class="mb-0 fw-semibold" style="font-size:0.82rem;color:#1f2937;">
+                                Ministry of Electronics &amp;<br>Information Technology
+                            </p>
+                            <p class="mb-0" style="font-size:0.75rem;color:#6b7280;">Government of India</p>
                         </div>
-                        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="Government Emblem" class="logo-img" style="height: 50px;" onerror="this.src='https://via.placeholder.com/50?text=Emblem'">
+                        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="Government Emblem"
+                             style="height:48px;width:auto;object-fit:contain;"
+                             onerror="this.src='https://via.placeholder.com/50?text=Emblem'">
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-    <!-- Main Navigation - DARKER BLUE BACKGROUND -->
+
+    <!-- ── Main Navigation ─────────────────────────────── -->
     <nav class="main-nav" id="mainNav">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center py-2">
-                <!-- Logo -->
-                <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'public:home' %}">
-                    <i class="fas fa-graduation-cap fa-2x"></i>
-                    <span class="ms-2 fw-bold">NIELIT Delhi</span>
+
+                <a class="navbar-brand" href="{% url 'public:home' %}">
+                    <i class="fas fa-graduation-cap fs-4"></i>
+                    <span>NIELIT Delhi</span>
                 </a>
-                <!-- Desktop Menu - Cleaned up links -->
-                <div class="d-none d-lg-flex align-items-center gap-2">
+
+                <!-- Desktop links -->
+                <div class="d-none d-lg-flex align-items-center gap-1">
                     <a href="{% url 'public:home' %}" class="nav-link">
-                        <i class="fas fa-home me-1"></i> Home
+                        <i class="fas fa-home me-1"></i>Home
+                    </a>
+                    <a href="{% url 'public:announcements' %}" class="nav-link">
+                        <i class="fas fa-bullhorn me-1"></i>Announcements
                     </a>
                     <a href="{% url 'public:courses' %}" class="nav-link">
-                        <i class="fas fa-book me-1"></i> Courses
+                        <i class="fas fa-book me-1"></i>Courses
                     </a>
-                    <!-- <a href="{% url 'public:centres' %}" class="nav-link">
-                        <i class="fas fa-building me-1"></i> Centers
-                    </a> -->
-                    <!-- <a href="{% url 'public:about' %}" class="nav-link">
-                        <i class="fas fa-info-circle me-1"></i> About
-                    </a> -->
                     <a href="{% url 'public:contact' %}" class="nav-link">
-                        <i class="fas fa-envelope me-1"></i> Contact
+                        <i class="fas fa-envelope me-1"></i>Contact
                     </a>
                     <a href="{% url 'registration:user_profile' %}" class="nav-link">
-                        <i class="fas fa-user me-1"></i> Student Portal
+                        <i class="fas fa-user me-1"></i>Student Portal
                     </a>
                 </div>
-                <!-- Mobile Menu Button -->
-                <button class="btn d-lg-none" type="button" id="mobileMenuBtn">
-                    <i class="fas fa-bars fa-2x"></i>
+
+                <!-- Mobile hamburger -->
+                <button id="mobileMenuBtn" class="d-lg-none" aria-label="Open menu">
+                    <i class="fas fa-bars"></i>
                 </button>
+
             </div>
         </div>
     </nav>
-    <!-- Mobile Menu -->
+
+    <!-- ── Mobile Menu ─────────────────────────────────── -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-bars me-2"></i>Menu</h5>
-                <button class="btn btn-sm btn-light" id="closeMobileMenu">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <h5><i class="fas fa-bars me-2"></i>Menu</h5>
+            <button class="btn btn-sm btn-light" id="closeMobileMenu" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         <div class="mobile-menu-body">
-            <a href="{% url 'public:home' %}" class="nav-link">
-                <i class="fas fa-home me-2"></i> Home
-            </a>
-            <a href="{% url 'public:courses' %}" class="nav-link">
-                <i class="fas fa-book me-2"></i> Courses
-            </a>
-            <!-- <a href="{% url 'public:centres' %}" class="nav-link">
-                <i class="fas fa-building me-2"></i> Centers
-            </a> -->
-            <!-- <a href="{% url 'public:about' %}" class="nav-link">
-                <i class="fas fa-info-circle me-2"></i> About
-            </a> -->
-            <a href="{% url 'public:contact' %}" class="nav-link">
-                <i class="fas fa-envelope me-2"></i> Contact
-            </a>
-            <a href="{% url 'registration:user_profile' %}" class="nav-link">
-                <i class="fas fa-user me-2"></i> Student Portal
-            </a>
+            <a href="{% url 'public:home' %}"                  class="nav-link"><i class="fas fa-home fa-fw"></i>Home</a>
+            <a href="{% url 'public:announcements' %}"         class="nav-link"><i class="fas fa-bullhorn fa-fw"></i>Announcements</a>
+            <a href="{% url 'public:courses' %}"               class="nav-link"><i class="fas fa-book fa-fw"></i>Courses</a>
+            <a href="{% url 'public:centres' %}"               class="nav-link"><i class="fas fa-building fa-fw"></i>Centers</a>
+            <a href="{% url 'public:about' %}"                 class="nav-link"><i class="fas fa-info-circle fa-fw"></i>About</a>
+            <a href="{% url 'public:contact' %}"               class="nav-link"><i class="fas fa-envelope fa-fw"></i>Contact</a>
+            <a href="{% url 'registration:user_profile' %}"    class="nav-link"><i class="fas fa-user fa-fw"></i>Student Portal</a>
         </div>
     </div>
-    <!-- Content Block -->
-    <div class="content">
+
+    <!-- ── Page Content ────────────────────────────────── -->
+    <main class="flex-grow-1">
         {% if messages %}
-            <div class="container mt-2">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm animate-fade-in" role="alert">
-                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm animate-fade-in" role="alert">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
+
         {% block content %}{% endblock %}
-    </div>
-    <!-- Footer - Redesigned with White Logo Cards -->
+    </main>
+
+    <!-- ── Footer ──────────────────────────────────────── -->
     <footer>
-        <div class="container py-5">
-            <!-- Logos Row: Two White Cards with Logos -->
-            <!-- <div class="row g-4 justify-content-center mb-5">
-                NIELIT Logo Card
+        <div class="container py-4">
+            <div class="row justify-content-center mb-3">
                 <div class="col-md-10">
+<<<<<<< HEAD
                     <div class="logo-card d-flex align-items-center gap-4">
                         <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="logo-card-img" onerror="this.src='https://via.placeholder.com/80?text=NIELIT'">
                         <div>
@@ -570,97 +440,91 @@
                         <a href="{% url 'registration:user_profile' %}" class="text-white-50 text-decoration-none small hover-white">Student Portal</a>
                         <a href="https://onlineapply.nielit.in/" class="text-white-50 text-decoration-none small hover-white">Online Apply Portal</a>
                         <a href="https://www.nielit.gov.in/delhi/index.php" class="text-white-50 text-decoration-none small hover-white">Website - NIELIT Delhi</a>
+=======
+                    <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
+                        <a href="{% url 'public:home' %}">Home</a>
+                        <a href="{% url 'public:courses' %}">Courses</a>
+                        <a href="{% url 'public:centres' %}">Centers</a>
+                        <a href="{% url 'public:about' %}">About</a>
+                        <a href="{% url 'public:contact' %}">Contact</a>
+                        <a href="{% url 'registration:user_profile' %}">Student Portal</a>
+                        <a href="#">FAQs</a>
+                        <a href="#">Terms</a>
+>>>>>>> e0a5a2f8fb5d9921ffa8216df80b05756da93858
                     </div>
                 </div>
             </div>
-            <hr class="my-4 bg-secondary opacity-25">
-            <!-- Copyright and Development Info -->
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="mb-1 small text-white-50">
-                        <i class="fas fa-copyright me-1"></i> 2026 - NIELIT Delhi. All Rights Reserved.
-                    </p>
-                    <p class="mb-0 small text-white-50">
-                        Developed and Maintained by <strong class="text-white-75">NIELIT Delhi Web Team </strong>
-                    </p>
-                </div>
+
+            <hr style="border-color:rgba(255,255,255,0.1);margin:0 0 16px;">
+
+            <div class="text-center copyright">
+                <p class="mb-1">
+                    <i class="fas fa-copyright me-1"></i>2026 NIELIT Delhi. All Rights Reserved.
+                </p>
+                <p class="mb-0">
+                    Developed by <strong>NIELIT Delhi Web Team </strong>
+                </p>
             </div>
         </div>
     </footer>
+
+    <!-- ── Scripts ─────────────────────────────────────── -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
     <script>
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const topHeader = document.getElementById('topHeader');
-            const mainNav = document.getElementById('mainNav');
-            
-            if (window.scrollY > 50) {
-                topHeader.classList.add('scrolled');
-                mainNav.classList.add('scrolled');
-            } else {
-                topHeader.classList.remove('scrolled');
-                mainNav.classList.remove('scrolled');
-            }
-        });
-        // Mobile menu toggle with scroll fix
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
+    (function () {
+        // ── Scroll shrink ──────────────────────────────
+        const topHeader = document.getElementById('topHeader');
+        const mainNav   = document.getElementById('mainNav');
+        window.addEventListener('scroll', function () {
+            const scrolled = window.scrollY > 50;
+            topHeader.classList.toggle('scrolled', scrolled);
+            mainNav.classList.toggle('scrolled', scrolled);
+        }, { passive: true });
+
+        // ── Mobile menu ────────────────────────────────
+        const mobileMenu    = document.getElementById('mobileMenu');
         const mobileOverlay = document.getElementById('mobileOverlay');
-        const closeMobileMenu = document.getElementById('closeMobileMenu');
-        function openMobileMenu() {
+
+        function openMenu() {
             mobileMenu.classList.add('active');
             mobileOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
         }
-        function closeMobileMenuFunc() {
+        function closeMenu() {
             mobileMenu.classList.remove('active');
             mobileOverlay.classList.remove('active');
             document.body.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
         }
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', openMobileMenu);
-        }
-        if (closeMobileMenu) {
-            closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
-        }
-        if (mobileOverlay) {
-            mobileOverlay.addEventListener('click', closeMobileMenuFunc);
-        }
-        
-        // Close mobile menu on window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 992) {
-                closeMobileMenuFunc();
-            }
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', openMenu);
+        document.getElementById('closeMobileMenu').addEventListener('click', closeMenu);
+        mobileOverlay.addEventListener('click', closeMenu);
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 992) closeMenu();
         });
-        // Add active class to current nav link
-        const currentLocation = window.location.pathname;
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
+
+        // ── Active nav link ────────────────────────────
+        const path = window.location.pathname;
+        document.querySelectorAll('.main-nav .nav-link, .mobile-menu-body .nav-link').forEach(function (link) {
             const href = link.getAttribute('href');
-            if (href && (currentLocation === href || (href !== '/' && currentLocation.startsWith(href)))) {
+            if (href && href !== '/' && path.startsWith(href)) {
+                link.classList.add('active');
+            } else if (href === '/' && path === '/') {
                 link.classList.add('active');
             }
         });
-        
-        // Tooltip initialization
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
+
+        // ── Bootstrap tooltips ─────────────────────────
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            new bootstrap.Tooltip(el);
         });
-        
-        // Hover effect for footer links
-        const hoverWhiteStyle = document.createElement('style');
-        hoverWhiteStyle.textContent = '.hover-white:hover { color: white !important; }';
-        document.head.appendChild(hoverWhiteStyle);
+    })();
     </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

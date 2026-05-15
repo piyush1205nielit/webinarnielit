@@ -1,0 +1,184 @@
+{% load static %}
+{% if announcements %}
+<div class="announcements-section">
+    <div class="container-fluid px-0">
+        <div class="announcement-wrapper">
+            <div class="announcement-label">
+                <i class="fas fa-bullhorn me-2"></i>
+                <span>ANNOUNCEMENTS</span>
+            </div>
+            <div class="announcement-marquee">
+                <div class="marquee-content">
+                    {% for announcement in announcements %}
+                    <div class="announcement-item {% if announcement.is_expired %}expired{% endif %}">
+                        <i class="fas fa-{% if announcement.is_expired %}clock{% else %}bell{% endif %} me-2"></i>
+                        <span>{{ announcement.content }}</span>
+                        {% comment %} {% if not announcement.is_expired %}
+                        <span class="announcement-date">{{ announcement.created_at|date:"d M Y" }}</span>
+                        {% endif %} {% endcomment %}
+                    </div>
+                    {% endfor %}
+                    <!-- Duplicate for seamless looping -->
+                    {% for announcement in announcements %}
+                    <div class="announcement-item {% if announcement.is_expired %}expired{% endif %}">
+                        <i class="fas fa-{% if announcement.is_expired %}clock{% else %}bell{% endif %} me-2"></i>
+                        <span>{{ announcement.content }}</span>
+                        {% comment %} {% if not announcement.is_expired %}
+                        <span class="announcement-date">{{ announcement.created_at|date:"d M Y" }}</span>
+                        {% endif %} {% endcomment %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .announcements-section {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        border-bottom: 2px solid #f59e0b;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .announcement-wrapper {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    
+    .announcement-label {
+        background: #f59e0b;
+        color: #1e3a8a;
+        padding: 8px 12px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        z-index: 2;
+        position: relative;
+        clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+        padding-right: 40px;
+    }
+    
+    .announcement-label i {
+        font-size: 1rem;
+    }
+    
+    .announcement-marquee {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .marquee-content {
+        display: inline-flex;
+        animation: marquee 15s linear infinite;
+        white-space: nowrap;
+    }
+    
+    .marquee-content:hover {
+        animation-play-state: paused;
+    }
+    
+    .announcement-item {
+        display: inline-flex;
+        align-items: center;
+        padding: 12px 30px;
+        color: white;
+        font-size: 0.85rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .announcement-item i {
+        opacity: 0.9;
+    }
+    
+    .announcement-date {
+        font-size: 0.7rem;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 8px;
+        border-radius: 20px;
+        margin-left: 12px;
+        font-weight: 500;
+    }
+    
+    .announcement-item.expired {
+        opacity: 0.6;
+        text-decoration: line-through;
+    }
+    
+    @keyframes marquee {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .announcement-label {
+            padding: 8px 16px;
+            font-size: 0.7rem;
+            padding-right: 30px;
+        }
+        
+        .announcement-label i {
+            font-size: 0.8rem;
+        }
+        
+        .announcement-item {
+            padding: 8px 20px;
+            font-size: 0.75rem;
+        }
+        
+        .announcement-date {
+            font-size: 0.6rem;
+            margin-left: 8px;
+        }
+        
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+    }
+    
+    /* Adjust animation speed for different screen sizes */
+    @media (max-width: 576px) {
+        .marquee-content {
+            animation: marquee 10s linear infinite;
+        }
+    }
+</style>
+
+<script>
+    // Pause animation on hover
+    document.querySelectorAll('.announcement-marquee').forEach(marquee => {
+        marquee.addEventListener('mouseenter', () => {
+            const content = marquee.querySelector('.marquee-content');
+            if (content) {
+                content.style.animationPlayState = 'paused';
+            }
+        });
+        
+        marquee.addEventListener('mouseleave', () => {
+            const content = marquee.querySelector('.marquee-content');
+            if (content) {
+                content.style.animationPlayState = 'running';
+            }
+        });
+    });
+</script>
+{% endif %}

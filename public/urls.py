@@ -11,4 +11,5 @@ urlpatterns = [
     path('centre/<uuid:pk>/', views.centre_detail, name='centre_detail'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
+    path('announcements/', views.announcements, name='announcements'),
 ]

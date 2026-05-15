@@ -1,0 +1,451 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}All Announcements - NIELIT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .announcements-page {
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+        min-height: calc(100vh - 300px);
+    }
+    
+    .page-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 50px 0;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+    }
+    
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+    
+    .page-banner h1 {
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-banner p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .breadcrumb-custom {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item a {
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item a:hover {
+        color: white;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item.active {
+        color: #f59e0b;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255,255,255,0.6);
+    }
+    
+    /* Table Card */
+    .table-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-top: -30px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .table-header {
+        padding: 20px 25px;
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .table-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .table-header i {
+        color: #3b82f6;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    .announcements-table {
+        margin-bottom: 0;
+    }
+    
+    .announcements-table thead th {
+        background: #1e293b;
+        color: white;
+        font-weight: 600;
+        padding: 15px;
+        border: none;
+        white-space: nowrap;
+    }
+    
+    .announcements-table tbody td {
+        padding: 15px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .announcements-table tbody tr:hover {
+        background: #f8fafc;
+    }
+    
+    .serial-number {
+        font-weight: 600;
+        color: #1e3a8a;
+        width: 70px;
+    }
+    
+    .announcement-content {
+        max-width: 500px;
+        color: #1e293b;
+        line-height: 1.5;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    
+    .status-active {
+        background: #10b98120;
+        color: #059669;
+    }
+    
+    .status-expired {
+        background: #ef444420;
+        color: #dc2626;
+    }
+    
+    .date-cell {
+        white-space: nowrap;
+        font-size: 1.2rem;
+        color: #475569;
+    }
+    
+    .date-cell i {
+        margin-right: 6px;
+        color: #3b82f6;
+        font-size: 1rem;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h4 {
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #94a3b8;
+    }
+    
+    /* Footer Stats */
+    .table-footer {
+        padding: 15px 25px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .stats-info {
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+    
+    .stats-info i {
+        margin-right: 8px;
+        color: #3b82f6;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-banner {
+            padding: 30px 0;
+        }
+        
+        .page-banner h1 {
+            font-size: 1.5rem;
+        }
+        
+        .page-banner p {
+            font-size: 0.9rem;
+        }
+        
+        .table-header {
+            padding: 15px 20px;
+        }
+        
+        .table-header h3 {
+            font-size: 1rem;
+        }
+        
+        .announcements-table tbody td {
+            padding: 12px;
+        }
+        
+        .announcement-content {
+            max-width: 250px;
+            font-size: 0.85rem;
+        }
+        
+        .date-cell {
+            font-size: 0.75rem;
+        }
+        
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="announcements-page">
+    <!-- Page Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Announcements</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-bullhorn me-3"></i>All Announcements</h1>
+            <p>Stay updated with the latest news and notifications from NIELIT</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Table Card -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>
+                    <i class="fas fa-list-ul"></i>
+                    Announcements 
+                    {% if announcements %}
+                    <span class="badge bg-primary ms-2">{{ announcements|length }} Total</span>
+                    {% endif %}
+                </h3>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table announcements-table">
+                    <thead>
+                        <tr>
+                            <th>S. No.</th>
+                            <th>Announcement</th>
+                            <th>Posted On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for announcement in announcements %}
+                        <tr>
+                            <td class="serial-number">{{ forloop.counter }}</td>
+                            <td class="announcement-content">
+                                <i class="fas fa-bullhorn text-primary me-2"></i>
+                                {{ announcement.content }}
+                            </td>
+                            <td class="date-cell">
+                                <i class="far fa-calendar-alt"></i>
+                                {{ announcement.created_at|date:"d M Y, h:i A" }}
+                            </td>
+                            
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <div class="empty-state">
+                                    <i class="fas fa-bullhorn"></i>
+                                    <h4>No Announcements Yet</h4>
+                                    <p>There are no announcements available at the moment.<br>Please check back later for updates.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if announcements %}
+            <div class="table-footer">
+                <div class="stats-info">
+                    <i class="fas fa-chart-line"></i>
+                    Showing {{ announcements|length }} announcement{{ announcements|length|pluralize }}
+                </div>
+                <div class="stats-info">
+                    <i class="fas fa-calendar-check"></i>
+                    Last updated: {{ announcements.0.created_at|date:"d M Y"|default:"N/A" }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Additional Info -->
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-bell fa-2x text-primary mb-3"></i>
+                        <h6 class="fw-bold">Subscribe to Updates</h6>
+                        <p class="small text-muted">Get notified about new announcements via email</p>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#subscribeModal">
+                            Subscribe Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                        <h6 class="fw-bold">Contact Support</h6>
+                        <p class="small text-muted">Have questions? Reach out to our support team</p>
+                        <a href="{% url 'public:contact' %}" class="btn btn-sm btn-outline-primary">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-share-alt fa-2x text-primary mb-3"></i>
+                        <h6 class="fw-bold">Follow Us</h6>
+                        <p class="small text-muted">Stay connected on social media for updates</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subscribe Modal -->
+<div class="modal fade" id="subscribeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-bell me-2"></i>Subscribe to Announcements
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Enter your email address to receive notifications about new announcements.</p>
+                <form id="subscribeForm">
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="termsCheck">
+                        <label class="form-check-label small" for="termsCheck">
+                            I agree to receive email notifications
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="alert('Subscription feature coming soon!')">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Modal styling */
+    .modal-content {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .modal-header {
+        border-bottom: none;
+    }
+    
+    .modal-footer {
+        border-top: none;
+    }
+</style>
+
+<script>
+    // Auto-hide alert after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.add('fade');
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
+    });
+</script>
+{% endblock %}
