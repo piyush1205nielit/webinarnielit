@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <style>
+
     body, h1, h2, h3, h4, h5, h6, p, a, span, div,
     .nav-link, .btn, .form-control, .form-select {
         font-family: 'Poppins', sans-serif !important;
@@ -15,10 +16,13 @@
         min-height: calc(100vh - 300px);
     }
 
-    /* ── Banner ─────────────────────────────────── */
+    /* =====================================================
+       BANNER
+    ===================================================== */
+
     .page-banner {
         background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        padding: 40px 0 36px;
+        padding: 42px 0 38px;
         color: white;
         position: relative;
         overflow: hidden;
@@ -27,8 +31,10 @@
     .page-banner::before {
         content: '';
         position: absolute;
-        top: -50%; right: -10%;
-        width: 220px; height: 220px;
+        top: -50%;
+        right: -10%;
+        width: 220px;
+        height: 220px;
         border-radius: 50%;
         background: rgba(255,255,255,0.08);
     }
@@ -36,8 +42,10 @@
     .page-banner::after {
         content: '';
         position: absolute;
-        bottom: -30%; left: -5%;
-        width: 160px; height: 160px;
+        bottom: -30%;
+        left: -5%;
+        width: 160px;
+        height: 160px;
         border-radius: 50%;
         background: rgba(255,255,255,0.06);
     }
@@ -53,9 +61,9 @@
     .page-banner p {
         font-size: 0.95rem;
         opacity: 0.9;
+        margin: 0;
         position: relative;
         z-index: 1;
-        margin: 0;
     }
 
     .breadcrumb-custom {
@@ -65,66 +73,68 @@
     }
 
     .breadcrumb-custom .breadcrumb-item a {
-        color: rgba(255,255,255,0.8);
+        color: rgba(255,255,255,0.82);
         text-decoration: none;
-        font-weight: 500;
         font-size: 0.85rem;
+        font-weight: 500;
     }
-
-    .breadcrumb-custom .breadcrumb-item a:hover { color: white; }
 
     .breadcrumb-custom .breadcrumb-item.active {
         color: #f59e0b;
         font-size: 0.85rem;
-        font-weight: 500;
     }
 
     .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
-        color: rgba(255,255,255,0.5);
-        font-size: 0.85rem;
+        color: rgba(255,255,255,0.45);
     }
 
-    /* ── Filter Card ────────────────────────────── */
+    /* =====================================================
+       FILTER CARD
+    ===================================================== */
+
     .filter-card {
         background: white;
-        border-radius: 16px;
+        border-radius: 18px;
         box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-        margin: 28px 0 32px;
+        margin: 30px 0 34px;
         overflow: hidden;
     }
 
     .filter-header {
         background: #f8fafc;
-        padding: 14px 22px;
+        padding: 16px 22px;
         border-bottom: 1px solid #e2e8f0;
     }
 
     .filter-header h5 {
         margin: 0;
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 0.96rem;
+        font-weight: 700;
         color: #1e3a8a;
     }
 
     .filter-body {
-        padding: 20px 22px;
+        padding: 22px;
     }
 
     .form-label {
-        font-weight: 600;
         font-size: 0.82rem;
+        font-weight: 600;
         margin-bottom: 6px;
         color: #374151;
     }
 
-    .form-control, .form-select {
-        font-size: 0.88rem;
-        padding: 9px 12px;
-        border-radius: 10px;
+    .form-control,
+    .form-select {
+        height: 46px;
+        border-radius: 12px;
         border: 1px solid #e2e8f0;
+        font-size: 0.88rem;
+        padding: 10px 14px;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus,
+    .form-select:focus {
         border-color: #2563eb;
         box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
     }
@@ -133,121 +143,183 @@
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-right: none;
+        border-radius: 12px 0 0 12px;
+        padding: 0 14px;
         font-size: 0.85rem;
-        padding: 9px 12px;
-        border-radius: 10px 0 0 10px;
     }
 
     .input-group .form-control {
-        border-radius: 0 10px 10px 0;
+        border-radius: 0 12px 12px 0;
+    }
+
+    /* =====================================================
+       FILTER BUTTONS FIXED
+    ===================================================== */
+
+    .filter-btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .filter-btn-group .btn {
+        height: 46px;
+        border-radius: 12px;
+        font-size: 0.88rem;
+        font-weight: 600;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transition: all .25s ease;
     }
 
     .btn-primary {
-        padding: 9px 16px;
-        font-size: 0.88rem;
-        font-weight: 600;
-        border-radius: 10px;
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(37,99,235,0.25);
     }
 
     .btn-outline-secondary {
-        padding: 9px 16px;
-        font-size: 0.88rem;
-        font-weight: 600;
-        border-radius: 10px;
+        border: 1px solid #d1d5db;
     }
 
-    /* ── Course Grid ────────────────────────────── */
+    .btn-outline-secondary:hover {
+        transform: translateY(-1px);
+    }
+
+    /* =====================================================
+       COURSE GRID
+    ===================================================== */
+
     .course-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 42px;
     }
 
     .course-card {
         background: white;
-        border-radius: 16px;
+        border-radius: 18px;
         overflow: hidden;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.07);
         border: 1px solid #e2e8f0;
+
+        box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+
+        transition:
+            transform .28s ease,
+            box-shadow .28s ease;
     }
 
     .course-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+        box-shadow: 0 18px 40px rgba(0,0,0,0.12);
     }
 
     .course-image-wrapper {
         position: relative;
         overflow: hidden;
-        height: 190px;
+        height: 200px;
     }
 
     .course-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+
+        transition: transform .45s ease;
     }
 
     .course-card:hover .course-image {
-        transform: scale(1.04);
+        transform: scale(1.05);
     }
 
     .course-badge {
         position: absolute;
-        top: 12px; right: 12px;
+        top: 14px;
+        right: 14px;
+
         padding: 5px 12px;
         border-radius: 20px;
-        font-size: 0.78rem;
+
+        font-size: 0.76rem;
         font-weight: 700;
+
         z-index: 2;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
+        box-shadow: 0 2px 8px rgba(0,0,0,0.14);
     }
 
-    .badge-free  { background: #10b981; color: white; }
-    .badge-paid  { background: #f59e0b; color: white; }
+    .badge-free {
+        background: #10b981;
+        color: white;
+    }
+
+    .badge-paid {
+        background: #f59e0b;
+        color: white;
+    }
 
     .course-mode-badge {
         position: absolute;
-        bottom: 12px; left: 12px;
+        left: 14px;
+        bottom: 14px;
+
         background: rgba(0,0,0,0.72);
         color: white;
+
         padding: 4px 12px;
+
         border-radius: 20px;
-        font-size: 0.78rem;
+
+        font-size: 0.76rem;
         font-weight: 600;
-        z-index: 2;
+
         backdrop-filter: blur(4px);
     }
 
     .course-content {
         padding: 18px 20px 20px;
+
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 200px);
     }
 
     .course-title {
         font-size: 1rem;
         font-weight: 700;
         color: #1e293b;
-        margin-bottom: 8px;
-        line-height: 1.4;
+        margin-bottom: 10px;
+        line-height: 1.45;
     }
 
     .course-description {
         font-size: 0.85rem;
         color: #64748b;
-        margin-bottom: 14px;
-        line-height: 1.55;
+        line-height: 1.6;
+
+        margin-bottom: 16px;
+
+        flex-grow: 1;
     }
 
     .course-meta {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-top: 12px;
+
+        padding-top: 14px;
+        margin-bottom: 16px;
+
         border-top: 1px solid #f1f5f9;
-        margin-bottom: 14px;
     }
 
     .course-duration {
@@ -257,8 +329,8 @@
     }
 
     .course-duration i {
-        margin-right: 5px;
         color: #3b82f6;
+        margin-right: 5px;
     }
 
     .course-fee {
@@ -267,69 +339,109 @@
         color: #1e3a8a;
     }
 
+    /* =====================================================
+       VIEW BUTTON FIXED
+    ===================================================== */
+
     .btn-view {
-        background: linear-gradient(135deg, #1e3a8a, #2563eb);
-        color: white;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.88rem;
-        transition: all 0.25s ease;
         width: 100%;
-        text-align: center;
-        display: inline-block;
+        height: 46px;
+
+        border-radius: 12px;
+        border: none;
+
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+
+        color: white;
         text-decoration: none;
+
+        font-size: 0.88rem;
+        font-weight: 600;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
     }
 
     .btn-view:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(30,58,138,0.28);
         color: white;
+        transform: translateY(-2px);
+
+        box-shadow: 0 10px 22px rgba(30,58,138,0.28);
     }
 
-    /* ── Empty State ────────────────────────────── */
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
     .empty-state {
-        text-align: center;
-        padding: 60px 30px;
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
         grid-column: 1 / -1;
+
+        background: white;
+        border-radius: 18px;
+
+        border: 1px solid #e2e8f0;
+
+        text-align: center;
+
+        padding: 70px 30px;
     }
 
     .empty-state i {
         font-size: 3.5rem;
         color: #cbd5e1;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
     }
 
     .empty-state h4 {
-        color: #64748b;
-        font-weight: 700;
         font-size: 1.15rem;
+        font-weight: 700;
+        color: #64748b;
         margin-bottom: 8px;
     }
 
     .empty-state p {
-        color: #94a3b8;
         font-size: 0.88rem;
-        margin-bottom: 16px;
+        color: #94a3b8;
+        margin-bottom: 18px;
     }
 
-    /* ── Pagination ─────────────────────────────── */
-    .pagination { gap: 6px; }
+    /* =====================================================
+       PAGINATION FIXED
+    ===================================================== */
+
+    .pagination {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
 
     .page-link {
-        border-radius: 10px;
+
+        min-width: 44px;
+        height: 44px;
+
         border: none;
-        padding: 8px 16px;
-        color: #1e3a8a;
+        border-radius: 12px;
+
         background: white;
-        font-weight: 600;
+        color: #1e3a8a;
+
         font-size: 0.88rem;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        font-weight: 600;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0 16px;
+
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+        transition: all .22s ease;
     }
 
     .page-link:hover {
@@ -344,207 +456,450 @@
     }
 
     .page-item.disabled .page-link {
-        color: #cbd5e1;
         background: #f8fafc;
-        cursor: not-allowed;
+        color: #cbd5e1;
         box-shadow: none;
     }
 
-    /* ── Responsive ─────────────────────────────── */
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 992px) {
+
+        .course-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+    }
+
     @media (max-width: 768px) {
-        .page-banner { padding: 28px 0 24px; }
-        .page-banner h1 { font-size: 1.5rem; }
-        .page-banner p  { font-size: 0.88rem; }
 
-        .filter-card  { margin: 20px 0 24px; }
-        .filter-body  { padding: 16px; }
+        .page-banner {
+            padding: 30px 0 26px;
+        }
 
-        .course-grid  { grid-template-columns: 1fr; gap: 18px; }
-        .course-image-wrapper { height: 170px; }
+        .page-banner h1 {
+            font-size: 1.55rem;
+        }
+
+        .page-banner p {
+            font-size: 0.88rem;
+        }
+
+        .filter-body {
+            padding: 18px;
+        }
+
+        .filter-btn-group {
+            margin-top: 4px;
+        }
+
+        .course-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .course-image-wrapper {
+            height: 185px;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
     }
 
     @media (max-width: 576px) {
-        .page-banner h1 { font-size: 1.3rem; }
-        .course-content { padding: 14px 16px 16px; }
-        .course-title   { font-size: 0.95rem; }
-        .btn-view       { font-size: 0.85rem; padding: 9px 14px; }
+
+        .page-banner h1 {
+            font-size: 1.32rem;
+        }
+
+        .course-content {
+            padding: 16px;
+        }
+
+        .course-title {
+            font-size: 0.95rem;
+        }
+
+        .course-description {
+            font-size: 0.82rem;
+        }
+
+        .page-link {
+            min-width: 40px;
+            height: 40px;
+            font-size: 0.82rem;
+        }
     }
+
 </style>
 {% endblock %}
 
 {% block content %}
+
 <div class="courses-page">
 
+    <!-- Banner -->
     <div class="page-banner">
+
         <div class="container">
+
             <nav aria-label="breadcrumb">
+
                 <ol class="breadcrumb breadcrumb-custom">
+
                     <li class="breadcrumb-item">
-                        <a href="{% url 'public:home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                        <a href="{% url 'public:home' %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">Courses</li>
+
+                    <li class="breadcrumb-item active">
+                        Courses
+                    </li>
+
                 </ol>
+
             </nav>
-            <h1><i class="fas fa-book-open me-2"></i>Our Courses</h1>
-            <p>Choose from a wide range of professional courses designed for career success</p>
+
+            <h1>
+                <i class="fas fa-book-open me-2"></i>
+                Our Courses
+            </h1>
+
+            <p>
+                Choose from a wide range of professional courses designed for career success
+            </p>
+
         </div>
+
     </div>
 
     <div class="container">
 
+        <!-- Filters -->
         <div class="filter-card">
+
             <div class="filter-header">
-                <h5><i class="fas fa-filter me-2"></i>Filter Courses</h5>
+                <h5>
+                    <i class="fas fa-filter me-2"></i>
+                    Filter Courses
+                </h5>
             </div>
+
             <div class="filter-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label"><i class="fas fa-search me-1"></i>Search</label>
+
+                <form method="get" class="row g-3 align-items-end">
+
+                    <div class="col-lg-4 col-md-6">
+
+                        <label class="form-label">
+                            <i class="fas fa-search me-1"></i>
+                            Search
+                        </label>
+
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" name="search" class="form-control"
-                                   placeholder="Course name or keyword…"
+
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+
+                            <input type="text"
+                                   name="search"
+                                   class="form-control"
+                                   placeholder="Course name or keyword..."
                                    value="{{ request.GET.search }}">
+
                         </div>
+
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-globe me-1"></i>Mode</label>
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <label class="form-label">
+                            <i class="fas fa-globe me-1"></i>
+                            Mode
+                        </label>
+
                         <select name="mode" class="form-select">
+
                             <option value="">All Modes</option>
+
                             {% for mode_value, mode_label in modes %}
-                            <option value="{{ mode_value }}" {% if request.GET.mode == mode_value %}selected{% endif %}>
+
+                            <option value="{{ mode_value }}"
+                                {% if request.GET.mode == mode_value %}selected{% endif %}>
+
                                 {{ mode_label }}
+
                             </option>
+
                             {% endfor %}
+
                         </select>
+
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label"><i class="fas fa-tag me-1"></i>Type</label>
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <label class="form-label">
+                            <i class="fas fa-tag me-1"></i>
+                            Type
+                        </label>
+
                         <select name="type" class="form-select">
+
                             <option value="">All Types</option>
+
                             {% for status_value, status_label in status_choices %}
-                            <option value="{{ status_value }}" {% if request.GET.type == status_value %}selected{% endif %}>
+
+                            <option value="{{ status_value }}"
+                                {% if request.GET.type == status_value %}selected{% endif %}>
+
                                 {{ status_label }}
+
                             </option>
+
                             {% endfor %}
+
                         </select>
+
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <div class="d-grid gap-2 w-100">
+
+                    <!-- FIXED BUTTON LAYOUT -->
+                    <div class="col-lg-2 col-md-6">
+
+                        <div class="filter-btn-group">
+
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search me-1"></i>Apply
+                                <i class="fas fa-search me-2"></i>
+                                Apply Filters
                             </button>
-                            <a href="{% url 'public:courses' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-redo me-1"></i>Reset
+
+                            <a href="{% url 'public:courses' %}"
+                               class="btn btn-outline-secondary">
+
+                                <i class="fas fa-redo me-2"></i>
+                                Reset
+
                             </a>
+
                         </div>
+
                     </div>
+
                 </form>
+
             </div>
+
         </div>
 
+        <!-- Course Grid -->
         <div class="course-grid">
+
             {% for course in page_obj %}
+
             <div class="course-card">
+
                 <div class="course-image-wrapper">
+
                     {% if course.image %}
-                    <img src="{{ course.image.url }}" class="course-image" alt="{{ course.course_name }}">
+
+                    <img src="{{ course.image.url }}"
+                         class="course-image"
+                         alt="{{ course.course_name }}">
+
                     {% else %}
+
                     <div class="course-image d-flex align-items-center justify-content-center"
                          style="background: linear-gradient(135deg, #1e3a8a, #2563eb);">
+
                         <i class="fas fa-graduation-cap fa-4x text-white opacity-50"></i>
+
                     </div>
+
                     {% endif %}
 
                     <div class="course-badge {% if course.is_free %}badge-free{% else %}badge-paid{% endif %}">
+
                         {% if course.is_free %}
-                        <i class="fas fa-gift me-1"></i>Free
+
+                        <i class="fas fa-gift me-1"></i>
+                        Free
+
                         {% else %}
-                        <i class="fas fa-tag me-1"></i>{{ course.display_fees }}
+
+                        <i class="fas fa-tag me-1"></i>
+                        {{ course.display_fees }}
+
                         {% endif %}
+
                     </div>
 
                     <div class="course-mode-badge">
+
                         <i class="fas fa-{% if course.mode == 'online' %}laptop{% elif course.mode == 'offline' %}building{% else %}sync{% endif %} me-1"></i>
+
                         {{ course.get_mode_display }}
+
                     </div>
+
                 </div>
 
                 <div class="course-content">
-                    <h5 class="course-title">{{ course.course_name }}</h5>
-                    <p class="course-description">{{ course.course_desc|truncatewords:20 }}</p>
+
+                    <h5 class="course-title">
+                        {{ course.course_name }}
+                    </h5>
+
+                    <p class="course-description">
+                        {{ course.course_desc|truncatewords:20 }}
+                    </p>
 
                     <div class="course-meta">
+
                         <div class="course-duration">
                             <i class="far fa-clock"></i>
                             {{ course.course_duration|default:"Flexible" }}
                         </div>
-                        <div class="course-fee">{{ course.display_fees }}</div>
+
+                        <div class="course-fee">
+                            {{ course.display_fees }}
+                        </div>
+
                     </div>
 
-                    <a href="{% url 'public:course_detail' course.slug %}" class="btn-view">
-                        View Details <i class="fas fa-arrow-right ms-2"></i>
+                    <a href="{% url 'public:course_detail' course.slug %}"
+                       class="btn-view">
+
+                        View Details
+                        <i class="fas fa-arrow-right ms-2"></i>
+
                     </a>
+
                 </div>
+
             </div>
+
             {% empty %}
+
             <div class="empty-state">
+
                 <i class="fas fa-book-open"></i>
+
                 <h4>No courses found</h4>
+
                 <p>Try adjusting your search criteria.</p>
-                <a href="{% url 'public:courses' %}" class="btn btn-primary mt-2">
-                    <i class="fas fa-redo me-1"></i>Clear Filters
+
+                <a href="{% url 'public:courses' %}"
+                   class="btn btn-primary mt-2">
+
+                    <i class="fas fa-redo me-1"></i>
+                    Clear Filters
+
                 </a>
+
             </div>
+
             {% endfor %}
+
         </div>
 
+        <!-- Pagination -->
         {% if page_obj.has_other_pages %}
+
         <div class="d-flex justify-content-center mt-2 mb-5">
+
             <nav>
+
                 <ul class="pagination">
+
                     {% if page_obj.has_previous %}
+
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">
-                            <i class="fas fa-chevron-left me-1"></i>Prev
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">
+
+                            <i class="fas fa-chevron-left me-1"></i>
+                            Prev
+
                         </a>
+
                     </li>
+
                     {% else %}
+
                     <li class="page-item disabled">
-                        <a class="page-link" href="#"><i class="fas fa-chevron-left me-1"></i>Prev</a>
+                        <span class="page-link">
+                            <i class="fas fa-chevron-left me-1"></i>
+                            Prev
+                        </span>
                     </li>
+
                     {% endif %}
 
                     {% for num in page_obj.paginator.page_range %}
+
                         {% if num == page_obj.number %}
+
                         <li class="page-item active">
-                            <a class="page-link" href="#">{{ num }}</a>
+                            <span class="page-link">{{ num }}</span>
                         </li>
+
                         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">
+
+                            <a class="page-link"
+                               href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">
+
                                 {{ num }}
+
                             </a>
+
                         </li>
+
                         {% endif %}
+
                     {% endfor %}
 
                     {% if page_obj.has_next %}
+
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">
-                            Next <i class="fas fa-chevron-right ms-1"></i>
+
+                        <a class="page-link"
+                           href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.mode %}&mode={{ request.GET.mode }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">
+
+                            Next
+                            <i class="fas fa-chevron-right ms-1"></i>
+
                         </a>
+
                     </li>
+
                     {% else %}
+
                     <li class="page-item disabled">
-                        <a class="page-link" href="#">Next <i class="fas fa-chevron-right ms-1"></i></a>
+                        <span class="page-link">
+                            Next
+                            <i class="fas fa-chevron-right ms-1"></i>
+                        </span>
                     </li>
+
                     {% endif %}
+
                 </ul>
+
             </nav>
+
         </div>
+
         {% endif %}
 
     </div>
+
 </div>
+
 {% endblock %}

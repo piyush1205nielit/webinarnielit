@@ -1,264 +1,400 @@
 {% load static %}
 {% if carousel_images %}
-<div class="carousel-wrapper bg-light">
-    <div class="carousel-container">
-        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-            <div class="carousel-indicators">
+
+<div class="hero-carousel-section">
+    <div class="hero-carousel-container">
+
+        <div id="featuredCarousel"
+             class="carousel slide carousel-fade"
+             data-bs-ride="carousel"
+             data-bs-interval="5000"
+             data-bs-pause="hover">
+
+            <!-- Indicators -->
+            <div class="carousel-indicators custom-indicators">
                 {% for image in carousel_images %}
-                <button type="button" data-bs-target="#featuredCarousel"
+                <button type="button"
+                        data-bs-target="#featuredCarousel"
                         data-bs-slide-to="{{ forloop.counter0 }}"
                         {% if forloop.first %}class="active"{% endif %}
-                        aria-label="Slide {{ forloop.counter }}"></button>
+                        aria-current="{% if forloop.first %}true{% endif %}"
+                        aria-label="Slide {{ forloop.counter }}">
+                </button>
                 {% endfor %}
             </div>
 
-            <div class="carousel-inner">
+            <!-- Slides -->
+            <div class="carousel-inner rounded-4 overflow-hidden">
+
                 {% for image in carousel_images %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
                     <div class="carousel-image-wrapper">
+
                         {% if image.link_url %}
-                        <a href="{{ image.link_url }}" target="_blank">
-                            <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}" style="object-fit: cover;">
+                        <a href="{{ image.link_url }}" target="_blank" rel="noopener noreferrer">
+                            <img src="{{ image.image.url }}"
+                                 class="carousel-image"
+                                 alt="Carousel Image {{ forloop.counter }}"
+                                 loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
                         </a>
                         {% else %}
-                        <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}" style="object-fit: cover;">
+                        <img src="{{ image.image.url }}"
+                             class="carousel-image"
+                             alt="Carousel Image {{ forloop.counter }}"
+                             loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
                         {% endif %}
+
                     </div>
-                   
+
                 </div>
                 {% endfor %}
+
             </div>
 
-            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
+            <!-- Controls -->
+            <button class="carousel-control-prev custom-control"
+                    type="button"
+                    data-bs-target="#featuredCarousel"
+                    data-bs-slide="prev">
+
+                <span class="carousel-control-prev-icon"></span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
+
+            <button class="carousel-control-next custom-control"
+                    type="button"
+                    data-bs-target="#featuredCarousel"
+                    data-bs-slide="next">
+
+                <span class="carousel-control-next-icon"></span>
             </button>
+
         </div>
+
     </div>
 </div>
 
 <style>
-    .carousel-wrapper {
-        background: linear-gradient(135deg, #f0f2f5 0%, #e8edf5 100%);
-        padding: 30px 0;
+
+/* =========================
+   SECTION
+========================= */
+
+.hero-carousel-section {
+    padding: 22px 0;
+    background:
+        linear-gradient(
+            135deg,
+            #eef2ff 0%,
+            #f8fafc 45%,
+            #e0f2fe 100%
+        );
+}
+
+/* Slightly smaller container on large screens */
+.hero-carousel-container {
+    width: min(88%, 1320px);
+    margin: auto;
+}
+
+/* =========================
+   MAIN CAROUSEL
+========================= */
+
+#featuredCarousel {
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+
+    background: #0f172a;
+
+    box-shadow:
+        0 8px 24px rgba(0,0,0,0.08),
+        0 18px 50px rgba(15,23,42,0.12);
+}
+
+/* Smooth sliding transition */
+#featuredCarousel .carousel-item {
+    transition:
+        transform 0.9s ease-in-out,
+        opacity 0.9s ease-in-out;
+}
+
+/* =========================
+   IMAGE WRAPPER
+========================= */
+
+.carousel-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+/* Skeleton Loader */
+.carousel-image-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e5e7eb 25%,
+            #f3f4f6 50%,
+            #e5e7eb 75%
+        );
+
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite linear;
+
+    z-index: 1;
+}
+
+.carousel-image-wrapper.loaded::before {
+    display: none;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* =========================
+   IMAGE
+========================= */
+
+.carousel-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    display: block;
+
+    /* Removed zoom animation */
+    transform: none;
+    transition: none;
+
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.custom-control {
+    width: 8%;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+#featuredCarousel:hover .custom-control {
+    opacity: 1;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+
+    background-color: rgba(15,23,42,0.72);
+    background-size: 40%;
+
+    backdrop-filter: blur(10px);
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease;
+}
+
+.carousel-control-prev-icon:hover,
+.carousel-control-next-icon:hover {
+    transform: scale(1.05);
+    background-color: rgba(30,41,59,0.92);
+}
+
+/* =========================
+   INDICATORS
+========================= */
+
+.custom-indicators {
+    bottom: 16px;
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+.custom-indicators button {
+
+    width: 30px;
+    height: 4px;
+
+    border: none;
+    border-radius: 999px;
+
+    background: rgba(255,255,255,0.45);
+
+    transition:
+        width .25s ease,
+        background .25s ease;
+}
+
+.custom-indicators button.active {
+    width: 52px;
+    background: #ffffff;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (min-width: 1600px) {
+    .hero-carousel-container {
+        max-width: 1250px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .hero-carousel-container {
+        width: 92%;
+    }
+}
+
+@media (max-width: 992px) {
+
+    .hero-carousel-section {
+        padding: 18px 0;
     }
 
-    .carousel-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 15px;
+    .hero-carousel-container {
+        width: 95%;
     }
 
     #featuredCarousel {
-        background: #1a1a2e;
         border-radius: 20px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-        overflow: hidden;
     }
 
-    /* ── Slide transition: Bootstrap .slide uses translateX.
-          We keep that and just tune the timing. ── */
-    #featuredCarousel .carousel-item {
-        transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    /* ── Images ── */
-    .carousel-image-wrapper {
-        overflow: hidden;
-        line-height: 0;   /* removes gap below inline img */
-    }
-
-    .carousel-image {
-    height: 80%;
-    width: 80%;
-    object-fit: cover;   /* fills fully */
-    object-position: center;
-    display: block;
-    position: relative;
-    z-index: 1;
-        /* NO background/animation here — that was overriding the image */
-    }
-
-    /* Skeleton shown only while image hasn't loaded */
-    .carousel-image-wrapper::before {
-        content: '';
-        display: block;
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg, #e8e8e8 25%, #d0d0d0 50%, #e8e8e8 75%);
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
-        z-index: 0;
-    }
-
-    .carousel-image-wrapper {
-        position: relative;
-    }
-
-    .carousel-image {
-        position: relative;
-        z-index: 1;   /* sits above the skeleton */
-    }
-
-    @keyframes shimmer {
-        from { background-position: 200% 0; }
-        to   { background-position: -200% 0; }
-    }
-
-    /* ── Caption ── */
-    .carousel-caption {
-        background: linear-gradient(0deg, rgba(0,0,0,0.72) 0%, transparent 100%);
-        border-radius: 0 0 20px 20px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 48px 40px 28px;
-    }
-
-    .carousel-caption h3 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    .carousel-caption p {
-        font-size: 1rem;
-        margin: 0;
-    }
-
-    /* Animate caption in when slide becomes active */
-    .carousel-item.active .carousel-caption h3 {
-        animation: captionUp 0.5s ease 0.2s both;
-    }
-    .carousel-item.active .carousel-caption p {
-        animation: captionUp 0.5s ease 0.35s both;
-    }
-
-    @keyframes captionUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Controls ── */
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 8%;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    #featuredCarousel:hover .carousel-control-prev,
-    #featuredCarousel:hover .carousel-control-next {
+    .custom-control {
         opacity: 1;
+        width: 12%;
     }
 
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
-        background-color: rgba(30, 58, 138, 0.85);
-        border-radius: 50%;
-        padding: 24px;
-        background-size: 50%;
-        transition: background-color 0.2s ease, transform 0.2s ease;
+        width: 42px;
+        height: 42px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .hero-carousel-container {
+        width: 100%;
+        padding: 0 12px;
     }
 
-    .carousel-control-prev-icon:hover,
-    .carousel-control-next-icon:hover {
-        background-color: #1e3a8a;
-        transform: scale(1.1);
+    #featuredCarousel {
+        border-radius: 16px;
     }
 
-    /* ── Indicators ── */
-    .carousel-indicators {
-        bottom: 18px;
-        margin-bottom: 0;
-        gap: 6px;
+    .carousel-image-wrapper {
+        aspect-ratio: 16 / 10;
     }
 
-    .carousel-indicators button {
+    .custom-indicators button {
+        width: 20px;
+    }
+
+    .custom-indicators button.active {
         width: 36px;
-        height: 4px;
-        background: rgba(255,255,255,0.45);
-        border: none;
-        border-radius: 2px;
-        margin: 0;
-        transition: width 0.3s ease, background 0.3s ease;
     }
 
-    .carousel-indicators button.active {
-        width: 60px;
-        background: #f59e0b;
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .carousel-image-wrapper {
+        aspect-ratio: 16 / 11;
     }
 
-    /* ── Responsive ── */
-    @media (min-width: 1400px) {
-        .carousel-image { height: 580px; }
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 32px;
+        height: 32px;
     }
-
-    @media (max-width: 1024px) {
-        .carousel-image { height: 420px; }
-        .carousel-caption h3 { font-size: 1.4rem; }
-    }
-
-    @media (max-width: 768px) {
-        .carousel-wrapper { padding: 15px 0; }
-        .carousel-image { height: 280px; }
-        .carousel-caption { padding: 32px 20px 16px; }
-        .carousel-caption h3 { font-size: 1.1rem; margin-bottom: 4px; }
-        .carousel-caption p { font-size: 0.78rem; }
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon { padding: 16px; background-size: 40%; }
-        .carousel-indicators button { width: 22px; height: 3px; }
-        .carousel-indicators button.active { width: 36px; }
-    }
-
-    @media (max-width: 576px) {
-        .carousel-image { height: 220px; }
-    }
+}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ── Skeleton removal ──────────────────────────────────
-    document.querySelectorAll('.carousel-image').forEach(function (img) {
-        function markLoaded() {
-            const wrapper = img.closest('.carousel-image-wrapper');
-            if (wrapper) wrapper.classList.add('loaded');
-        }
+
+    // ===============================
+    // Skeleton Loader Remove
+    // ===============================
+
+    document.querySelectorAll('.carousel-image').forEach((img) => {
+
+        const wrapper = img.closest('.carousel-image-wrapper');
+
+        const loaded = () => {
+            if (wrapper) {
+                wrapper.classList.add('loaded');
+            }
+        };
+
         if (img.complete && img.naturalWidth > 0) {
-            markLoaded();
+            loaded();
         } else {
-            img.addEventListener('load', markLoaded);
+            img.addEventListener('load', loaded);
+            img.addEventListener('error', loaded);
         }
     });
 
-    // ── Explicit Bootstrap Carousel init (fixes auto-scroll) ──
-    const el = document.getElementById('featuredCarousel');
-    if (el && typeof bootstrap !== 'undefined') {
-        const carousel = new bootstrap.Carousel(el, {
-            interval: 4000,
-            ride:     'carousel',
-            wrap:     true,
-            touch:    true
-        });
+    // ===============================
+    // Bootstrap Carousel Init
+    // ===============================
 
-        // Restart auto-scroll after manual interaction
-        el.addEventListener('click', function (e) {
-            if (e.target.closest('.carousel-control-prev, .carousel-control-next, .carousel-indicators button')) {
+    const carouselElement =
+        document.querySelector('#featuredCarousel');
+
+    if (carouselElement && window.bootstrap) {
+
+        const carousel =
+            new bootstrap.Carousel(carouselElement, {
+                interval: 3500,
+                ride: 'carousel',
+                pause: 'hover',
+                wrap: true,
+                touch: true
+            });
+
+        // Force autoplay start
+        carousel.cycle();
+
+        // Restart autoplay after manual controls
+        carouselElement.addEventListener(
+            'slid.bs.carousel',
+            function () {
                 carousel.cycle();
             }
-        });
+        );
     }
 });
 </script>
 
-<style>
-    /* Stop skeleton shimmer once image is loaded */
-    .carousel-image-wrapper.loaded::before {
-        display: none;
-    }
-</style>
 {% endif %}

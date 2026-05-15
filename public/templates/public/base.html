@@ -219,7 +219,7 @@
             border: none;
         }
 
-        /* ── Footer ──────────────────────────────────────── */
+         /* ── Footer ──────────────────────────────────────── */
         footer {
             background: linear-gradient(135deg, #0a1a2f 0%, #051220 100%);
             color: #9ca3af;
@@ -233,6 +233,7 @@
             font-size: 0.88rem;
             transition: color 0.2s ease;
         }
+
         footer a:hover { color: white; }
 
         footer .copyright {
@@ -375,45 +376,12 @@
         {% block content %}{% endblock %}
     </main>
     <!-- ── Footer ──────────────────────────────────────── -->
+    <!-- ── Footer ──────────────────────────────────────── -->
     <footer>
-        <div class="container py-1">
-            <div class="row justify-content-center mb-2
-            ">
+        <div class="container py-4">
+            <div class="row justify-content-center mb-3">
                 <div class="col-md-10">
-<!-- <<<<<<< HEAD
-                    <div class="logo-card d-flex align-items-center gap-4">
-                        <img src="{% static 'assets/nielit_logo.jpg' %}" alt="NIELIT Logo" class="logo-card-img" onerror="this.src='https://via.placeholder.com/80?text=NIELIT'">
-                        <div>
-                            <p class="logo-card-title">NIELIT</p>
-                            <p class="logo-card-subtitle">National Institute of Electronics<br>& Information Technology</p>
-                        </div>
-                    </div>
-                </div> --> 
-                <!-- MeitY Logo Card -->
-                <!-- <div class="col-md-5">
-                    <div class="logo-card d-flex align-items-center gap-4">
-                        <img src="{% static 'assets/nat_emblem.jpg' %}" alt="MeitY Emblem" class="logo-card-img" style="height: 55px;" onerror="this.src='https://via.placeholder.com/55?text=Emblem'">
-                        <div>
-                            <p class="logo-card-title">MeitY</p>
-                            <p class="logo-card-subtitle">Ministry of Electronics &<br>Information Technology(Meity)</p>
-                        </div>
-                    </div>
-                </div> -->
-            </div> 
-            <!-- Quick Links Row - Clean, minimal -->
-            <div class="row g-1 justify-content-center border-top border-light pt-1">
-                <div class="col-md-8">
-                    <div class="d-flex flex-wrap justify-content-center gap-2 gap-md-5">
-                        <a href="{% url 'public:home' %}" class="text-white-50 text-decoration-none small hover-white">Home</a>
-                        <a href="{% url 'public:courses' %}" class="text-white-50 text-decoration-none small hover-white">Courses</a>
-                        <!-- <a href="{% url 'public:centres' %}" class="text-white-50 text-decoration-none small hover-white">Centers</a> -->
-                        <!-- <a href="{% url 'public:about' %}" class="text-white-50 text-decoration-none small hover-white">About</a> -->
-                        <a href="{% url 'public:contact' %}" class="text-white-50 text-decoration-none small hover-white">Contact</a>
-                        <a href="{% url 'registration:user_profile' %}" class="text-white-50 text-decoration-none small hover-white">Student Portal</a>
-                        <a href="https://onlineapply.nielit.in/" class="text-white-50 text-decoration-none small hover-white">Online Apply Portal</a>
-                        <a href="https://www.nielit.gov.in/delhi/index.php" class="text-white-50 text-decoration-none small hover-white">Website - NIELIT Delhi</a>
-
-                    <!-- <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
+                    <div class="d-flex flex-wrap justify-content-center gap-3 gap-md-4">
                         <a href="{% url 'public:home' %}">Home</a>
                         <a href="{% url 'public:courses' %}">Courses</a>
                         <a href="{% url 'public:centres' %}">Centers</a>
@@ -422,8 +390,7 @@
                         <a href="{% url 'registration:user_profile' %}">Student Portal</a>
                         <a href="#">FAQs</a>
                         <a href="#">Terms</a>
-
-                    </div> -->
+                    </div>
                 </div>
             </div>
 
@@ -439,6 +406,8 @@
             </div>
         </div>
     </footer>
+
+        
 
     <!-- ── Scripts ─────────────────────────────────────── -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

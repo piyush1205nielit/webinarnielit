@@ -1,279 +1,603 @@
 {% extends 'public/base.html' %}
 {% load static %}
 
-{% block title %}My Profile - NIELIT{% endblock %}
+{% block title %}Student Portal - NIELIT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-page {
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+        min-height: calc(100vh - 300px);
+    }
+
+    /* ── Banner ─────────────────────────────────── */
+    .page-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 40px 0 36px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -8%;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+    }
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%; left: -5%;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+    }
+    .page-banner h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    .page-banner p {
+        font-size: 0.98rem;
+        opacity: 0.88;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    .breadcrumb-custom { background: transparent; padding: 0; margin-bottom: 14px; }
+    .breadcrumb-custom .breadcrumb-item a {
+        color: rgba(255,255,255,0.78);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+    .breadcrumb-custom .breadcrumb-item a:hover { color: white; }
+    .breadcrumb-custom .breadcrumb-item.active { color: #f59e0b; font-size: 0.88rem; font-weight: 500; }
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.45); }
+
+    /* ── Search Card ─────────────────────────────── */
+    .search-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        padding: 24px 28px;
+        margin-bottom: 28px;
+    }
+
+    .search-card h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .lookup-toggle {
+        display: flex;
+        gap: 6px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 16px;
+        width: fit-content;
+    }
+
+    .lookup-toggle label {
+        padding: 7px 18px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: 0;
+        user-select: none;
+    }
+
+    .lookup-toggle input[type="radio"] { display: none; }
+
+    .lookup-toggle input[type="radio"]:checked + label {
+        background: white;
+        color: #1e3a8a;
+        font-weight: 600;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-control {
+        font-size: 0.92rem;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        outline: none;
+    }
+
+    .btn-search {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        white-space: nowrap;
+    }
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30,58,138,0.28);
+    }
+
+    /* ── Profile Card ────────────────────────────── */
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .profile-card-header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .profile-card-header .avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .profile-card-header h4 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin: 0 0 2px;
+    }
+
+    .profile-card-header span {
+        font-size: 0.82rem;
+        opacity: 0.82;
+    }
+
+    .profile-card-body { padding: 24px; }
+
+    /* ── Section headings inside card ───────────── */
+    .section-heading {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-heading i {
+        width: 28px;
+        height: 28px;
+        background: #eff6ff;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    /* ── Detail fields ───────────────────────────── */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .detail-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        border-right: 1px solid #f1f5f9;
+    }
+
+    .detail-item:nth-child(even) { border-right: none; }
+    .detail-item:nth-last-child(-n+2) { border-bottom: none; }
+    /* if last row has odd count, handle single-cell last row */
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+        border-right: none;
+    }
+
+    .detail-item .label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 3px;
+    }
+
+    .detail-item .value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    /* ── Status badges ───────────────────────────── */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .status-confirmed { background: #d1fae5; color: #065f46; }
+    .status-pending   { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #dbeafe; color: #1e40af; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+    /* ── Certificate / Status alerts ────────────── */
+    .cert-banner {
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .cert-banner.success { background: #d1fae5; border: 1px solid #a7f3d0; }
+    .cert-banner.info    { background: #dbeafe; border: 1px solid #bfdbfe; }
+    .cert-banner.warning { background: #fef3c7; border: 1px solid #fde68a; }
+
+    .cert-banner .cert-text strong {
+        font-size: 0.92rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 2px;
+    }
+    .cert-banner .cert-text small { font-size: 0.82rem; opacity: 0.85; }
+
+    .btn-cert {
+        background: #059669;
+        color: white;
+        border: none;
+        padding: 9px 20px;
+        border-radius: 9px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        transition: transform 0.2s, box-shadow 0.2s;
+        white-space: nowrap;
+    }
+    .btn-cert:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+        color: white;
+    }
+
+    /* ── Empty state ─────────────────────────────── */
+    .empty-state {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+        text-align: center;
+        padding: 56px 32px;
+    }
+    .empty-state i { font-size: 3rem; color: #cbd5e1; display: block; margin-bottom: 14px; }
+    .empty-state h4 { font-size: 1.1rem; font-weight: 700; color: #64748b; margin-bottom: 8px; }
+    .empty-state p  { font-size: 0.9rem; color: #94a3b8; margin-bottom: 18px; }
+    .btn-browse {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: inline-block;
+    }
+    .btn-browse:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30,58,138,0.28);
+        color: white;
+    }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 768px) {
+        .page-banner    { padding: 28px 0 24px; }
+        .page-banner h1 { font-size: 1.5rem; }
+        .search-card    { padding: 18px; }
+        .profile-card-body { padding: 18px; }
+        .detail-grid    { grid-template-columns: 1fr; }
+        .detail-item    { border-right: none !important; }
+        .detail-item:last-child { border-bottom: none; }
+    }
+
+    @media (max-width: 576px) {
+        .page-banner h1 { font-size: 1.3rem; }
+        .lookup-toggle  { width: 100%; }
+        .lookup-toggle label { flex: 1; text-align: center; }
+    }
+
+    @media print {
+        .top-header, .main-nav, footer, .search-card, .page-banner { display: none !important; }
+        body { background: white; }
+        .profile-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Header Section -->
-            <div class="text-center mb-4">
-                <h1 class="display-5 fw-bold text-primary">
-                    <i class="fas fa-id-card me-3"></i>My Profile
-                </h1>
-                <p class="lead text-secondary">View your registration details and download certificate</p>
-            </div>
+<div class="profile-page">
 
-            <!-- Search Form Card -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4">
-                <div class="card-body p-4">
+    <!-- Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'public:home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Student Portal</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-id-card me-2"></i>Student Portal</h1>
+            <p>View your registration details and download your certificate</p>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- Search Card -->
+                <div class="search-card">
+                    <h5><i class="fas fa-search me-2"></i>Look Up Your Registration</h5>
                     <form method="post">
                         {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <div class="d-flex gap-4 mb-3">
-                                    <div class="form-check">
-                                        <input type="radio" name="lookup_by" id="lookup_email" value="email" class="form-check-input" checked>
-                                        <label class="form-check-label" for="lookup_email">
-                                            <i class="fas fa-envelope me-1"></i> Email
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input type="radio" name="lookup_by" id="lookup_mobile" value="mobile" class="form-check-input">
-                                        <label class="form-check-label" for="lookup_mobile">
-                                            <i class="fas fa-mobile-alt me-1"></i> Mobile
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
+
+                        <!-- Toggle -->
+                        <div class="lookup-toggle">
+                            <input type="radio" name="lookup_by" id="lookup_email" value="email" checked>
+                            <label for="lookup_email"><i class="fas fa-envelope me-1"></i>Email</label>
+                            <input type="radio" name="lookup_by" id="lookup_mobile" value="mobile">
+                            <label for="lookup_mobile"><i class="fas fa-mobile-alt me-1"></i>Mobile</label>
+                        </div>
+
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="flex-grow-1">
                                 <div id="email_field">
-                                    <input type="email" name="email_id" class="form-control form-control-lg rounded-pill" placeholder="Enter your registered email address">
+                                    <input type="email" name="email_id" class="form-control"
+                                           placeholder="Enter your registered email address">
                                 </div>
-                                <div id="mobile_field" style="display: none;">
-                                    <input type="tel" name="mobile_number" class="form-control form-control-lg rounded-pill" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}">
+                                <div id="mobile_field" style="display:none;">
+                                    <input type="tel" name="mobile_number" class="form-control"
+                                           placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}">
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill">
-                                    <i class="fas fa-search me-2"></i>Search
-                                </button>
-                            </div>
+                            <button type="submit" class="btn-search">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
                         </div>
                     </form>
                 </div>
-            </div>
 
-            {% if lookup_done %}
-                {% if students %}
-                    {% for student in students %}
-                    <!-- Student Details Card -->
-                    <div class="card border-0 rounded-4 shadow-sm mb-4">
-                        <div class="card-header bg-primary text-white py-3 rounded-top-4">
-                            <h4 class="mb-0 fw-semibold">
-                                <i class="fas fa-user-graduate me-2"></i>{{ student.name }}
-                            </h4>
-                        </div>
-                        
-                        <div class="card-body p-4">
-                            <!-- Personal Details -->
-                            <h5 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-user-circle me-2"></i>Personal Details
-                            </h5>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Registration Number</small>
-                                        <p class="fw-bold mb-0">{{ student.registration_number }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Registration Date</small>
-                                        <p class="fw-bold mb-0">{{ student.registration_date|date:"d M Y" }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Full Name</small>
-                                        <p class="fw-bold mb-0">{{ student.name }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Father's Name</small>
-                                        <p class="fw-bold mb-0">{{ student.father_name }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Date of Birth</small>
-                                        <p class="fw-bold mb-0">{{ student.date_of_birth|date:"d M Y" }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Category</small>
-                                        <p class="fw-bold mb-0">{{ student.get_category_display }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Email Address</small>
-                                        <p class="fw-bold mb-0">{{ student.email_id }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Mobile Number</small>
-                                        <p class="fw-bold mb-0">{{ student.mobile_number }}</p>
-                                    </div>
+                <!-- Results -->
+                {% if lookup_done %}
+                    {% if students %}
+                        {% for student in students %}
+                        <div class="profile-card">
+
+                            <!-- Card Header -->
+                            <div class="profile-card-header">
+                                <div class="avatar"><i class="fas fa-user-graduate"></i></div>
+                                <div>
+                                    <h4>{{ student.name }}</h4>
+                                    <span>Reg. No: {{ student.registration_number }}</span>
                                 </div>
                             </div>
 
-                            <!-- Course Details -->
-                            <h5 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-book-open me-2"></i>Course Details
-                            </h5>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Course Name</small>
-                                        <p class="fw-bold mb-0">{{ student.course_enrolled.course_name }}</p>
+                            <div class="profile-card-body">
+
+                                <!-- Personal Details -->
+                                <p class="section-heading">
+                                    <i class="fas fa-user"></i>Personal Details
+                                </p>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <div class="label">Registration Number</div>
+                                        <div class="value">{{ student.registration_number }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Registration Date</div>
+                                        <div class="value">{{ student.registration_date|date:"d M Y" }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Full Name</div>
+                                        <div class="value">{{ student.name }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Father's Name</div>
+                                        <div class="value">{{ student.father_name }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Date of Birth</div>
+                                        <div class="value">{{ student.date_of_birth|date:"d M Y" }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Category</div>
+                                        <div class="value">{{ student.get_category_display }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Email Address</div>
+                                        <div class="value">{{ student.email_id }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Mobile Number</div>
+                                        <div class="value">{{ student.mobile_number }}</div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Course Duration</small>
-                                        <p class="fw-bold mb-0">{{ student.course_enrolled.course_duration|default:"Flexible" }}</p>
+
+                                <!-- Course Details -->
+                                <p class="section-heading">
+                                    <i class="fas fa-book-open"></i>Course Details
+                                </p>
+                                <div class="detail-grid" style="margin-bottom:24px;">
+                                    <div class="detail-item">
+                                        <div class="label">Course Name</div>
+                                        <div class="value">{{ student.course_enrolled.course_name }}</div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Mode of Training</small>
-                                        <p class="fw-bold mb-0">{{ student.course_enrolled.get_mode_display|default:"Classroom" }}</p>
+                                    <div class="detail-item">
+                                        <div class="label">Duration</div>
+                                        <div class="value">{{ student.course_enrolled.course_duration|default:"Flexible" }}</div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Status</small>
-                                        <p class="fw-bold mb-0">
+                                    <div class="detail-item">
+                                        <div class="label">Mode of Training</div>
+                                        <div class="value">{{ student.course_enrolled.get_mode_display|default:"Classroom" }}</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="label">Status</div>
+                                        <div class="value">
                                             {% if student.status == 'confirmed' %}
-                                                <span class="text-success">✓ Confirmed</span>
+                                            <span class="status-badge status-confirmed"><i class="fas fa-check-circle"></i>Confirmed</span>
                                             {% elif student.status == 'pending' %}
-                                                <span class="text-warning">⏳ Pending</span>
+                                            <span class="status-badge status-pending"><i class="fas fa-clock"></i>Pending</span>
                                             {% elif student.status == 'completed' %}
-                                                <span class="text-info">✓ Completed</span>
+                                            <span class="status-badge status-completed"><i class="fas fa-graduation-cap"></i>Completed</span>
                                             {% elif student.status == 'cancelled' %}
-                                                <span class="text-danger">✗ Cancelled</span>
+                                            <span class="status-badge status-cancelled"><i class="fas fa-times-circle"></i>Cancelled</span>
                                             {% else %}
-                                                {{ student.get_status_display }}
+                                            <span class="status-badge" style="background:#f1f5f9;color:#475569;">{{ student.get_status_display }}</span>
                                             {% endif %}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Centre Details -->
-                            <h5 class="fw-bold text-primary mb-3">
-                                <i class="fas fa-building me-2"></i>Centre Details
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <div class="border-bottom pb-2">
-                                        <small class="text-muted">Preferred Centre</small>
-                                        <p class="fw-bold mb-0">{{ student.preferred_centre.centre_name }}</p>
-                                        <small class="text-muted">{{ student.preferred_centre.centre_address|default:"" }}</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Certificate Download Section -->
-                            {% if student.status == 'completed' %}
-                            <div class="mt-4 pt-3 border-top">
-                                <div class="alert alert-success mb-0">
-                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                                        <div>
-                                            <i class="fas fa-award fa-2x me-3 float-start"></i>
-                                            <strong>Certificate Available!</strong><br>
-                                            <small>Your course has been completed successfully.</small>
                                         </div>
-                                        <a href="{% url 'registration:download_certificate' student.registration_number %}" class="btn btn-success rounded-pill px-4">
-                                            <i class="fas fa-download me-2"></i>Download Certificate
-                                        </a>
                                     </div>
                                 </div>
-                            </div>
-                            {% elif student.status == 'confirmed' %}
-                            <div class="mt-4 pt-3 border-top">
-                                <div class="alert alert-info mb-0">
-                                    <i class="fas fa-hourglass-half me-2"></i>
-                                    <strong>Course in Progress</strong> - Certificate will be available upon course completion.
+
+                                <!-- Centre Details -->
+                                <p class="section-heading">
+                                    <i class="fas fa-building"></i>Centre Details
+                                </p>
+                                <div class="detail-grid" style="margin-bottom:0;">
+                                    <div class="detail-item full-width">
+                                        <div class="label">Preferred Centre</div>
+                                        <div class="value">{{ student.preferred_centre.centre_name }}</div>
+                                        {% if student.preferred_centre.centre_address %}
+                                        <div style="font-size:0.82rem;color:#64748b;margin-top:3px;">
+                                            {{ student.preferred_centre.centre_address }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>
-                            {% elif student.status == 'pending' %}
-                            <div class="mt-4 pt-3 border-top">
-                                <div class="alert alert-warning mb-0">
-                                    <i class="fas fa-clock me-2"></i>
-                                    <strong>Registration Pending</strong> - Your registration is under review.
+
+                                <!-- Certificate / Status Banner -->
+                                {% if student.status == 'completed' %}
+                                <div class="cert-banner success">
+                                    <div class="cert-text" style="color:#065f46;">
+                                        <strong><i class="fas fa-award me-2"></i>Certificate Available</strong>
+                                        <small>Your course has been completed successfully.</small>
+                                    </div>
+                                    <a href="{% url 'registration:download_certificate' student.registration_number %}" class="btn-cert">
+                                        <i class="fas fa-download me-1"></i>Download Certificate
+                                    </a>
                                 </div>
-                            </div>
-                            {% endif %}
-                        </div>
+                                {% elif student.status == 'confirmed' %}
+                                <div class="cert-banner info">
+                                    <div class="cert-text" style="color:#1e40af;">
+                                        <strong><i class="fas fa-hourglass-half me-2"></i>Course In Progress</strong>
+                                        <small>Certificate will be available upon course completion.</small>
+                                    </div>
+                                </div>
+                                {% elif student.status == 'pending' %}
+                                <div class="cert-banner warning">
+                                    <div class="cert-text" style="color:#92400e;">
+                                        <strong><i class="fas fa-clock me-2"></i>Registration Pending</strong>
+                                        <small>Your registration is currently under review.</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                            </div><!-- /card-body -->
+                        </div><!-- /profile-card -->
+                        {% endfor %}
+
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h4>No Registrations Found</h4>
+                        <p>We couldn't find any registrations with the provided information.<br>
+                           Please check your details and try again.</p>
+                        <a href="{% url 'public:courses' %}" class="btn-browse">
+                            <i class="fas fa-book-open me-1"></i>Browse Courses
+                        </a>
                     </div>
-                    {% endfor %}
-                {% else %}
-                    <!-- No Registrations Found -->
-                    <div class="card border-0 rounded-4 shadow-sm text-center p-5">
-                        <div class="py-4">
-                            <i class="fas fa-folder-open fa-4x text-muted mb-3 d-block"></i>
-                            <h3 class="fw-bold text-secondary">No Registrations Found</h3>
-                            <p class="text-muted">We couldn't find any registrations with the provided information.</p>
-                            <a href="{% url 'public:courses' %}" class="btn btn-primary rounded-pill px-4 mt-2">
-                                <i class="fas fa-book-open me-2"></i>Browse Courses
-                            </a>
-                        </div>
-                    </div>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
+
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<style>
-    .border-bottom {
-        border-bottom: 2px solid #f0f0f0 !important;
-    }
-    
-    @media print {
-        .top-header, .main-nav, footer, form, .alert {
-            display: none !important;
-        }
-        body {
-            background: white;
-        }
-        .card {
-            border: 1px solid #ddd !important;
-            box-shadow: none !important;
-        }
-    }
-</style>
-
+{% block extra_js %}
 <script>
-    // Toggle between email and mobile fields
-    const radioButtons = document.querySelectorAll('input[name="lookup_by"]');
-    const emailField = document.getElementById('email_field');
+(function () {
+    const emailField  = document.getElementById('email_field');
     const mobileField = document.getElementById('mobile_field');
-    const emailInput = document.querySelector('input[name="email_id"]');
+    const emailInput  = document.querySelector('input[name="email_id"]');
     const mobileInput = document.querySelector('input[name="mobile_number"]');
-    
-    function toggleFields() {
-        const selected = document.querySelector('input[name="lookup_by"]:checked');
-        if (selected && selected.value === 'email') {
-            emailField.style.display = 'block';
-            mobileField.style.display = 'none';
-            if (emailInput) emailInput.required = true;
-            if (mobileInput) mobileInput.required = false;
-        } else if (selected && selected.value === 'mobile') {
-            emailField.style.display = 'none';
-            mobileField.style.display = 'block';
-            if (emailInput) emailInput.required = false;
-            if (mobileInput) mobileInput.required = true;
-        }
+
+    function toggle() {
+        const val = document.querySelector('input[name="lookup_by"]:checked').value;
+        const byEmail = val === 'email';
+        emailField.style.display  = byEmail ? 'block' : 'none';
+        mobileField.style.display = byEmail ? 'none'  : 'block';
+        if (emailInput)  emailInput.required  = byEmail;
+        if (mobileInput) mobileInput.required = !byEmail;
     }
-    
-    radioButtons.forEach(radio => radio.addEventListener('change', toggleFields));
-    toggleFields();
+
+    document.querySelectorAll('input[name="lookup_by"]')
+            .forEach(r => r.addEventListener('change', toggle));
+    toggle();
+})();
 </script>
 {% endblock %}

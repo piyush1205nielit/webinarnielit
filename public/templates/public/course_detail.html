@@ -1,207 +1,500 @@
 {% extends 'public/base.html' %}
+{% load static %}
 
 {% block title %}{{ course.course_name }} - NIELIT{% endblock %}
 
-{% block content %}
-<section class="bg-light py-4">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'public:courses' %}">Courses</a></li>
-                <li class="breadcrumb-item active">{{ course.course_name }}</li>
-            </ol>
-        </nav>
-    </div>
-</section>
+{% block extra_css %}
+<style>
+    .detail-page {
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+        min-height: calc(100vh - 300px);
+    }
 
-<section class="container py-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <h1 class="display-5 fw-bold text-primary mb-3">{{ course.course_name }}</h1>
-            
-            <div class="mb-4">
-                <span class="badge bg-primary fs-6 me-2">{{ course.get_mode_display }}</span>
+    /* ── Banner ─────────────────────────────────── */
+    .page-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 40px 0 36px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -8%;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+    }
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%; left: -5%;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+    }
+    .page-banner h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+        line-height: 1.35;
+    }
+    .page-banner .banner-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    .banner-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.25);
+    }
+    .banner-tag.accent { background: #f59e0b; border-color: #f59e0b; }
+
+    .breadcrumb-custom { background: transparent; padding: 0; margin-bottom: 14px; }
+    .breadcrumb-custom .breadcrumb-item a {
+        color: rgba(255,255,255,0.78);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+    .breadcrumb-custom .breadcrumb-item a:hover { color: white; }
+    .breadcrumb-custom .breadcrumb-item.active { color: #f59e0b; font-size: 0.88rem; font-weight: 500; }
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.45); }
+
+    /* ── Content cards ───────────────────────────── */
+    .content-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .content-card .card-head {
+        padding: 16px 22px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .content-card .card-head .head-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #eff6ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .content-card .card-head .head-icon i { font-size: 0.88rem; color: #2563eb; }
+
+    .content-card .card-head h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin: 0;
+    }
+
+    .content-card .card-body-inner {
+        padding: 20px 22px;
+        font-size: 0.92rem;
+        color: #475569;
+        line-height: 1.75;
+    }
+
+    /* Syllabus download strip */
+    .syllabus-strip {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 12px;
+        padding: 14px 18px;
+    }
+    .syllabus-strip .s-icon { font-size: 2rem; color: #dc2626; flex-shrink: 0; }
+    .syllabus-strip .s-text strong { display: block; font-size: 0.92rem; font-weight: 700; color: #1e293b; }
+    .syllabus-strip .s-text small  { font-size: 0.82rem; color: #64748b; }
+    .btn-pdf {
+        margin-left: auto;
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 9px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        white-space: nowrap;
+        transition: transform 0.2s, box-shadow 0.2s;
+        flex-shrink: 0;
+    }
+    .btn-pdf:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+        color: white;
+    }
+
+    /* ── Sidebar card ────────────────────────────── */
+    .sidebar-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        position: sticky;
+        top: 80px;
+    }
+
+    .sidebar-card .course-thumb {
+        width: 100%;
+        height: 190px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .sidebar-card .no-thumb {
+        height: 130px;
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .sidebar-card .no-thumb i { font-size: 3rem; color: rgba(255,255,255,0.4); }
+
+    .sidebar-card .sidebar-body { padding: 20px; }
+
+    .sidebar-price {
+        text-align: center;
+        padding: 14px 0 16px;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 16px;
+    }
+    .sidebar-price .price-label { font-size: 0.78rem; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+    .sidebar-price .price-value { font-size: 1.8rem; font-weight: 800; color: #059669; line-height: 1.2; }
+    .sidebar-price .price-value.free { color: #059669; }
+
+    .info-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f8fafc;
+    }
+    .info-row:last-of-type { border-bottom: none; }
+    .info-row .ir-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        background: #eff6ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+    .info-row .ir-icon i { font-size: 0.78rem; color: #2563eb; }
+    .info-row .ir-content .ir-label { font-size: 0.75rem; font-weight: 500; color: #94a3b8; margin-bottom: 1px; }
+    .info-row .ir-content .ir-value { font-size: 0.88rem; font-weight: 600; color: #1e293b; }
+
+    .btn-register {
+        display: block;
+        width: 100%;
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+        border: none;
+        padding: 13px 16px;
+        border-radius: 11px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 18px;
+        cursor: pointer;
+    }
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(5,150,105,0.3);
+        color: white;
+    }
+    .btn-register.closed {
+        background: #e2e8f0;
+        color: #94a3b8;
+        cursor: not-allowed;
+    }
+    .btn-register.closed:hover { transform: none; box-shadow: none; }
+
+    /* ── Related courses ─────────────────────────── */
+    .related-section { margin-top: 40px; margin-bottom: 40px; }
+    .related-section h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 992px) {
+        .sidebar-card { position: static; margin-top: 8px; }
+    }
+    @media (max-width: 768px) {
+        .page-banner    { padding: 28px 0 24px; }
+        .page-banner h1 { font-size: 1.35rem; }
+        .content-card .card-body-inner { padding: 16px; }
+        .syllabus-strip { flex-wrap: wrap; }
+        .btn-pdf        { margin-left: 0; width: 100%; text-align: center; }
+    }
+    @media (max-width: 576px) {
+        .page-banner h1 { font-size: 1.2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+
+    <!-- Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'public:home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'public:courses' %}">Courses</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ course.course_name }}</li>
+                </ol>
+            </nav>
+            <h1>{{ course.course_name }}</h1>
+            <div class="banner-meta">
+                <span class="banner-tag"><i class="fas fa-globe"></i>{{ course.get_mode_display }}</span>
                 {% if course.course_duration %}
-                <span class="badge bg-secondary fs-6 me-2">{{ course.course_duration }}</span>
+                <span class="banner-tag"><i class="fas fa-clock"></i>{{ course.course_duration }}</span>
                 {% endif %}
-                <span class="badge bg-success fs-6">{{ course.display_fees }}</span>
                 {% if course.course_type != 'regular' %}
-                <span class="badge bg-info fs-6 me-2">{{ course.get_course_type_display }}</span>
+                <span class="banner-tag"><i class="fas fa-tag"></i>{{ course.get_course_type_display }}</span>
                 {% endif %}
+                <span class="banner-tag accent">
+                    {% if course.is_free %}<i class="fas fa-gift"></i>Free{% else %}<i class="fas fa-tag"></i>{{ course.display_fees }}{% endif %}
+                </span>
             </div>
-            
-            <!-- Course Description -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Course Description</h4>
-                    <p>{{ course.course_desc|linebreaks }}</p>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row g-4">
+
+            <!-- ── Left: Main Content ─────────────── -->
+            <div class="col-lg-8">
+
+                <!-- Description -->
+                <div class="content-card">
+                    <div class="card-head">
+                        <div class="head-icon"><i class="fas fa-info-circle"></i></div>
+                        <h4>Course Description</h4>
+                    </div>
+                    <div class="card-body-inner">
+                        {{ course.course_desc|linebreaks }}
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Course Modules / Syllabus -->
-            {% if course.modules_info %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="text-primary mb-3"><i class="fas fa-book me-2"></i>Course Modules / Syllabus</h4>
-                    <div>{{ course.modules_info|linebreaks }}</div>
+
+                <!-- Modules / Syllabus text -->
+                {% if course.modules_info %}
+                <div class="content-card">
+                    <div class="card-head">
+                        <div class="head-icon"><i class="fas fa-list-ul"></i></div>
+                        <h4>Course Modules / Syllabus</h4>
+                    </div>
+                    <div class="card-body-inner">
+                        {{ course.modules_info|linebreaks }}
+                    </div>
                 </div>
-            </div>
-            {% endif %}
-            
-            <!-- Syllabus PDF Download Section -->
-            {% if course.syllabus_file %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="text-primary mb-3"><i class="fas fa-file-pdf me-2"></i>Course Syllabus</h4>
-                    <div class="p-4 bg-light rounded">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-file-pdf text-danger fa-3x me-3"></i>
-                            <div class="flex-grow-1">
-                                <strong>Detailed Syllabus Document</strong><br>
-                                <small class="text-muted">Download the complete syllabus for more information</small>
+                {% endif %}
+
+                <!-- Syllabus PDF -->
+                {% if course.syllabus_file %}
+                <div class="content-card">
+                    <div class="card-head">
+                        <div class="head-icon"><i class="fas fa-file-pdf"></i></div>
+                        <h4>Download Syllabus</h4>
+                    </div>
+                    <div class="card-body-inner">
+                        <div class="syllabus-strip">
+                            <i class="fas fa-file-pdf s-icon"></i>
+                            <div class="s-text">
+                                <strong>Detailed Syllabus Document</strong>
+                                <small>Complete syllabus PDF with all topics and references</small>
                             </div>
-                            <a href="{{ course.syllabus_file.url }}" class="btn btn-danger" target="_blank">
-                                <i class="fas fa-download me-2"></i>Download Syllabus (PDF)
+                            <a href="{{ course.syllabus_file.url }}" class="btn-pdf" target="_blank">
+                                <i class="fas fa-download me-1"></i>Download PDF
                             </a>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endif %}
-            
-            <!-- Prerequisites -->
-            {% if course.prerequisites %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="text-primary mb-3"><i class="fas fa-check-circle me-2"></i>Prerequisites</h4>
-                    <p>{{ course.prerequisites|linebreaks }}</p>
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Learning Outcomes -->
-            {% if course.learning_outcomes %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="text-primary mb-3"><i class="fas fa-star me-2"></i>Learning Outcomes</h4>
-                    <p>{{ course.learning_outcomes|linebreaks }}</p>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <div class="col-lg-4">
-            <!-- Course Info Sidebar -->
-            <div class="card shadow-sm " style="top: 100px;">
-                {% if course.image %}
-                <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.course_name }}">
                 {% endif %}
-                
-                <div class="card-body">
-                    <h4 class="text-primary mb-3">Course Information</h4>
-                    <hr>
-                    
-                    <!-- Fees -->
-                    <div class="mb-3">
-                        <strong><i class="fas fa-tag me-2 text-primary"></i>Fees:</strong><br>
-                        <span class="fs-3 text-success fw-bold">{{ course.display_fees }}</span>
-                    </div>
-                    
-                    <!-- Duration -->
-                    {% if course.course_duration %}
-                    <div class="mb-3">
-                        <strong><i class="fas fa-clock me-2 text-primary"></i>Duration:</strong><br>
-                        {{ course.course_duration }}
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Schedule / Date -->
-                    <div class="mb-3">
-                        <strong><i class="fas fa-calendar-alt me-2 text-primary"></i>Schedule:</strong><br>
-                        {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
-                            {% if course.event_date %}
-                                <span class="fs-6">{{ course.event_date|date:"l, d F Y" }}</span>
-                            {% else %}
-                                <span class="text-muted">Date to be announced</span>
-                            {% endif %}
-                        {% else %}
-                            {% if course.start_date %}
-                                {% if course.end_date %}
-                                    <span class="fs-6">{{ course.start_date|date:"d F Y" }} - {{ course.end_date|date:"d F Y" }}</span>
-                                {% else %}
-                                    <span class="fs-6">Starts: {{ course.start_date|date:"d F Y" }}</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">Dates to be announced</span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
 
-                    <!-- Registration Deadline -->
-                    {% if course.registration_deadline %}
-                    <div class="mb-3">
-                        <strong><i class="fas fa-hourglass-end me-2 text-primary"></i>Registration Deadline:</strong><br>
-                        {{ course.registration_deadline|date:"d F Y" }}
+                <!-- Prerequisites -->
+                {% if course.prerequisites %}
+                <div class="content-card">
+                    <div class="card-head">
+                        <div class="head-icon"><i class="fas fa-check-circle"></i></div>
+                        <h4>Prerequisites</h4>
                     </div>
-                    {% endif %}
-
-                    <!-- Seats Available -->
-                    {% comment %} {% if course.max_seats and course.max_seats > 0 %}
-                    <div class="mb-3">
-                        <strong><i class="fas fa-chair me-2 text-primary"></i>Seats Available:</strong><br>
-                        {% if course.get_seats_available > 0 %}
-                        <span class="badge bg-success fs-6">{{ course.get_seats_available }} seats</span>
-                        {% else %}
-                        <span class="badge bg-danger fs-6">Full</span>
-                        {% endif %}
+                    <div class="card-body-inner">
+                        {{ course.prerequisites|linebreaks }}
                     </div>
-                    {% endif %} {% endcomment %}
-                    
-                    <!-- Mode -->
-                    <div class="mb-3">
-                        <strong><i class="fas fa-globe me-2 text-primary"></i>Mode:</strong><br>
-                        {{ course.get_mode_display }}
-                    </div>
-                    
-                    <!-- Course Type -->
-                    {% if course.course_type != 'regular' %}
-                    <div class="mb-3">
-                        <strong><i class="fas fa-tag me-2 text-primary"></i>Course Type:</strong><br>
-                        {{ course.get_course_type_display }}
-                    </div>
-                    {% endif %}
-                    
-                    <hr>
-                    
-                    <!-- Registration Button -->
-                    {% if course.is_available_for_registration %}
-                    <a href="{% url 'registration:register_with_course' course.id %}" class="btn btn-success btn-lg w-100 mb-2">
-                        <i class="fas fa-pencil-alt me-2"></i>Register Now
-                    </a>
-                    {% else %}
-                    <button class="btn btn-secondary btn-lg w-100 mb-2" disabled>
-                        <i class="fas fa-times-circle me-2"></i>Registration Closed
-                    </button>
-                    {% endif %}
-                  
                 </div>
+                {% endif %}
+
+                <!-- Learning Outcomes -->
+                {% if course.learning_outcomes %}
+                <div class="content-card">
+                    <div class="card-head">
+                        <div class="head-icon"><i class="fas fa-star"></i></div>
+                        <h4>Learning Outcomes</h4>
+                    </div>
+                    <div class="card-body-inner">
+                        {{ course.learning_outcomes|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- ── Right: Sidebar ─────────────────── -->
+            <div class="col-lg-4">
+                <div class="sidebar-card">
+
+                    <!-- Thumbnail -->
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="course-thumb" alt="{{ course.course_name }}">
+                    {% else %}
+                    <div class="no-thumb">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    {% endif %}
+
+                    <div class="sidebar-body">
+
+                        <!-- Price -->
+                        <div class="sidebar-price">
+                            <div class="price-label">Course Fee</div>
+                            <div class="price-value {% if course.is_free %}free{% endif %}">
+                                {{ course.display_fees }}
+                            </div>
+                        </div>
+
+                        <!-- Info rows -->
+                        {% if course.course_duration %}
+                        <div class="info-row">
+                            <div class="ir-icon"><i class="fas fa-clock"></i></div>
+                            <div class="ir-content">
+                                <div class="ir-label">Duration</div>
+                                <div class="ir-value">{{ course.course_duration }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="info-row">
+                            <div class="ir-icon"><i class="fas fa-globe"></i></div>
+                            <div class="ir-content">
+                                <div class="ir-label">Mode of Training</div>
+                                <div class="ir-value">{{ course.get_mode_display }}</div>
+                            </div>
+                        </div>
+
+                        {% if course.course_type != 'regular' %}
+                        <div class="info-row">
+                            <div class="ir-icon"><i class="fas fa-tag"></i></div>
+                            <div class="ir-content">
+                                <div class="ir-label">Course Type</div>
+                                <div class="ir-value">{{ course.get_course_type_display }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="info-row">
+                            <div class="ir-icon"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="ir-content">
+                                <div class="ir-label">Schedule</div>
+                                <div class="ir-value">
+                                    {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
+                                        {% if course.event_date %}{{ course.event_date|date:"l, d F Y" }}
+                                        {% else %}<span style="color:#94a3b8;font-weight:400;">To be announced</span>{% endif %}
+                                    {% else %}
+                                        {% if course.start_date %}
+                                            {% if course.end_date %}{{ course.start_date|date:"d M Y" }} – {{ course.end_date|date:"d M Y" }}
+                                            {% else %}From {{ course.start_date|date:"d M Y" }}{% endif %}
+                                        {% else %}<span style="color:#94a3b8;font-weight:400;">To be announced</span>{% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if course.registration_deadline %}
+                        <div class="info-row">
+                            <div class="ir-icon"><i class="fas fa-hourglass-end"></i></div>
+                            <div class="ir-content">
+                                <div class="ir-label">Registration Deadline</div>
+                                <div class="ir-value">{{ course.registration_deadline|date:"d F Y" }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- CTA -->
+                        {% if course.is_available_for_registration %}
+                        <a href="{% url 'registration:register_with_course' course.id %}" class="btn-register">
+                            <i class="fas fa-pencil-alt me-2"></i>Register Now
+                        </a>
+                        {% else %}
+                        <button class="btn-register closed" disabled>
+                            <i class="fas fa-times-circle me-2"></i>Registration Closed
+                        </button>
+                        {% endif %}
+
+                    </div><!-- /sidebar-body -->
+                </div><!-- /sidebar-card -->
+            </div>
+
+        </div><!-- /row -->
+
+        <!-- Related Courses -->
+        {% if related_courses %}
+        <div class="related-section">
+            <h3><i class="fas fa-th-large me-2"></i>Related Courses</h3>
+            <div class="row g-4">
+                {% for related in related_courses %}
+                <div class="col-md-4">
+                    {% include 'course/course_card.html' with course=related %}
+                </div>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
+
     </div>
-    
-    <!-- Related Courses -->
-    {% if related_courses %}
-    <div class="mt-5">
-        <h3 class="fw-bold text-primary mb-4">Related Courses</h3>
-        <div class="row g-4">
-            {% for related in related_courses %}
-            <div class="col-md-4">
-                {% include 'course/course_card.html' with course=related %}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-</section>
+</div>
 {% endblock %}
