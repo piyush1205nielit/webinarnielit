@@ -1,9 +1,8 @@
 {% load static %}
 {% if carousel_images %}
-<div class="carousel-wrapper">
+<div class="carousel-wrapper bg-light">
     <div class="carousel-container">
         <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-
             <div class="carousel-indicators">
                 {% for image in carousel_images %}
                 <button type="button" data-bs-target="#featuredCarousel"
@@ -19,10 +18,10 @@
                     <div class="carousel-image-wrapper">
                         {% if image.link_url %}
                         <a href="{{ image.link_url }}" target="_blank">
-                            <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}">
+                            <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}" style="object-fit: cover;">
                         </a>
                         {% else %}
-                        <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}">
+                        <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}" style="object-fit: cover;">
                         {% endif %}
                     </div>
                    
@@ -74,10 +73,13 @@
     }
 
     .carousel-image {
-        height: 500px;
-        object-fit: cover;
-        object-position: center;
-        display: block;
+    height: 80%;
+    width: 80%;
+    object-fit: cover;   /* fills fully */
+    object-position: center;
+    display: block;
+    position: relative;
+    z-index: 1;
         /* NO background/animation here — that was overriding the image */
     }
 
