@@ -3,7 +3,7 @@
     <!-- Course Image with Modern Overlay & Badges -->
     <div class="position-relative overflow-hidden">
         {% if course.image %}
-        <center><img src="{{ course.image.url }}" class="course-img w-75 transition-transform hover-scale" alt="{{ course.course_name }}" style="height: 200px; object-fit: cover;"></center>
+        <img src="{{ course.image.url }}" class="course-img w-100 transition-transform hover-scale" alt="{{ course.course_name }}" style="height: 200px; object-fit: contain;">
         {% else %}
         <div class="course-img bg-gradient-primary d-flex align-items-center justify-content-center" style="height: 200px; background: linear-gradient(135deg, #2563eb, #1e40af);">
             <i class="fas fa-graduation-cap fa-4x text-white opacity-40"></i>
