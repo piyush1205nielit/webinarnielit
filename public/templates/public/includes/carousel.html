@@ -3,7 +3,6 @@
 <div class="carousel-wrapper">
     <div class="carousel-container">
         <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-
             <div class="carousel-indicators">
                 {% for image in carousel_images %}
                 <button type="button" data-bs-target="#featuredCarousel"
@@ -19,10 +18,10 @@
                     <div class="carousel-image-wrapper">
                         {% if image.link_url %}
                         <a href="{{ image.link_url }}" target="_blank">
-                            <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}">
+                            <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}" style="object-fit: contain;">
                         </a>
                         {% else %}
-                        <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}">
+                        <img src="{{ image.image.url }}" class="d-block w-100 carousel-image" alt="Carousel image {{ forloop.counter }}" style="object-fit: contain;">
                         {% endif %}
                     </div>
                    
