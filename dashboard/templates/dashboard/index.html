@@ -3,202 +3,947 @@
 
 {% block title %}Dashboard Overview{% endblock %}
 
-{% block dashboard_content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 fw-bold text-dark mb-0">
-            <i class="fas fa-tachometer-alt text-primary me-2"></i>Dashboard Overview
-        </h1>
-        <div class="text-muted small">{{ now|date:"l, d F Y" }}</div>
-    </div>
-    
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #3b82f6;">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-value">{{ total_students }}</div>
-                        <div class="stat-label">Total Students</div>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #10b981;">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-value">{{ total_courses }}</div>
-                        <div class="stat-label">Total Courses</div>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #f59e0b;">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-value">{{ total_centres }}</div>
-                        <div class="stat-label">Training Centers</div>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-building"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 col-sm-6">
-            <div class="stat-card" style="border-left-color: #ef4444;">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-value">{{ pending_approvals }}</div>
-                        <div class="stat-label">Pending Approvals</div>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- Recent Registrations -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Registrations</h6>
-                    <a href="{% url 'dashboard:students_list' %}" class="btn btn-sm btn-primary">View All</a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 small">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Course</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for reg in recent_registrations %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ reg.name }}</strong><br>
-                                        <span class="text-muted" style="font-size: 0.7rem;">{{ reg.mobile_number }}</span>
-                                    </td>
-                                    <td>{{ reg.course_enrolled.course_name|truncatechars:25 }}</td>
-                                    <td>{{ reg.registration_date|date:"d M Y" }}</td>
-                                    <td>
-                                        <span class="badge {% if reg.status == 'confirmed' %}bg-success{% elif reg.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %}">
-                                            {{ reg.get_status_display }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center py-4 text-muted">No registrations yet</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-sm-6">
-                            <a href="{% url 'course:course_create' %}" class="btn btn-outline-primary w-100 py-2">
-                                <i class="fas fa-plus-circle me-1"></i> Add Course
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="{% url 'course:centre_create' %}" class="btn btn-outline-success w-100 py-2">
-                                <i class="fas fa-building me-1"></i> Add Center
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="{% url 'dashboard:approve_certificate' %}" class="btn btn-outline-warning w-100 py-2">
-                                <i class="fas fa-certificate me-1"></i> Approve Certs
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="{% url 'dashboard:reports' %}" class="btn btn-outline-info w-100 py-2">
-                                <i class="fas fa-chart-bar me-1"></i> Reports
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Top Enrolled Courses Chart -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0"><i class="fas fa-chart-line me-2"></i>Top Enrolled Courses</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="courseChart" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{% block extra_css %}
+<style>
+  /* ── Reset & base ───────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  /* ── Layout shell ───────────────────────────────────────────── */
+  .dash { padding: 24px; background: #f8fafc; min-height: 100vh; }
+
+  /* ── Top bar ────────────────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .topbar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+  }
+  .topbar-title i { color: #64748b; margin-right: 8px; }
+  .topbar-sub { font-size: 0.8rem; color: #64748b; margin: 3px 0 0; }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+  .live-badge {
+    background: #dcfce7;
+    color: #166534;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  /* ── Section label ──────────────────────────────────────────── */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  /* ── KPI cards ──────────────────────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px 18px 14px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .kpi-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .kpi-icon-wrap {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  .kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-label {
+    font-size: 0.72rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .kpi-note {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kpi-note.up   { color: #16a34a; }
+  .kpi-note.warn { color: #d97706; }
+  .kpi-bar-track {
+    height: 3px;
+    border-radius: 2px;
+    background: #f1f5f9;
+    margin-top: 12px;
+  }
+  .kpi-bar-fill {
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  /* colour tokens */
+  .kpi-blue .kpi-icon-wrap  { background: #eff6ff; color: #1d4ed8; }
+  .kpi-blue .kpi-value      { color: #1d4ed8; }
+  .kpi-blue .kpi-bar-fill   { background: #3b82f6; }
+
+  .kpi-green .kpi-icon-wrap { background: #f0fdf4; color: #15803d; }
+  .kpi-green .kpi-value     { color: #15803d; }
+  .kpi-green .kpi-bar-fill  { background: #22c55e; }
+
+  .kpi-amber .kpi-icon-wrap { background: #fffbeb; color: #b45309; }
+  .kpi-amber .kpi-value     { color: #b45309; }
+  .kpi-amber .kpi-bar-fill  { background: #f59e0b; }
+
+  .kpi-teal .kpi-icon-wrap  { background: #f0fdfa; color: #0f766e; }
+  .kpi-teal .kpi-value      { color: #0f766e; }
+  .kpi-teal .kpi-bar-fill   { background: #14b8a6; }
+
+  /* ── Registration strip ─────────────────────────────────────── */
+  .reg-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .reg-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .reg-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .reg-num { font-size: 1.4rem; font-weight: 700; color: #0f172a; }
+  .reg-lbl {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+  .reg-note { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+  .reg-note.down { color: #dc2626; }
+  .reg-note.up   { color: #16a34a; }
+
+  /* ── Quick actions ──────────────────────────────────────────── */
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .act-btn {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .act-btn:hover {
+    background: #f8fafc;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .act-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .act-label { font-size: 0.85rem; font-weight: 600; color: #0f172a; display: block; }
+  .act-sub   { font-size: 0.72rem; color: #94a3b8; display: block; margin-top: 1px; }
+
+  /* ── Main two-column grid ───────────────────────────────────── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 310px;
+    gap: 18px;
+    margin-bottom: 24px;
+    align-items: start;
+  }
+
+  /* ── Generic card shell ─────────────────────────────────────── */
+  .panel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .panel:last-child { margin-bottom: 0; }
+  .panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafafa;
+  }
+  .panel-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .panel-title i { color: #94a3b8; font-size: 0.95rem; }
+  .panel-link {
+    font-size: 0.72rem;
+    color: #2563eb;
+    text-decoration: none;
+    padding: 4px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    background: #eff6ff;
+  }
+  .panel-link:hover { background: #dbeafe; }
+
+  /* ── Course table ───────────────────────────────────────────── */
+  .course-table-wrap { overflow-x: auto; }
+  .course-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+  }
+  .course-table thead th {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    font-weight: 700;
+    padding: 10px 18px;
+    text-align: left;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .course-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+  }
+  .course-table tbody tr:last-child { border-bottom: none; }
+  .course-table tbody tr:hover { background: #f8fafc; }
+  .course-table tbody td {
+    padding: 12px 18px;
+    font-size: 0.82rem;
+    vertical-align: middle;
+  }
+  .course-name   { font-weight: 600; color: #0f172a; }
+  .course-dur    { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+  /* status badges */
+  .s-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .s-open    { background: #f0fdf4; color: #15803d; }
+  .s-active  { background: #eff6ff; color: #1d4ed8; }
+  .s-ongoing { background: #fffbeb; color: #b45309; }
+  .s-closed  { background: #fef2f2; color: #b91c1c; }
+
+  /* mode pill */
+  .mode-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* mini progress bar inline */
+  .fill-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .fill-track {
+    width: 80px;
+    height: 5px;
+    border-radius: 3px;
+    background: #f1f5f9;
+    flex-shrink: 0;
+  }
+  .fill-bar {
+    height: 5px;
+    border-radius: 3px;
+    background: #3b82f6;
+    transition: width 0.5s ease;
+  }
+  .fill-pct { font-size: 0.72rem; color: #94a3b8; }
+
+  /* seats */
+  .seats-ok   { color: #15803d; font-weight: 600; }
+  .seats-warn { color: #b91c1c; font-weight: 600; }
+
+  /* ── Right sidebar charts ───────────────────────────────────── */
+  .chart-panel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .chart-panel:last-child { margin-bottom: 0; }
+  .chart-head {
+    padding: 11px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #fafafa;
+  }
+  .chart-head i { color: #94a3b8; font-size: 0.85rem; }
+  .chart-body { padding: 12px 14px 14px; }
+  .chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: #64748b;
+  }
+  .legend-sq {
+    width: 9px; height: 9px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── Centres section ────────────────────────────────────────── */
+  .centres-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 16px 18px;
+  }
+  .centre-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    background: #fafafa;
+    transition: background 0.2s;
+  }
+  .centre-item:hover { background: #f1f5f9; }
+  .centre-name-text { font-size: 0.85rem; font-weight: 700; color: #0f172a; }
+  .centre-meta-text { font-size: 0.72rem; color: #94a3b8; margin: 4px 0 10px; }
+  .centre-stu { font-weight: 700; color: #334155; }
+  .course-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .course-tag-item {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+  .occ-track { height: 5px; border-radius: 3px; background: #e2e8f0; }
+  .occ-fill  { height: 5px; border-radius: 3px; background: #22c55e; transition: width 0.5s ease; }
+  .occ-label { font-size: 0.7rem; color: #94a3b8; margin-top: 5px; }
+
+  /* ── Responsive ─────────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .kpi-grid, .reg-grid { grid-template-columns: repeat(2, 1fr); }
+    .actions-grid { grid-template-columns: repeat(2, 1fr); }
+    .centres-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 540px) {
+    .kpi-grid, .reg-grid, .actions-grid, .centres-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dash">
+
+  <!-- ── Top bar ──────────────────────────────────────────────── -->
+  <div class="topbar">
+    <div>
+      <h1 class="topbar-title">
+        <i class="fas fa-tachometer-alt"></i> Dashboard Overview
+      </h1>
+      <p class="topbar-sub">Welcome back! Here's what's happening with your courses today.</p>
+    </div>
+    <div class="topbar-right">
+      <i class="far fa-calendar-alt"></i>
+      {{ now|date:"l, d F Y" }}
+      <span class="live-badge">● System live</span>
+    </div>
+  </div>
+
+  <!-- ── KPI cards ────────────────────────────────────────────── -->
+  <div class="section-label">Key metrics</div>
+  <div class="kpi-grid">
+
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-icon-wrap"><i class="fas fa-users"></i></div>
+      <div class="kpi-value">{{ total_students }}</div>
+      <div class="kpi-label">Total students</div>
+      <div class="kpi-note up">
+        <i class="fas fa-arrow-up"></i> {{ recent_students_count }} new this month
+      </div>
+      <div class="kpi-bar-track">
+        <div class="kpi-bar-fill" style="width:{{ total_students_pct|default:'60' }}%"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-green">
+      <div class="kpi-icon-wrap"><i class="fas fa-certificate"></i></div>
+      <div class="kpi-value">{{ approved_count }}</div>
+      <div class="kpi-label">Certificates issued</div>
+      <div class="kpi-note">
+        {% if total_students > 0 %}
+          {{ approved_count|floatformat:0 }}% of enrolled students
+        {% else %}
+          No students yet
+        {% endif %}
+      </div>
+      <div class="kpi-bar-track">
+        <div class="kpi-bar-fill"
+             style="width:{% if total_students > 0 %}{{ approved_count|floatformat:0 }}{% else %}0{% endif %}%"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-icon-wrap"><i class="fas fa-clock"></i></div>
+      <div class="kpi-value">{{ pending_approvals }}</div>
+      <div class="kpi-label">Pending approvals</div>
+      <div class="kpi-note warn">
+        <i class="fas fa-hourglass-half"></i> Awaiting verification
+      </div>
+      <div class="kpi-bar-track">
+        <div class="kpi-bar-fill"
+             style="width:{% if total_students > 0 %}{{ pending_approvals_pct|default:'10' }}{% else %}0{% endif %}%"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-teal">
+      <div class="kpi-icon-wrap"><i class="fas fa-graduation-cap"></i></div>
+      <div class="kpi-value">{{ total_courses }}</div>
+      <div class="kpi-label">Total courses</div>
+      <div class="kpi-note">
+        <i class="fas fa-play-circle"></i> {{ active_courses_count }} currently open
+      </div>
+      <div class="kpi-bar-track">
+        <div class="kpi-bar-fill"
+             style="width:{% if total_courses > 0 %}{{ active_courses_pct|default:'67' }}{% else %}0{% endif %}%"></div>
+      </div>
+    </div>
+
+  </div><!-- /kpi-grid -->
+
+  <!-- ── Registration strip ───────────────────────────────────── -->
+  <div class="section-label">Registrations</div>
+  <div class="reg-grid">
+
+    <div class="reg-card">
+      <div class="reg-dot" style="background:#3b82f6"></div>
+      <div>
+        <div class="reg-num">{{ today_registrations }}</div>
+        <div class="reg-lbl">Today</div>
+        <div class="reg-note">So far today</div>
+      </div>
+    </div>
+
+    <div class="reg-card">
+      <div class="reg-dot" style="background:#94a3b8"></div>
+      <div>
+        <div class="reg-num">{{ yesterday_registrations }}</div>
+        <div class="reg-lbl">Yesterday</div>
+        <div class="reg-note {% if today_registrations < yesterday_registrations %}down{% else %}up{% endif %}">
+          {% if today_registrations > yesterday_registrations %}
+            ↑ +{{ today_registrations|add:"-"|add:yesterday_registrations }} vs today
+          {% elif today_registrations < yesterday_registrations %}
+            ↓ {{ yesterday_registrations|add:"-"|add:today_registrations }} fewer today
+          {% else %}
+            Same as today
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="reg-card">
+      <div class="reg-dot" style="background:#22c55e"></div>
+      <div>
+        <div class="reg-num">{{ weekly_registrations }}</div>
+        <div class="reg-lbl">This week</div>
+        <div class="reg-note">Last 7 days</div>
+      </div>
+    </div>
+
+    <div class="reg-card">
+      <div class="reg-dot" style="background:#a855f7"></div>
+      <div>
+        <div class="reg-num">{{ monthly_registrations }}</div>
+        <div class="reg-lbl">This month</div>
+        <div class="reg-note">{{ now|date:"F Y" }}</div>
+      </div>
+    </div>
+
+  </div><!-- /reg-grid -->
+
+  <!-- ── Quick actions ────────────────────────────────────────── -->
+  <div class="section-label">Quick actions</div>
+  <div class="actions-grid">
+
+    <a href="{% url 'course:course_create' %}" class="act-btn">
+      <div class="act-icon" style="background:#eff6ff; color:#1d4ed8">
+        <i class="fas fa-plus"></i>
+      </div>
+      <div>
+        <span class="act-label">Add course</span>
+        <span class="act-sub">Create a new course</span>
+      </div>
+    </a>
+
+    <a href="{% url 'course:centre_create' %}" class="act-btn">
+      <div class="act-icon" style="background:#f0fdf4; color:#15803d">
+        <i class="fas fa-building"></i>
+      </div>
+      <div>
+        <span class="act-label">Add centre</span>
+        <span class="act-sub">Register training centre</span>
+      </div>
+    </a>
+
+    <a href="{% url 'dashboard:approve_certificate' %}" class="act-btn">
+      <div class="act-icon" style="background:#fffbeb; color:#b45309">
+        <i class="fas fa-certificate"></i>
+      </div>
+      <div>
+        <span class="act-label">Approve certs</span>
+        <span class="act-sub">{{ pending_approvals }} pending</span>
+      </div>
+    </a>
+
+    <a href="{% url 'dashboard:reports' %}" class="act-btn">
+      <div class="act-icon" style="background:#f0fdfa; color:#0f766e">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+      <div>
+        <span class="act-label">Reports</span>
+        <span class="act-sub">View analytics</span>
+      </div>
+    </a>
+
+  </div><!-- /actions-grid -->
+
+  <!-- ── Main content: table + sidebar ────────────────────────── -->
+  <div class="main-grid">
+
+    <!-- Left: course table -->
+    <div>
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title">
+            <i class="fas fa-book-open"></i> Active courses
+          </span>
+          <a href="{% url 'course:course_list' %}" class="panel-link">View all</a>
+        </div>
+        <div class="course-table-wrap">
+          <table class="course-table">
+            <thead>
+              <tr>
+                <th style="min-width:200px">Course name</th>
+                <th>Mode</th>
+                <th>Status</th>
+                <th>Enrolled</th>
+                <th>Seats</th>
+                <th>Fill rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for course in active_courses %}
+              <tr>
+                <td>
+                  <div class="course-name">{{ course.course_name }}</div>
+                  <div class="course-dur">{{ course.course_duration|default:"Flexible duration" }}</div>
+                </td>
+                <td>
+                  <span class="mode-pill">
+                    <i class="fas fa-{% if course.mode == 'online' %}laptop{% elif course.mode == 'offline' %}building{% else %}sync{% endif %}"></i>
+                    {{ course.get_mode_display }}
+                  </span>
+                </td>
+                <td>
+                  {% if course.course_status == 'open' %}
+                    <span class="s-badge s-open"><i class="fas fa-door-open"></i> Open</span>
+                  {% elif course.course_status == 'active' %}
+                    <span class="s-badge s-active"><i class="fas fa-play"></i> Active</span>
+                  {% elif course.course_status == 'ongoing' %}
+                    <span class="s-badge s-ongoing"><i class="fas fa-spinner"></i> Ongoing</span>
+                  {% else %}
+                    <span class="s-badge s-closed"><i class="fas fa-lock"></i> Closed</span>
+                  {% endif %}
+                </td>
+                <td><strong>{{ course.student_count }}</strong></td>
+                <td>
+                  {% if course.max_seats %}
+                    {% with left=course.max_seats|add:course.student_count %}
+                      <span class="{% if left < 5 %}seats-warn{% else %}seats-ok{% endif %}">
+                        {{ left }}/{{ course.max_seats }}
+                      </span>
+                    {% endwith %}
+                  {% else %}
+                    <span style="color:#94a3b8">Unlimited</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if course.max_seats %}
+                    <div class="fill-wrap">
+                      <span class="fill-track">
+                        <span class="fill-bar"
+                              style="width:{{ course.fill_rate }}%;
+                                     background:{% if course.fill_rate >= 85 %}#ef4444{% elif course.fill_rate >= 60 %}#3b82f6{% else %}#22c55e{% endif %}">
+                        </span>
+                      </span>
+                      <span class="fill-pct">{{ course.fill_rate }}%</span>
+                    </div>
+                  {% else %}
+                    <span style="color:#94a3b8">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align:center;padding:32px;color:#94a3b8">
+                  <i class="fas fa-inbox fa-2x" style="display:block;margin-bottom:8px"></i>
+                  No active courses found
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /left col -->
+
+    <!-- Right: chart sidebar -->
+    <div>
+
+      <!-- Course mode split -->
+      <div class="chart-panel">
+        <div class="chart-head">
+          <i class="fas fa-chart-donut"></i> Course mode split
+        </div>
+        <div class="chart-body">
+          <div style="position:relative;height:140px">
+            <canvas id="modeChart"
+                    role="img"
+                    aria-label="Doughnut chart showing course distribution by delivery mode">
+              {% for stat in course_mode_stats %}{{ stat.mode_display }}: {{ stat.count }}. {% endfor %}
+            </canvas>
+          </div>
+          <div class="chart-legend">
+            {% for stat in course_mode_stats %}
+            <span class="legend-item">
+              <span class="legend-sq" style="background:
+                {% if stat.mode == 'offline' %}#1d4ed8
+                {% elif stat.mode == 'online' %}#0f766e
+                {% else %}#b45309{% endif %}">
+              </span>
+              {{ stat.mode_display }} &nbsp;{{ stat.count }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 7-day registrations -->
+      <div class="chart-panel">
+        <div class="chart-head">
+          <i class="fas fa-chart-line"></i> 7-day registrations
+        </div>
+        <div class="chart-body">
+          <div style="position:relative;height:120px">
+            <canvas id="weeklyChart"
+                    role="img"
+                    aria-label="Line chart showing daily registrations over the last 7 days">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificate status -->
+      <div class="chart-panel">
+        <div class="chart-head">
+          <i class="fas fa-certificate"></i> Certificate status
+        </div>
+        <div class="chart-body">
+          <div style="position:relative;height:110px">
+            <canvas id="certChart"
+                    role="img"
+                    aria-label="Donut chart showing approved, pending, and not-started certificate counts">
+              Approved: {{ approved_count }}, Pending: {{ pending_approvals }}.
+            </canvas>
+          </div>
+          <div class="chart-legend" style="margin-top:10px">
+            <span class="legend-item"><span class="legend-sq" style="background:#15803d"></span>Approved &nbsp;{{ approved_count }}</span>
+            <span class="legend-item"><span class="legend-sq" style="background:#f59e0b"></span>Pending &nbsp;{{ pending_approvals }}</span>
+            <span class="legend-item"><span class="legend-sq" style="background:#cbd5e1"></span>Not started</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top courses by enrollment -->
+      <div class="chart-panel">
+        <div class="chart-head">
+          <i class="fas fa-chart-bar"></i> Top courses by enrollment
+        </div>
+        <div class="chart-body">
+        <div style="position:relative;height:120px;min-height:120px">
+            <canvas id="topCoursesChart"
+                    role="img"
+                    aria-label="Horizontal bar chart of top courses by number of enrolled students">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right col -->
+
+  </div><!-- /main-grid -->
+
+  <!-- ── Active centres ───────────────────────────────────────── -->
+  <div class="section-label">Active centres</div>
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">
+        <i class="fas fa-map-marker-alt"></i> Active centres
+      </span>
+      <a href="{% url 'course:centre_list' %}" class="panel-link">View all centres</a>
+    </div>
+    <div class="centres-grid">
+      {% for centre in active_centres %}
+      <div class="centre-item">
+        <div class="centre-name-text">{{ centre.centre_name }}</div>
+        <div class="centre-meta-text">
+          {{ centre.centre_contact }} &nbsp;·&nbsp;
+          <span class="centre-stu">{{ centre.total_students }}</span> students
+        </div>
+        <div class="course-tags">
+          {% for course in centre.courses %}
+            <span class="course-tag-item">{{ course.course_name|truncatechars:22 }}</span>
+          {% empty %}
+            <span style="font-size:0.72rem;color:#94a3b8">No courses assigned</span>
+          {% endfor %}
+        </div>
+        {% if centre.total_students > 0 %}
+        <div class="occ-track">
+          <div class="occ-fill"
+               style="width:{{ centre.occupancy_rate }}%;
+                      background:{% if centre.occupancy_rate >= 85 %}#ef4444{% elif centre.occupancy_rate >= 50 %}#22c55e{% else %}#f59e0b{% endif %}">
+          </div>
+        </div>
+        <div class="occ-label">{{ centre.occupancy_rate }}% occupancy</div>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div style="grid-column:1/-1;text-align:center;padding:32px;color:#94a3b8">
+        <i class="fas fa-building fa-2x" style="display:block;margin-bottom:8px"></i>
+        No active centres found
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div><!-- /dash -->
+
+<!-- ── Charts ────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-    const courseStats = [
-        {% for stat in course_enrollment_stats %}
-            { label: "{{ stat.course_name|escapejs }}", count: {{ stat.student_count }} },
-        {% endfor %}
-    ];
-    
-    const ctx = document.getElementById('courseChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: courseStats.map(s => s.label.length > 30 ? s.label.substring(0, 27) + '...' : s.label),
-            datasets: [{
-                label: 'Number of Students',
-                data: courseStats.map(s => s.count),
-                backgroundColor: 'rgba(30, 58, 138, 0.8)',
-                borderRadius: 8,
-            }]
+/* ── Course mode donut ─────────────────────────────────────── */
+(function () {
+  const labels = {{ mode_labels|safe }};
+  const counts = {{ mode_counts|safe }};
+  const colors = ['#1d4ed8', '#0f766e', '#b45309'];
+  new Chart(document.getElementById('modeChart'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: counts,
+        backgroundColor: colors,
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      cutout: '68%'
+    }
+  });
+})();
+
+/* ── 7-day registrations line ──────────────────────────────── */
+(function () {
+  const labels = {{ weekly_dates|safe }};
+  const data   = {{ weekly_counts|safe }};
+  new Chart(document.getElementById('weeklyChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59,130,246,0.08)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#3b82f6',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { size: 10 }, stepSize: 5 }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 }
-                }
-            },
-            plugins: {
-                legend: { position: 'top' }
-            }
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 } }
         }
-    });
+      }
+    }
+  });
+})();
+
+/* ── Certificate status donut ──────────────────────────────── */
+(function () {
+  const approved = {{ approved_count }};
+  const pending  = {{ pending_approvals }};
+  const total    = {{ total_students }};
+  const notStarted = Math.max(0, total - approved - pending);
+  new Chart(document.getElementById('certChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Approved', 'Pending', 'Not started'],
+      datasets: [{
+        data: [approved, pending, notStarted],
+        backgroundColor: ['#15803d', '#f59e0b', '#cbd5e1'],
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      cutout: '65%'
+    }
+  });
+})();
+
+/* ── Top courses horizontal bar ────────────────────────────── */
+(function () {
+  const courses = [
+    {% for course in active_courses|slice:":6" %}
+    { name: "{{ course.course_name|truncatechars:22|escapejs }}", count: {{ course.student_count }} }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+  courses.sort((a, b) => b.count - a.count);
+  const barColors = ['#1d4ed8','#0f766e','#b45309','#7c3aed','#be123c','#0369a1'];
+  const wrapperHeight = Math.max(120, courses.length * 36 + 40);
+  document.querySelector('#topCoursesChart').parentElement.style.height = wrapperHeight + 'px';
+
+  new Chart(document.getElementById('topCoursesChart'), {
+    type: 'bar',
+    data: {
+      labels: courses.map(c => c.name),
+      datasets: [{
+        data: courses.map(c => c.count),
+        backgroundColor: courses.map((_, i) => barColors[i % barColors.length]),
+        borderRadius: 5,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { size: 10 }, stepSize: 10 }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 10 } }
+        }
+      }
+    }
+  });
+})();
 </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
-from django.db.models import Count, Q
+from django.db.models import Count,Sum, Q
 from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator
 from registration.models import Student, Certificate
@@ -14,6 +14,19 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from public.models import Announcement, CarouselImage
 from .forms import AnnouncementForm, CarouselImageForm
+from datetime import datetime, timedelta, date
+import pandas as pd
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from reportlab.platypus import ( SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer )
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.styles import getSampleStyleSheet
+
+
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -26,11 +39,81 @@ def dashboard_index(request):
     approved_students = Student.objects.filter(is_approved=True).count()
     pending_approvals = Student.objects.filter(is_approved=False, status='confirmed').count()
     
+    # Today's and Yesterday's Registrations
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    week_ago = today - timedelta(days=7)
+    month_ago = today - timedelta(days=30)
+    
+    today_registrations = Student.objects.filter(registration_date__date=today).count()
+    yesterday_registrations = Student.objects.filter(registration_date__date=yesterday).count()
+    weekly_registrations = Student.objects.filter(registration_date__date__gte=week_ago).count()
+    monthly_registrations = Student.objects.filter(registration_date__date__gte=month_ago).count()
+    
+
+     # Active Courses with enrollment counts
+    active_courses = Course.objects.filter(is_active=True, course_status__in=['open', 'active', 'ongoing']).annotate(
+        student_count=Count('students', filter=Q(students__status__in=['pending', 'confirmed']))
+    ).order_by('-student_count')[:10]
+
+    # Add fill_rate to each course
+    for course in active_courses:
+        if course.max_seats and course.max_seats > 0:
+            course.fill_rate = min(int((course.student_count / course.max_seats) * 100), 100)
+        else:
+            course.fill_rate = 0
+
+    # Weekly data for mini chart
+    weekly_dates = []
+    weekly_counts = []
+    for i in range(7, 0, -1):
+        day = today - timedelta(days=i)
+        count = Student.objects.filter(registration_date__date=day).count()
+        weekly_dates.append(day.strftime('%d/%m'))
+        weekly_counts.append(count)
+    
+    # Active Centres with course and student data
+    active_centres = []
+    for centre in Centre.objects.all():
+        courses = centre.available_courses.filter(is_active=True)
+        total_students = Student.objects.filter(preferred_centre=centre, status__in=['pending', 'confirmed']).count()
+        max_capacity = sum([c.max_seats for c in courses if c.max_seats]) or 1
+        occupancy_rate = int((total_students / max_capacity) * 100) if max_capacity else 0
+        
+        active_centres.append({
+            'centre_name': centre.centre_name,
+            'centre_contact': centre.centre_contact,
+            'courses': courses[:3],  # Limit to 3 courses
+            'total_students': total_students,
+            'occupancy_rate': min(occupancy_rate, 100)
+        })
+    
+    # Course Mode Statistics
+    course_mode_stats = Course.objects.values('mode').annotate(count=Count('id'))
+    mode_labels = []
+    mode_counts = []
+    mode_map = dict(Course.MODE_CHOICES)
+    for stat in course_mode_stats:
+        mode_labels.append(mode_map.get(stat['mode'], stat['mode']))
+        mode_counts.append(stat['count'])
+    
+    # Registration trends for last 30 days
+    dates = []
+    registration_counts = []
+    for i in range(30):
+        day = today - timedelta(days=i)
+        count = Student.objects.filter(registration_date__date=day).count()
+        dates.append(day.strftime('%d %b'))
+        registration_counts.append(count)
+    
+    dates.reverse()
+    registration_counts.reverse()
+    
+    # Recent registrations
     recent_registrations = Student.objects.all().select_related('course_enrolled', 'preferred_centre')[:10]
     
-    course_enrollment_stats = Course.objects.annotate(
-        student_count=Count('students')
-    ).order_by('-student_count')[:5]
+    # Course enrollment stats for chart
+    course_enrollment_stats = Course.objects.annotate(student_count=Count('students')).order_by('-student_count')[:5]
     
     context = {
         'total_students': total_students,
@@ -42,24 +125,54 @@ def dashboard_index(request):
         'recent_registrations': recent_registrations,
         'course_enrollment_stats': course_enrollment_stats,
         'now': datetime.now(),
+        'approved_count': approved_students,
+
+        # New data
+        'today_registrations': today_registrations,
+        'yesterday_registrations': yesterday_registrations,
+        'weekly_registrations': weekly_registrations,
+        'monthly_registrations': monthly_registrations,
+        'active_courses': active_courses,
+        'active_courses_count': active_courses.count(),
+        'active_centres': active_centres,
+        'recent_students_count': monthly_registrations,
+        'course_mode_stats': course_mode_stats,
+        'mode_labels': mode_labels,
+        'mode_counts': mode_counts,
+        'dates': dates,
+        'registration_counts': registration_counts,
+        'weekly_dates': weekly_dates,
+        'weekly_counts': weekly_counts,
     }
     return render(request, 'dashboard/index.html', context)
 
+
+
+
 @user_passes_test(is_admin)
 def students_list(request):
-    students = Student.objects.select_related('course_enrolled', 'preferred_centre').all()
-    
+
+    students = Student.objects.select_related(
+        'course_enrolled',
+        'preferred_centre'
+    ).all().order_by('-registration_date')
+
+    # ───────────────── Filters ───────────────── #
+
     course_filter = request.GET.get('course')
     center_filter = request.GET.get('center')
     status_filter = request.GET.get('status')
     search_query = request.GET.get('search')
-    
-    if course_filter and course_filter != '':
+
+    if course_filter:
         students = students.filter(course_enrolled_id=course_filter)
-    if center_filter and center_filter != '':
+
+    if center_filter:
         students = students.filter(preferred_centre_id=center_filter)
-    if status_filter and status_filter != '':
+
+    if status_filter:
         students = students.filter(status=status_filter)
+
     if search_query:
         students = students.filter(
             Q(name__icontains=search_query) |
@@ -67,14 +180,158 @@ def students_list(request):
             Q(email_id__icontains=search_query) |
             Q(registration_number__icontains=search_query)
         )
-    
+
+    # ───────────────── Export ───────────────── #
+
+    export_type = request.GET.get("export")
+
+    # ================= EXCEL EXPORT ================= #
+
+    if export_type == "excel":
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Students"
+
+        headers = [
+            "Registration No", "Student Name", "Father Name", "Mobile", "Email", "Course", "Center", "Status", "Certificate", "Registration Date",
+        ]
+        ws.append(headers)
+
+        # Header Styling
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        # Data Rows
+        for student in students:
+
+            ws.append([
+                student.registration_number,
+                student.name,
+                student.father_name,
+                student.mobile_number,
+                student.email_id,
+                student.course_enrolled.course_name if student.course_enrolled else "",
+                student.preferred_centre.centre_name if student.preferred_centre else "",
+                student.get_status_display(),
+                "Issued" if student.is_approved else "Pending",
+                student.registration_date.strftime("%d-%m-%Y"),
+            ])
+
+        # Column Widths
+        column_widths = {
+            "A": 22, "B": 28, "C": 28, "D": 18, "E": 35, "F": 30, "G": 25, "H": 18, "I": 18, "J": 18,
+        }
+
+        for column, width in column_widths.items():
+            ws.column_dimensions[column].width = width
+
+        response = HttpResponse(
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        response["Content-Disposition"] = (
+            'attachment; filename="students.xlsx"'
+        )
+
+        wb.save(response)
+        return response
+
+    # ================= PDF EXPORT ================= #
+
+    if export_type == "pdf":
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="students.pdf"'
+
+        buffer = BytesIO()
+
+        doc = SimpleDocTemplate( buffer, pagesize=landscape(A4), rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+
+        elements = []
+        styles = getSampleStyleSheet()
+
+        title = Paragraph(
+            "<b>Students Report</b>",
+            styles['Title']
+        )
+
+        elements.append(title)
+        elements.append(Spacer(1, 12))
+
+        data = [[
+            "Reg No", "Student", "Mobile", "Email", "Course", "Center", "Status", "Certificate", "Date",
+        ]]
+
+        for student in students:
+
+            data.append([
+                student.registration_number,
+                student.name,
+                student.mobile_number,
+                student.email_id,
+                student.course_enrolled.course_name if student.course_enrolled else "",
+                student.preferred_centre.centre_name if student.preferred_centre else "",
+                student.get_status_display(),
+                "Issued" if student.is_approved else "Pending",
+                student.registration_date.strftime("%d-%m-%Y"),
+            ])
+
+        table = Table(
+            data,
+            repeatRows=1,
+            colWidths=[ 80, 100, 75, 130, 110, 90, 60, 70, 70 ]
+        )
+
+        table.setStyle(TableStyle([
+
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e293b")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+
+            ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [
+                colors.whitesmoke,
+                colors.HexColor("#f8fafc")
+            ]),
+
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
+
+        pdf = buffer.getvalue()
+        buffer.close()
+
+        response.write(pdf)
+
+        return response
+
+    # ───────────────── Pagination ───────────────── #
+
     paginator = Paginator(students, 20)
+
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     courses = Course.objects.all()
     centres = Centre.objects.all()
-    
+
     context = {
         'page_obj': page_obj,
         'courses': courses,
@@ -84,7 +341,10 @@ def students_list(request):
         'selected_status': status_filter,
         'search_query': search_query,
     }
+
     return render(request, 'dashboard/students_list.html', context)
+
+
 
 @user_passes_test(is_admin)
 def student_detail(request, pk):

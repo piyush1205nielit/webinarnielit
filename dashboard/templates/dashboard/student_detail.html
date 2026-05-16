@@ -2,156 +2,352 @@
 
 {% block title %}Student Details - Admin{% endblock %}
 
-{% block content %}
+{% block dashboard_content %}
 <div class="container py-4">
+
+    <!-- Header -->
     <div class="d-flex align-items-center mb-4">
-        <a href="{% url 'dashboard:students_list' %}" class="btn btn-outline-secondary me-3">
+        <a href="{% url 'dashboard:students_list' %}"
+           class="btn btn-outline-secondary me-3">
+
             <i class="fas fa-arrow-left"></i> Back
         </a>
+
         <h1 class="display-6 fw-bold text-primary mb-0">
-            <i class="fas fa-user-graduate me-2"></i>Student Details
+            <i class="fas fa-user-graduate me-2"></i>
+            Student Details
         </h1>
     </div>
 
     <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
+
+        <!-- Personal Information -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Personal Information</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Personal Information
+                    </h5>
                 </div>
+
                 <div class="card-body">
-                    <table class="table table-borderless">
+
+                    <table class="table table-borderless align-middle">
+
                         <tr>
                             <th width="40%">Registration Number:</th>
-                            <td><code>{{ student.registration_number }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>Full Name:</th>
-                            <td><strong>{{ student.name }}</strong></td>
-                        </tr>
-                        <tr>
-                            <th>Father's Name:</th>
-                            <td>{{ student.father_name }}</td>
-                        </tr>
-                        <tr>
-                            <th>Date of Birth:</th>
-                            <td>{{ student.date_of_birth|date:"d M Y" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Category:</th>
-                            <td>{{ student.get_category_display }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-phone-alt me-2"></i>Contact Information</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th width="40%">Mobile Number:</th>
-                            <td>{{ student.mobile_number }}</td>
-                        </tr>
-                        <tr>
-                            <th>Email ID:</th>
-                            <td>{{ student.email_id }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Course Information</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <th width="40%">Course Enrolled:</th>
-                            <td><strong>{{ student.course_enrolled.course_name }}</strong></td>
-                        </tr>
-                        <tr>
-                            <th>Preferred Centre:</th>
-                            <td>{{ student.preferred_centre.centre_name }}</td>
-                        </tr>
-                        <tr>
-                            <th>Registration Date:</th>
-                            <td>{{ student.registration_date|date:"d M Y, h:i A" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Status:</th>
                             <td>
-                                <span class="badge bg-{% if student.status == 'confirmed' %}success{% elif student.status == 'pending' %}warning{% elif student.status == 'completed' %}info{% else %}danger{% endif %} fs-6">
-                                    {{ student.get_status_display }}
-                                </span>
+                                <code>
+                                    {{ student.registration_number|default:"N/A" }}
+                                </code>
                             </td>
                         </tr>
+
                         <tr>
-                            <th>Certificate Status:</th>
+                            <th>Full Name:</th>
                             <td>
-                                {% if student.is_approved %}
-                                    <span class="badge bg-success">Certificate Issued</span>
-                                    {% if student.certificate %}
-                                    <br>
-                                    <small>Certificate No: {{ student.certificate.certificate_number }}</small>
-                                    {% endif %}
+                                <strong>
+                                    {{ student.name|default:"N/A" }}
+                                </strong>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Father's Name:</th>
+                            <td>
+                                {{ student.father_name|default:"N/A" }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Date of Birth:</th>
+                            <td>
+                                {% if student.date_of_birth %}
+                                    {{ student.date_of_birth|date:"d M Y" }}
                                 {% else %}
-                                    <span class="badge bg-warning">Pending Approval</span>
+                                    <span class="text-muted">Not Available</span>
                                 {% endif %}
                             </td>
                         </tr>
+
+                        <tr>
+                            <th>Category:</th>
+                            <td>
+                                {{ student.get_category_display|default:"N/A" }}
+                            </td>
+                        </tr>
+
                     </table>
+
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card shadow-sm">
+        <!-- Contact Information -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Actions</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-phone-alt me-2"></i>
+                        Contact Information
+                    </h5>
                 </div>
+
                 <div class="card-body">
-                    {% if not student.is_approved and student.status == 'confirmed' %}
-                    <form method="post" action="{% url 'dashboard:approve_certificate' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="student_id" value="{{ student.id }}">
-                        <button type="submit" class="btn btn-success w-100 mb-2">
-                            <i class="fas fa-certificate me-2"></i>Approve for Certificate
-                        </button>
-                    </form>
-                    {% endif %}
-                    
-                    {% if student.is_approved and student.certificate %}
-                    <a href="{% url 'registration:download_certificate' student.registration_number %}" class="btn btn-info w-100 mb-2" target="_blank">
-                        <i class="fas fa-download me-2"></i>View Certificate
-                    </a>
-                    {% endif %}
-                    
-                    <button onclick="window.print()" class="btn btn-secondary w-100">
-                        <i class="fas fa-print me-2"></i>Print Details
-                    </button>
+
+                    <table class="table table-borderless align-middle">
+
+                        <tr>
+                            <th width="40%">Mobile Number:</th>
+                            <td>
+                                {{ student.mobile_number|default:"N/A" }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Email ID:</th>
+                            <td>
+                                {{ student.email_id|default:"N/A" }}
+                            </td>
+                        </tr>
+
+                    </table>
+
                 </div>
             </div>
         </div>
+
+        <!-- Course Information -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Course Information
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-borderless align-middle">
+
+                        <tr>
+                            <th width="40%">Course Enrolled:</th>
+                            <td>
+                                {% if student.course_enrolled %}
+                                    <strong>
+                                        {{ student.course_enrolled.course_name }}
+                                    </strong>
+                                {% else %}
+                                    <span class="text-muted">
+                                        Not Assigned
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Preferred Centre:</th>
+                            <td>
+                                {% if student.preferred_centre %}
+                                    {{ student.preferred_centre.centre_name }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        Not Assigned
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Registration Date:</th>
+                            <td>
+                                {% if student.registration_date %}
+                                    {{ student.registration_date|date:"d M Y, h:i A" }}
+                                {% else %}
+                                    <span class="text-muted">
+                                        Not Available
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+
+                                <span class="badge fs-6
+                                    {% if student.status == 'confirmed' %}
+                                        bg-success
+                                    {% elif student.status == 'pending' %}
+                                        bg-warning text-dark
+                                    {% elif student.status == 'completed' %}
+                                        bg-info text-dark
+                                    {% else %}
+                                        bg-danger
+                                    {% endif %}
+                                ">
+                                    {{ student.get_status_display }}
+                                </span>
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Certificate Status:</th>
+
+                            <td>
+
+                                {% if student.is_approved %}
+
+                                    <span class="badge bg-success">
+                                        Certificate Issued
+                                    </span>
+
+                                    {% if certificate %}
+                                        <br>
+
+                                        <small class="text-muted">
+                                            Certificate No:
+                                            {{ certificate.certificate_number }}
+                                        </small>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span class="badge bg-warning text-dark">
+                                        Pending Approval
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog me-2"></i>
+                        Actions
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    {% if not student.is_approved and student.status == 'confirmed' %}
+
+                    <form method="post"
+                          action="{% url 'dashboard:approve_certificate' %}">
+
+                        {% csrf_token %}
+
+                        <input type="hidden"
+                               name="student_id"
+                               value="{{ student.id }}">
+
+                        <button type="submit"
+                                class="btn btn-success w-100 mb-3">
+
+                            <i class="fas fa-certificate me-2"></i>
+                            Approve for Certificate
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                    {% if certificate %}
+
+                    <a href="{% url 'registration:download_certificate' student.registration_number %}"
+                       class="btn btn-info w-100 mb-3"
+                       target="_blank">
+
+                        <i class="fas fa-download me-2"></i>
+                        View Certificate
+                    </a>
+
+                    {% endif %}
+
+                    <button onclick="window.print()"
+                            class="btn btn-secondary w-100">
+
+                        <i class="fas fa-print me-2"></i>
+                        Print Details
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <style>
-    @media print {
-        .btn, .main-nav, .top-header, footer, .d-flex.align-items-center {
-            display: none !important;
-        }
-        .card {
-            box-shadow: none !important;
-            border: 1px solid #ddd !important;
-        }
+
+.table th {
+    color: #334155;
+    font-weight: 600;
+}
+
+.table td {
+    color: #0f172a;
+}
+
+.card {
+    border: none;
+    border-radius: 14px;
+}
+
+.card-header {
+    border-top-left-radius: 14px !important;
+    border-top-right-radius: 14px !important;
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+/* Print Styling */
+@media print {
+
+    .btn,
+    .main-nav,
+    .top-header,
+    footer,
+    .d-flex.align-items-center {
+        display: none !important;
     }
+
+    body {
+        background: white !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background: #f8f9fa !important;
+        color: #000 !important;
+    }
+}
+
 </style>
+
 {% endblock %}

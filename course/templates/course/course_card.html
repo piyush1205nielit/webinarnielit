@@ -5,28 +5,20 @@
     <!-- =====================================================
          IMAGE SECTION
     ====================================================== -->
-
     <div class="course-image-wrapper position-relative overflow-hidden">
-
         {% if course.image %}
-
         <img src="{{ course.image.url }}"
              class="course-img w-100"
              alt="{{ course.course_name }}">
-
         {% else %}
-
         <div class="course-img placeholder-image d-flex align-items-center justify-content-center">
             <i class="fas fa-graduation-cap fa-4x text-white opacity-50"></i>
         </div>
-
         {% endif %}
 
         <!-- Top Right Fee Badge -->
         <div class="position-absolute top-0 end-0 m-3 z-2">
-
             {% if course.is_free %}
-
             <span class="course-badge badge-free">
                 <i class="fas fa-gift me-1"></i>
                 Free

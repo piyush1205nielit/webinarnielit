@@ -179,13 +179,17 @@
     }
     .sidebar-card .no-thumb i { font-size: 3rem; color: rgba(255,255,255,0.4); }
 
-    .sidebar-card .sidebar-body { padding: 20px; }
+    .sidebar-card .sidebar-body { padding: 12px; }
 
     .sidebar-price {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 1rem;
         text-align: center;
-        padding: 14px 0 16px;
+        padding: 8px 0 8px;
         border-bottom: 1px solid #f1f5f9;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
     }
     .sidebar-price .price-label { font-size: 0.78rem; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
     .sidebar-price .price-value { font-size: 1.8rem; font-weight: 800; color: #059669; line-height: 1.2; }
@@ -252,6 +256,64 @@
         margin-bottom: 18px;
         padding-bottom: 10px;
         border-bottom: 2px solid #e2e8f0;
+    }
+
+    /* ── Expandable Content ───────────────────── */
+    .expandable-content {
+        position: relative;
+    }
+
+    .expandable-text {
+        position: relative;
+        overflow: hidden;
+        max-height: 5.6em; /* approx 3 lines */
+        transition: max-height 0.35s ease;
+    }
+
+    .expandable-text.expanded {
+        max-height: 1000px;
+    }
+
+    .expandable-text.collapsed::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 40px;
+        background: linear-gradient(
+            to bottom,
+            rgba(255,255,255,0),
+            rgba(255,255,255,1)
+        );
+        pointer-events: none;
+    }
+
+    .expand-btn {
+        margin-top: 12px;
+        background: none;
+        border: none;
+        color: #2563eb;
+        font-size: 0.88rem;
+        font-weight: 600;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .expand-btn:hover {
+        color: #1d4ed8;
+    }
+
+    .expand-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .expand-btn.active i {
+        transform: rotate(180deg);
     }
 
     /* ── Responsive ──────────────────────────────── */
@@ -329,7 +391,16 @@
                         <h4>Course Modules / Syllabus</h4>
                     </div>
                     <div class="card-body-inner">
-                        {{ course.modules_info|linebreaks }}
+                        <div class="expandable-content">
+                            <div class="expandable-text collapsed">
+                                {{ course.modules_info|linebreaks }}
+                            </div>
+
+                            <button class="expand-btn" type="button">
+                                Read More
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -364,7 +435,16 @@
                         <h4>Prerequisites</h4>
                     </div>
                     <div class="card-body-inner">
-                        {{ course.prerequisites|linebreaks }}
+                        <div class="expandable-content">
+                            <div class="expandable-text collapsed">
+                                {{ course.prerequisites|linebreaks }}
+                            </div>
+
+                            <button class="expand-btn" type="button">
+                                Read More
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -377,7 +457,16 @@
                         <h4>Learning Outcomes</h4>
                     </div>
                     <div class="card-body-inner">
-                        {{ course.learning_outcomes|linebreaks }}
+                        <div class="expandable-content">
+                            <div class="expandable-text collapsed">
+                                {{ course.learning_outcomes|linebreaks }}
+                            </div>
+
+                            <button class="expand-btn" type="button">
+                                Read More
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -497,4 +586,50 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.expandable-content').forEach(wrapper => {
+
+        const text = wrapper.querySelector('.expandable-text');
+        const btn = wrapper.querySelector('.expand-btn');
+
+        // Hide button if content is short
+        if (text.scrollHeight <= text.clientHeight + 5) {
+            btn.style.display = 'none';
+            text.classList.remove('collapsed');
+            return;
+        }
+
+        btn.addEventListener('click', function () {
+
+            const expanded = text.classList.contains('expanded');
+
+            if (expanded) {
+                text.classList.remove('expanded');
+                text.classList.add('collapsed');
+
+                btn.classList.remove('active');
+                btn.innerHTML = `
+                    Read More
+                    <i class="fas fa-chevron-down"></i>
+                `;
+            } else {
+                text.classList.add('expanded');
+                text.classList.remove('collapsed');
+
+                btn.classList.add('active');
+                btn.innerHTML = `
+                    Show Less
+                    <i class="fas fa-chevron-down"></i>
+                `;
+            }
+        });
+
+    });
+
+});
+</script>
+
 {% endblock %}

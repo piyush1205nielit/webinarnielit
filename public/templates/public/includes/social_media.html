@@ -1,0 +1,140 @@
+{% load static %}
+
+<!-- ── Connect With Us (Social Media) ────────────── -->
+<section class="home-section-alt">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-eyebrow">Stay Connected</span>
+            <h2 class="section-title">Connect With Us</h2>
+        </div>
+        <div class="social-grid">
+
+            <a href="https://www.facebook.com/nielitdelhi" target="_blank" rel="noopener" class="social-card sc-facebook">
+                <div class="social-icon-wrap">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <h5>Facebook</h5>
+                <span class="social-btn">Follow Us</span>
+            </a>
+
+            <a href="https://twitter.com/nielitdelhi" target="_blank" rel="noopener" class="social-card sc-twitter">
+                <div class="social-icon-wrap">
+                    <i class="fab fa-twitter"></i>
+                </div>
+                <h5>Twitter / X</h5>
+                <span class="social-btn">Follow Us</span>
+            </a>
+
+            <a href="https://www.instagram.com/nielitdelhi" target="_blank" rel="noopener" class="social-card sc-instagram">
+                <div class="social-icon-wrap">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <h5>Instagram</h5>
+                <span class="social-btn">Follow Us</span>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+<style>
+
+/* ── Design tokens matching site-wide system ── */
+    :root {
+        --primary:      #141b60;
+        --primary2:      #1b29a2;
+        --primary-mid:  #11176f;
+        --accent:       #f59e0b;
+        --success:      #059669;
+        --off-white:    #f8fafc;
+        --border:       #e2e8f0;
+        --text-main:    #0e1b2e;
+        --text-muted:   #64748b;
+        --text-light:   #94a3b8;
+    }
+
+    body { font-family: 'Poppins', sans-serif; font-size: 16px; color: var(--text-main); }
+
+    /* ── Section commons ─────────────────────────── */
+    .home-section { padding: 24px 0; }
+    .home-section-alt { padding: 24px 0; background: var(--off-white); }
+
+    .section-header { text-align: center; margin-bottom: 36px; }
+    .section-eyebrow {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 8px;
+    }
+    .section-title {
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: var(--primary2);
+        margin: 0 0 10px;
+        line-height: 1.3;
+    }
+    .section-desc {
+        font-size: 0.92rem;
+        color: var(--text-muted);
+        max-width: 580px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    
+ /* ── Social cards ────────────────────────────── */
+    .social-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+    .social-card {
+        border-radius: 14px;
+        padding: 26px 22px 22px;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        border: 1px solid var(--border);
+        background: white;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .social-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+        text-decoration: none;
+    }
+    .social-icon-wrap {
+        width: 56px; height: 56px;
+        border-radius: 14px;
+        margin: 0 auto 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+    }
+    .sc-facebook .social-icon-wrap { background: #e7f0fd; color: #1877f2; }
+    .sc-twitter  .social-icon-wrap { background: #e7f5fd; color: #1da1f2; }
+    .sc-instagram .social-icon-wrap {
+        background: linear-gradient(135deg, #fdf0e7, #fde7f0);
+        color: #e1306c;
+    }
+    .social-card h5 { font-size: 0.95rem; font-weight: 700; margin: 0 0 5px; color: var(--text-main); }
+    .social-card p  { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 14px; }
+    .social-btn {
+        display: inline-block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 6px 18px;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: opacity 0.2s;
+    }
+    .social-btn:hover { opacity: 0.85; text-decoration: none; }
+    .sc-facebook .social-btn { background: #1877f2; color: white; }
+    .sc-twitter  .social-btn { background: #1da1f2; color: white; }
+    .sc-instagram .social-btn {
+        background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
+        color: white;
+    }
+</style>

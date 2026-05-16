@@ -286,7 +286,7 @@
     }
 
     .course-content {
-        padding: 18px 20px 20px;
+        padding: 12px 16px 16px;
 
         display: flex;
         flex-direction: column;
@@ -462,6 +462,95 @@
     }
 
     /* =====================================================
+       FOOTER BUTTONS
+    ====================================================== */
+
+    .course-footer {
+        padding: 0 0px 0px;
+    }
+
+    .course-btn-group {
+
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 10px;
+    }
+
+    .btn-course-outline,
+    .btn-course-primary,
+    .btn-course-disabled {
+
+        height: 46px;
+
+        border-radius: 12px;
+
+        font-size: 0.84rem;
+        font-weight: 600;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
+
+        text-decoration: none;
+    }
+
+    .btn-course-outline {
+
+        border: 1px solid #2563eb;
+
+        color: #2563eb;
+
+        background: transparent;
+    }
+
+    .btn-course-outline:hover {
+
+        background: #2563eb;
+
+        color: white;
+
+        transform: translateY(-2px);
+    }
+
+    .btn-course-primary {
+
+        border: none;
+
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+
+        color: white;
+
+        box-shadow: 0 8px 18px rgba(37,99,235,0.22);
+    }
+
+    .btn-course-primary:hover {
+
+        color: white;
+
+        transform: translateY(-2px);
+
+        box-shadow: 0 12px 24px rgba(37,99,235,0.28);
+    }
+
+    .btn-course-disabled {
+
+        border: 1px solid #e2e8f0;
+
+        background: #f8fafc;
+
+        color: #94a3b8;
+
+        cursor: not-allowed;
+    }
+
+
+    /* =====================================================
        RESPONSIVE
     ===================================================== */
 
@@ -506,6 +595,8 @@
         .pagination {
             justify-content: center;
         }
+
+        
     }
 
     @media (max-width: 576px) {
@@ -515,7 +606,7 @@
         }
 
         .course-content {
-            padding: 16px;
+            padding: 12px;
         }
 
         .course-title {
@@ -770,13 +861,42 @@
 
                     </div>
 
-                    <a href="{% url 'public:course_detail' course.slug %}"
-                       class="btn-view">
+                    <div class="card-footer course-footer bg-white border-0">
 
-                        View Details
-                        <i class="fas fa-arrow-right ms-2"></i>
+        <div class="course-btn-group">
 
-                    </a>
+            <a href="{% url 'public:course_detail' course.slug %}"
+               class="btn btn-course-outline">
+
+                View Details
+                <i class="fas fa-arrow-right ms-2"></i>
+
+            </a>
+
+            {% if course.is_available_for_registration %}
+
+            <a href="{% url 'registration:register_with_course' course.id %}"
+               class="btn btn-course-primary">
+
+                <i class="fas fa-pencil-alt me-1"></i>
+                Register
+
+            </a>
+
+            {% else %}
+
+            <button class="btn btn-course-disabled" disabled>
+
+                <i class="fas fa-times-circle me-1"></i>
+                Closed
+
+            </button>
+
+            {% endif %}
+
+        </div>
+
+    </div>
 
                 </div>
 

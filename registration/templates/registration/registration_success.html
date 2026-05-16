@@ -1,39 +1,327 @@
 {% extends 'public/base.html' %}
+{% load static %}
 
 {% block title %}Registration Successful - NIELIT{% endblock %}
 
+{% block extra_css %}
+<style>
+    .success-page {
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+        min-height: calc(100vh - 300px);
+    }
+
+    /* ── Banner ─────────────────────────────────── */
+    .page-banner {
+        background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+        padding: 40px 0 36px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -8%;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+    }
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%; left: -5%;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.05);
+    }
+    .page-banner h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    .page-banner p {
+        font-size: 0.98rem;
+        opacity: 0.88;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    .breadcrumb-custom { background: transparent; padding: 0; margin-bottom: 14px; }
+    .breadcrumb-custom .breadcrumb-item a {
+        color: rgba(255,255,255,0.78);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+    .breadcrumb-custom .breadcrumb-item a:hover { color: white; }
+    .breadcrumb-custom .breadcrumb-item.active { color: #a7f3d0; font-size: 0.88rem; font-weight: 500; }
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.45); }
+
+    /* ── Main card ───────────────────────────────── */
+    .success-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+
+    /* ── Success icon area ───────────────────────── */
+    .success-icon-wrap {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #d1fae5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    .success-icon-wrap i {
+        font-size: 2.2rem;
+        color: #059669;
+    }
+
+    .success-heading {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .success-subtext {
+        font-size: 0.92rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* ── Reg number box ──────────────────────────── */
+    .reg-box {
+        background: #f0fdf4;
+        border: 1.5px dashed #6ee7b7;
+        border-radius: 12px;
+        padding: 20px 24px;
+        text-align: center;
+        margin: 24px 0;
+    }
+    .reg-box .reg-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #065f46;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .reg-box .reg-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #065f46;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.04em;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .reg-box .reg-hint {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    /* ── Divider ─────────────────────────────────── */
+    .card-divider {
+        border: none;
+        border-top: 1px solid #f1f5f9;
+        margin: 24px 0;
+    }
+
+    /* ── Action buttons ──────────────────────────── */
+    .btn-primary-action {
+        display: block;
+        width: 100%;
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin-bottom: 10px;
+    }
+    .btn-primary-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(30,58,138,0.28);
+        color: white;
+    }
+
+    .btn-secondary-action {
+        display: block;
+        width: 100%;
+        background: white;
+        color: #1e3a8a;
+        border: 1.5px solid #e2e8f0;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .btn-secondary-action:hover {
+        border-color: #1e3a8a;
+        background: #f0f4ff;
+        color: #1e3a8a;
+    }
+
+    /* ── What's next steps ───────────────────────── */
+    .next-steps {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin: 24px 0 0;
+    }
+    .next-steps-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 14px;
+    }
+    .next-step-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .next-step-item:last-child { margin-bottom: 0; }
+    .step-dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #1e3a8a;
+        color: white;
+        font-size: 0.68rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+    .next-step-item p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.55;
+    }
+    .next-step-item p strong { color: #1e293b; font-weight: 600; }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 768px) {
+        .page-banner    { padding: 28px 0 24px; }
+        .page-banner h1 { font-size: 1.5rem; }
+    }
+    @media (max-width: 576px) {
+        .page-banner h1   { font-size: 1.3rem; }
+        .success-heading  { font-size: 1.2rem; }
+        .reg-box .reg-number { font-size: 1.2rem; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body text-center p-5">
-                    <div class="mb-4">
-                        <i class="fas fa-check-circle text-success fa-5x"></i>
-                    </div>
-                    <h1 class="display-6 mb-3">Registration Successful!</h1>
-                    <p class="lead">Thank you for registering with NIELIT.</p>
-                    
-                    <div class="alert alert-info mt-4">
-                        <strong>Your Registration Number:</strong><br>
-                        <code class="fs-4">{{ student.registration_number }}</code>
-                    </div>
-                    
-                    <p class="mt-3">Please save this registration number for future reference.</p>
-                    
-                    <hr class="my-4">
-                    
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'registration:user_profile' %}" class="btn btn-primary">
+<div class="success-page">
+
+    <!-- Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'public:home' %}"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'public:courses' %}">Courses</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Registration Successful</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-check-circle me-2"></i>Registration Successful</h1>
+            <p>Your enrolment has been received. Please save your registration number.</p>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+
+                <div class="success-card">
+                    <div class="p-4">
+
+                        <!-- Icon + heading -->
+                        <div class="text-center">
+                            <div class="success-icon-wrap">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h2 class="success-heading">You're registered!</h2>
+                            <p class="success-subtext">
+                                Thank you for registering with NIELIT Delhi.<br>
+                                Your application has been submitted successfully.
+                            </p>
+                        </div>
+
+                        <!-- Registration number -->
+                        <div class="reg-box">
+                            <span class="reg-label">Your Registration Number</span>
+                            <span class="reg-number">{{ student.registration_number }}</span>
+                            <span class="reg-hint">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Keep this number safe — you'll need it to access your profile.
+                            </span>
+                        </div>
+
+                        <hr class="card-divider">
+
+                        <!-- Actions -->
+                        <a href="{% url 'registration:user_profile' %}" class="btn-primary-action">
                             <i class="fas fa-id-card me-2"></i>View My Profile
                         </a>
-                        <a href="{% url 'public:courses' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'public:courses' %}" class="btn-secondary-action">
                             <i class="fas fa-book-open me-2"></i>Browse More Courses
                         </a>
+
+                        <!-- What's next -->
+                        <div class="next-steps">
+                            <p class="next-steps-title"><i class="fas fa-list-check me-2"></i>What happens next</p>
+                            <div class="next-step-item">
+                                <div class="step-dot">1</div>
+                                <p><strong>Save your registration number.</strong> You will need it to track your application and download your certificate.</p>
+                            </div>
+                            <div class="next-step-item">
+                                <div class="step-dot">2</div>
+                                <p><strong>Await confirmation.</strong> NIELIT staff will review your application and update the status shortly.</p>
+                            </div>
+                            <div class="next-step-item">
+                                <div class="step-dot">3</div>
+                                <p><strong>Visit the Student Portal</strong> at any time to check your registration status and download your certificate once the course is completed.</p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}
