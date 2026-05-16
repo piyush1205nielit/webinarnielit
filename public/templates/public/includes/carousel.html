@@ -5,7 +5,7 @@
     <div class="hero-carousel-container">
 
         <div id="featuredCarousel"
-             class="carousel slide carousel-fade"
+             class="carousel slide"
              data-bs-ride="carousel"
              data-bs-interval="5000"
              data-bs-pause="hover">
@@ -25,12 +25,9 @@
 
             <!-- Slides -->
             <div class="carousel-inner rounded-4 overflow-hidden">
-
                 {% for image in carousel_images %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
-
                     <div class="carousel-image-wrapper">
-
                         {% if image.link_url %}
                         <a href="{{ image.link_url }}" target="_blank" rel="noopener noreferrer">
                             <img src="{{ image.image.url }}"
@@ -44,12 +41,9 @@
                              alt="Carousel Image {{ forloop.counter }}"
                              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}">
                         {% endif %}
-
                     </div>
-
                 </div>
                 {% endfor %}
-
             </div>
 
             <!-- Controls -->
@@ -57,7 +51,6 @@
                     type="button"
                     data-bs-target="#featuredCarousel"
                     data-bs-slide="prev">
-
                 <span class="carousel-control-prev-icon"></span>
             </button>
 
@@ -65,7 +58,6 @@
                     type="button"
                     data-bs-target="#featuredCarousel"
                     data-bs-slide="next">
-
                 <span class="carousel-control-next-icon"></span>
             </button>
 
@@ -82,16 +74,9 @@
 
 .hero-carousel-section {
     padding: 22px 0;
-    background:
-        linear-gradient(
-            135deg,
-            #eef2ff 0%,
-            #f8fafc 45%,
-            #e0f2fe 100%
-        );
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 45%, #e0f2fe 100%);
 }
 
-/* Slightly smaller container on large screens */
 .hero-carousel-container {
     width: min(88%, 1320px);
     margin: auto;
@@ -102,53 +87,57 @@
 ========================= */
 
 #featuredCarousel {
-    border-radius: 24px;
+    border-radius: 10px;
     overflow: hidden;
     position: relative;
-
     background: #0f172a;
-
     box-shadow:
         0 8px 24px rgba(0,0,0,0.08),
         0 18px 50px rgba(15,23,42,0.12);
 }
 
-/* Smooth sliding transition */
+/* ── Pure horizontal slide — no fade ── */
 #featuredCarousel .carousel-item {
-    transition:
-        transform 0.9s ease-in-out,
-        opacity 0.9s ease-in-out;
+    transition: transform 0.75s cubic-bezier(0.77, 0, 0.18, 1);
+}
+
+/* Override Bootstrap's default fade classes just in case */
+#featuredCarousel.carousel-fade .carousel-item {
+    opacity: 1 !important;
+    transform: none;
+}
+#featuredCarousel.carousel-fade .carousel-item.active {
+    opacity: 1 !important;
 }
 
 /* =========================
    IMAGE WRAPPER
+   Fixed 16:9 landscape ratio
+   on every breakpoint
 ========================= */
 
 .carousel-image-wrapper {
     position: relative;
     width: 100%;
+    /* 16:9 landscape — consistent on all screens */
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background: #e5e7eb;
 }
 
-/* Skeleton Loader */
+/* Skeleton shimmer */
 .carousel-image-wrapper::before {
     content: "";
     position: absolute;
     inset: 0;
-
-    background:
-        linear-gradient(
-            90deg,
-            #e5e7eb 25%,
-            #f3f4f6 50%,
-            #e5e7eb 75%
-        );
-
+    background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite linear;
-
     z-index: 1;
 }
 
@@ -157,12 +146,8 @@
 }
 
 @keyframes shimmer {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* =========================
@@ -172,16 +157,9 @@
 .carousel-image {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
     object-position: center;
-
     display: block;
-
-    /* Removed zoom animation */
-    transform: none;
-    transition: none;
-
     position: relative;
     z-index: 2;
 }
@@ -193,7 +171,8 @@
 .custom-control {
     width: 8%;
     opacity: 0;
-    transition: opacity .3s ease;
+    transition: opacity 0.3s ease;
+    z-index: 10;
 }
 
 #featuredCarousel:hover .custom-control {
@@ -202,26 +181,21 @@
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
-
     width: 48px;
     height: 48px;
-
     border-radius: 50%;
-
-    background-color: rgba(15,23,42,0.72);
+    background-color: rgba(15, 23, 42, 0.72);
     background-size: 40%;
-
     backdrop-filter: blur(10px);
-
     transition:
-        transform .2s ease,
-        background-color .2s ease;
+        transform 0.2s ease,
+        background-color 0.2s ease;
 }
 
 .carousel-control-prev-icon:hover,
 .carousel-control-next-icon:hover {
-    transform: scale(1.05);
-    background-color: rgba(30,41,59,0.92);
+    transform: scale(1.08);
+    background-color: rgba(30, 41, 59, 0.92);
 }
 
 /* =========================
@@ -235,18 +209,14 @@
 }
 
 .custom-indicators button {
-
     width: 30px;
     height: 4px;
-
     border: none;
     border-radius: 999px;
-
-    background: rgba(255,255,255,0.45);
-
+    background: rgba(255, 255, 255, 0.45);
     transition:
-        width .25s ease,
-        background .25s ease;
+        width 0.25s ease,
+        background 0.25s ease;
 }
 
 .custom-indicators button.active {
@@ -271,24 +241,20 @@
 }
 
 @media (max-width: 992px) {
-
     .hero-carousel-section {
         padding: 18px 0;
     }
-
     .hero-carousel-container {
         width: 95%;
     }
-
     #featuredCarousel {
         border-radius: 20px;
     }
-
+    /* Always visible controls on touch devices */
     .custom-control {
         opacity: 1;
         width: 12%;
     }
-
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
         width: 42px;
@@ -297,102 +263,99 @@
 }
 
 @media (max-width: 768px) {
-
+    .hero-carousel-section {
+        padding: 12px 0;
+    }
     .hero-carousel-container {
         width: 100%;
-        padding: 0 12px;
+        padding: 0 10px;
     }
-
     #featuredCarousel {
-        border-radius: 16px;
+        border-radius: 14px;
     }
-
+    /* Keep 16:9 on mobile — do NOT override aspect-ratio */
     .carousel-image-wrapper {
-        aspect-ratio: 16 / 10;
+        aspect-ratio: 16 / 9;
     }
-
     .custom-indicators button {
         width: 20px;
     }
-
     .custom-indicators button.active {
         width: 36px;
     }
-
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
-        width: 36px;
-        height: 36px;
+        width: 34px;
+        height: 34px;
     }
 }
 
 @media (max-width: 480px) {
-
-    .carousel-image-wrapper {
-        aspect-ratio: 16 / 11;
+    .hero-carousel-container {
+        padding: 0 6px;
     }
-
+    #featuredCarousel {
+        border-radius: 10px;
+    }
+    /* Still 16:9 on small phones */
+    .carousel-image-wrapper {
+        aspect-ratio: 16 / 9;
+    }
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
+    }
+    .custom-indicators button {
+        width: 14px;
+        height: 3px;
+    }
+    .custom-indicators button.active {
+        width: 26px;
     }
 }
+
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ===============================
-    // Skeleton Loader Remove
-    // ===============================
-
-    document.querySelectorAll('.carousel-image').forEach((img) => {
-
-        const wrapper = img.closest('.carousel-image-wrapper');
-
-        const loaded = () => {
-            if (wrapper) {
-                wrapper.classList.add('loaded');
-            }
+    // ── Skeleton loader removal ──────────────────────────────
+    document.querySelectorAll('.carousel-image').forEach(function (img) {
+        var wrapper = img.closest('.carousel-image-wrapper');
+        var markLoaded = function () {
+            if (wrapper) wrapper.classList.add('loaded');
         };
-
         if (img.complete && img.naturalWidth > 0) {
-            loaded();
+            markLoaded();
         } else {
-            img.addEventListener('load', loaded);
-            img.addEventListener('error', loaded);
+            img.addEventListener('load', markLoaded);
+            img.addEventListener('error', markLoaded);
         }
     });
 
-    // ===============================
-    // Bootstrap Carousel Init
-    // ===============================
-
-    const carouselElement =
-        document.querySelector('#featuredCarousel');
+    // ── Bootstrap carousel init ──────────────────────────────
+    var carouselElement = document.querySelector('#featuredCarousel');
 
     if (carouselElement && window.bootstrap) {
 
-        const carousel =
-            new bootstrap.Carousel(carouselElement, {
-                interval: 3500,
-                ride: 'carousel',
-                pause: 'hover',
-                wrap: true,
-                touch: true
-            });
+        // Remove carousel-fade class if it was accidentally set
+        carouselElement.classList.remove('carousel-fade');
 
-        // Force autoplay start
+        var carousel = new bootstrap.Carousel(carouselElement, {
+            interval: 5000,
+            ride: 'carousel',
+            pause: 'hover',
+            wrap: true,
+            touch: true
+        });
+
         carousel.cycle();
 
-        // Restart autoplay after manual controls
-        carouselElement.addEventListener(
-            'slid.bs.carousel',
-            function () {
-                carousel.cycle();
-            }
-        );
+        // Keep autoplay going after manual navigation
+        carouselElement.addEventListener('slid.bs.carousel', function () {
+            carousel.cycle();
+        });
     }
 });
 </script>
