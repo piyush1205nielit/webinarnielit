@@ -2,139 +2,415 @@
 
 <!-- ── Connect With Us (Social Media) ────────────── -->
 <section class="home-section-alt">
+
     <div class="container">
+
         <div class="section-header">
-            <span class="section-eyebrow">Stay Connected</span>
-            <h2 class="section-title">Connect With Us</h2>
+
+            <span class="section-eyebrow">
+                Stay Connected
+            </span>
+
+            <h2 class="section-title">
+                Connect With Us
+            </h2>
+
         </div>
+
         <div class="social-grid">
 
-            <a href="https://www.facebook.com/nielitdelhi" target="_blank" rel="noopener" class="social-card sc-facebook">
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/nielitdelhi"
+               target="_blank"
+               rel="noopener"
+               class="social-card sc-facebook">
+
                 <div class="social-icon-wrap">
                     <i class="fab fa-facebook-f"></i>
                 </div>
+
                 <h5>Facebook</h5>
-                <span class="social-btn">Follow Us</span>
+
+                <p>@nielitdelhi</p>
+
+                <span class="social-btn">
+                    Follow Us
+                </span>
+
             </a>
 
-            <a href="https://twitter.com/nielitdelhi" target="_blank" rel="noopener" class="social-card sc-twitter">
+            <!-- Twitter / X -->
+            <a href="https://twitter.com/nielitdelhi"
+               target="_blank"
+               rel="noopener"
+               class="social-card sc-twitter">
+
                 <div class="social-icon-wrap">
-                    <i class="fab fa-twitter"></i>
+                <i class="fab fa-twitter"></i>
                 </div>
+
                 <h5>Twitter / X</h5>
-                <span class="social-btn">Follow Us</span>
+
+                <p>@nielitdelhi</p>
+
+                <span class="social-btn">
+                    Follow Us
+                </span>
+
             </a>
 
-            <a href="https://www.instagram.com/nielitdelhi" target="_blank" rel="noopener" class="social-card sc-instagram">
+            <!-- Instagram -->
+            <a href="https://www.instagram.com/nielitdelhi"
+               target="_blank"
+               rel="noopener"
+               class="social-card sc-instagram">
+
                 <div class="social-icon-wrap">
                     <i class="fab fa-instagram"></i>
                 </div>
+
                 <h5>Instagram</h5>
-                <span class="social-btn">Follow Us</span>
+
+                <p>@nielitdelhi</p>
+
+                <span class="social-btn">
+                    Follow Us
+                </span>
+
             </a>
 
         </div>
+
     </div>
+
 </section>
 
 <style>
 
-/* ── Design tokens matching site-wide system ── */
+    /* ─────────────────────────────────────────────
+       DESIGN TOKENS
+    ───────────────────────────────────────────── */
+
     :root {
-        --primary:      #141b60;
-        --primary2:      #1b29a2;
-        --primary-mid:  #11176f;
-        --accent:       #f59e0b;
-        --success:      #059669;
-        --off-white:    #f8fafc;
-        --border:       #e2e8f0;
-        --text-main:    #0e1b2e;
-        --text-muted:   #64748b;
-        --text-light:   #94a3b8;
+
+        --primary: #141b60;
+        --primary2: #1b29a2;
+
+        --accent: #f59e0b;
+
+        --off-white: #f8fafc;
+
+        --border: #e2e8f0;
+
+        --text-main: #0e1b2e;
+        --text-muted: #64748b;
     }
 
-    body { font-family: 'Poppins', sans-serif; font-size: 16px; color: var(--text-main); }
+    body {
+        font-family: 'Poppins', sans-serif;
+        font-size: 16px;
+        color: var(--text-main);
+    }
 
-    /* ── Section commons ─────────────────────────── */
-    .home-section { padding: 24px 0; }
-    .home-section-alt { padding: 24px 0; background: var(--off-white); }
+    /* ─────────────────────────────────────────────
+       SECTION
+    ───────────────────────────────────────────── */
 
-    .section-header { text-align: center; margin-bottom: 36px; }
+    .home-section-alt {
+
+        padding: 32px 0;
+
+        background: var(--off-white);
+    }
+
+    .section-header {
+
+        text-align: center;
+
+        margin-bottom: 34px;
+    }
+
     .section-eyebrow {
+
         display: inline-block;
+
         font-size: 0.72rem;
         font-weight: 700;
+
         letter-spacing: 0.1em;
+
         text-transform: uppercase;
+
         color: var(--accent);
+
         margin-bottom: 8px;
     }
+
     .section-title {
-        font-size: 1.55rem;
+
+        font-size: 1.65rem;
+
         font-weight: 700;
+
         color: var(--primary2);
-        margin: 0 0 10px;
+
+        margin: 0;
+
         line-height: 1.3;
     }
-    .section-desc {
-        font-size: 0.92rem;
-        color: var(--text-muted);
-        max-width: 580px;
-        margin: 0 auto;
-        line-height: 1.7;
+
+    /* ─────────────────────────────────────────────
+       SOCIAL GRID
+    ───────────────────────────────────────────── */
+
+    .social-grid {
+
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 20px;
     }
 
-    
- /* ── Social cards ────────────────────────────── */
-    .social-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-    }
+    /* ─────────────────────────────────────────────
+       SOCIAL CARD
+    ───────────────────────────────────────────── */
+
     .social-card {
-        border-radius: 14px;
-        padding: 26px 22px 22px;
-        text-align: center;
-        text-decoration: none;
-        display: block;
-        border: 1px solid var(--border);
+
         background: white;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        border: 1px solid var(--border);
+
+        border-radius: 18px;
+
+        padding: 28px 22px;
+
+        text-align: center;
+
+        text-decoration: none;
+
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
     }
+
     .social-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+
+        transform: translateY(-5px);
+
+        box-shadow: 0 14px 32px rgba(0,0,0,0.10);
+
         text-decoration: none;
     }
+
+    /* ─────────────────────────────────────────────
+       ICON WRAPPER
+    ───────────────────────────────────────────── */
+
     .social-icon-wrap {
-        width: 56px; height: 56px;
-        border-radius: 14px;
-        margin: 0 auto 14px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.5rem;
+
+        width: 64px;
+        height: 64px;
+
+        border-radius: 18px;
+
+        margin: 0 auto 16px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 1.7rem;
     }
-    .sc-facebook .social-icon-wrap { background: #e7f0fd; color: #1877f2; }
-    .sc-twitter  .social-icon-wrap { background: #e7f5fd; color: #1da1f2; }
-    .sc-instagram .social-icon-wrap {
-        background: linear-gradient(135deg, #fdf0e7, #fde7f0);
-        color: #e1306c;
+
+    /* Facebook */
+
+    .sc-facebook .social-icon-wrap {
+
+        background: #e7f0fd;
+
+        color: #1877f2;
     }
-    .social-card h5 { font-size: 0.95rem; font-weight: 700; margin: 0 0 5px; color: var(--text-main); }
-    .social-card p  { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 14px; }
-    .social-btn {
-        display: inline-block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        padding: 6px 18px;
-        border-radius: 20px;
-        text-decoration: none;
-        transition: opacity 0.2s;
-    }
-    .social-btn:hover { opacity: 0.85; text-decoration: none; }
-    .sc-facebook .social-btn { background: #1877f2; color: white; }
-    .sc-twitter  .social-btn { background: #1da1f2; color: white; }
-    .sc-instagram .social-btn {
-        background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af);
+
+    .sc-facebook .social-btn {
+
+        background: #1877f2;
+
         color: white;
     }
+
+    /* Twitter / X */
+
+    .sc-twitter .social-icon-wrap {
+
+        background: #f1f5f9;
+
+        color: #000;
+    }
+
+    .sc-twitter .social-btn {
+
+        background: #000;
+
+        color: white;
+    }
+
+    /* Instagram */
+
+    .sc-instagram .social-icon-wrap {
+
+        background: linear-gradient(
+            135deg,
+            #fdf0e7,
+            #fde7f0
+        );
+
+        color: #e1306c;
+    }
+
+    .sc-instagram .social-btn {
+
+        background: linear-gradient(
+            135deg,
+            #f58529,
+            #dd2a7b,
+            #8134af
+        );
+
+        color: white;
+    }
+
+    /* ─────────────────────────────────────────────
+       CARD TEXT
+    ───────────────────────────────────────────── */
+
+    .social-card h5 {
+
+        font-size: 1rem;
+
+        font-weight: 700;
+
+        color: var(--text-main);
+
+        margin-bottom: 6px;
+    }
+
+    .social-card p {
+
+        font-size: 0.84rem;
+
+        color: var(--text-muted);
+
+        margin-bottom: 16px;
+    }
+
+    /* ─────────────────────────────────────────────
+       BUTTON
+    ───────────────────────────────────────────── */
+
+    .social-btn {
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        min-width: 120px;
+
+        height: 40px;
+
+        padding: 0 18px;
+
+        border-radius: 999px;
+
+        font-size: 0.82rem;
+
+        font-weight: 600;
+
+        transition: opacity 0.2s ease;
+    }
+
+    .social-card:hover .social-btn {
+
+        opacity: 0.9;
+    }
+
+    /* ─────────────────────────────────────────────
+       TABLET RESPONSIVE
+    ───────────────────────────────────────────── */
+
+    @media (max-width: 992px) {
+
+        .social-grid {
+
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* ─────────────────────────────────────────────
+       MOBILE RESPONSIVE
+    ───────────────────────────────────────────── */
+
+    @media (max-width: 576px) {
+
+        .home-section-alt {
+
+            padding: 26px 0;
+        }
+
+        .section-header {
+
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+
+            font-size: 1.35rem;
+        }
+
+        .social-grid {
+
+            grid-template-columns: 1fr;
+
+            gap: 16px;
+        }
+
+        .social-card {
+
+            padding: 22px 18px;
+        }
+
+        .social-icon-wrap {
+
+            width: 58px;
+            height: 58px;
+
+            font-size: 1.45rem;
+
+            margin-bottom: 14px;
+        }
+
+        .social-card h5 {
+
+            font-size: 0.95rem;
+        }
+
+        .social-card p {
+
+            font-size: 0.8rem;
+
+            margin-bottom: 14px;
+        }
+
+        .social-btn {
+
+            width: 100%;
+
+            height: 42px;
+
+            font-size: 0.82rem;
+        }
+    }
+
 </style>
