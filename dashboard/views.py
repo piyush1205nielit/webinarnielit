@@ -17,7 +17,6 @@ from .forms import AnnouncementForm, CarouselImageForm
 from datetime import datetime, timedelta, date
 import pandas as pd
 from django.template.loader import get_template
-from xhtml2pdf import pisa
 
 from openpyxl import Workbook
 from openpyxl.styles import Font
