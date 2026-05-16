@@ -11,6 +11,10 @@ def course_syllabus_upload_path(instance, filename):
     ext = filename.split('.')[-1]
     return f'courses/syllabus/{instance.course_name[:20]}_{instance.id}.{ext}'
 
+def course_video_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'courses/videos/{instance.course_name[:20]}_{instance.id}.{ext}'
+
 class Centre(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     centre_name = models.CharField(max_length=200)
@@ -57,7 +61,6 @@ class Course(models.Model):
     slug = models.SlugField(max_length=200, unique=True, null=True, blank=True)
     course_duration = models.CharField(max_length=100, blank=True, null=True, help_text="e.g., 3 months, 6 weeks (for regular courses)")
     
-    # New field for course type
     course_type = models.CharField(max_length=20, choices=COURSE_TYPE_CHOICES, default='regular')
     course_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
 
@@ -72,6 +75,10 @@ class Course(models.Model):
 
     image = models.ImageField(upload_to=course_image_upload_path, blank=True, null=True)
     syllabus_file = models.FileField(upload_to=course_syllabus_upload_path, blank=True, null=True)
+    
+    # New video field for course
+    video_file = models.FileField(upload_to=course_video_upload_path, blank=True, null=True, help_text="Upload MP4 video for course preview (recommended 16:9 aspect ratio)")
+    video_url = models.URLField(blank=True, null=True, help_text="OR paste YouTube/Vimeo embed URL")
     
     modules_info = models.TextField(blank=True, null=True, help_text="Enter module details, topics covered, syllabus structure")
     prerequisites = models.TextField(blank=True, null=True)
@@ -110,6 +117,18 @@ class Course(models.Model):
         if self.is_free or not self.course_fees or self.course_fees == 0:
             return "Free"
         return f"₹{self.course_fees:,.2f}"
+    
+    @property
+    def has_video(self):
+        """Check if course has a video (either uploaded or URL)"""
+        return bool(self.video_file or self.video_url)
+    
+    @property
+    def get_video_source(self):
+        """Get the video source URL"""
+        if self.video_file:
+            return self.video_file.url
+        return self.video_url
     
     def get_seats_available(self):
         from registration.models import Student

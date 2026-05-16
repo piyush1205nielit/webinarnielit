@@ -1,6 +1,117 @@
 {% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
 
 {% block title %}Manage Courses - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .courses-table {
+        min-width: 1000px;
+    }
+    
+    .courses-table th,
+    .courses-table td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    
+    .courses-table td:first-child,
+    .courses-table th:first-child {
+        white-space: normal;
+        min-width: 220px;
+    }
+    
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .status-active {
+        background: #10b98120;
+        color: #059669;
+    }
+    
+    .status-open {
+        background: #3b82f620;
+        color: #2563eb;
+    }
+    
+    .status-ongoing {
+        background: #f59e0b20;
+        color: #d97706;
+    }
+    
+    .status-closed {
+        background: #ef444420;
+        color: #dc2626;
+    }
+    
+    .status-inactive {
+        background: #64748b20;
+        color: #475569;
+    }
+    
+    .media-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+    }
+    
+    .media-indicator i {
+        font-size: 0.85rem;
+    }
+    
+    .media-indicator .text-success {
+        color: #10b981;
+    }
+    
+    .media-indicator .text-danger {
+        color: #ef4444;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+    }
+    
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        .courses-table td:first-child,
+        .courses-table th:first-child {
+            min-width: 180px;
+        }
+        
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+        }
+        
+        .media-indicator {
+            font-size: 0.7rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block dashboard_content %}
 <div class="container-fluid">
@@ -8,7 +119,7 @@
         <h1 class="h3 fw-bold text-dark mb-0">
             <i class="fas fa-book text-primary me-2"></i>Manage Courses
         </h1>
-        <a href="{% url 'course:course_create' %}" class="btn btn-success btn-sm">
+        <a href="{% url 'course:course_create' %}" class="btn btn-success">
             <i class="fas fa-plus me-2"></i>Add New Course
         </a>
     </div>
@@ -16,64 +127,148 @@
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0" id="coursesTable">
+                <table class="table table-hover mb-0 courses-table" id="coursesTable">
                     <thead class="table-dark">
                         <tr>
-                            <th>Course Name</th>
+                            <th style="min-width: 220px;">Course Name</th>
                             <th>Duration</th>
                             <th>Fees</th>
+                            <th>Media</th>
                             <th>Status</th>
                             <th>Mode</th>
                             <th>Seats</th>
-                            <th>Featured</th>
-                            <th>Actions</th>
+                            <th class="text-center">Featured</th>
+                            <th style="min-width: 100px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for course in courses %}
                         <tr>
                             <td>
-                                <strong>{{ course.course_name }}</strong><br>
-                                <small class="text-muted">{{ course.course_desc|truncatewords:10 }}</small>
+                                <strong>{{ course.course_name }}</strong>
+                                <br>
                             </td>
-                            <td>{{ course.course_duration }}</td>
+                            <td>
+                                {% if course.course_duration %}
+                                    {{ course.course_duration }}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if course.is_free %}
                                     <span class="badge bg-success">Free</span>
                                 {% else %}
-                                    <strong class="text-primary">₹{{ course.course_fees }}</strong>
+                                    <strong class="text-primary">₹{{ course.course_fees|floatformat:0 }}</strong>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="badge {% if course.course_status == 'active' or course.course_status == 'open' %}bg-success{% elif course.course_status == 'ongoing' %}bg-info{% elif course.course_status == 'closed' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                <div class="d-flex flex-column gap-1">
+                                    <!-- Image Indicator -->
+                                    <div class="media-indicator">
+                                        {% if course.image %}
+                                        <i class="fas fa-image text-success"></i>
+                                        <span class="text-success">Image</span>
+                                        {% else %}
+                                        <i class="fas fa-image text-danger"></i>
+                                        <span class="text-muted">No Image</span>
+                                        {% endif %}
+                                    </div>
+                                    <!-- Video Indicator -->
+                                    <div class="media-indicator">
+                                        {% if course.video_file or course.video_url %}
+                                        <i class="fas fa-video text-success"></i>
+                                        <span class="text-success">Video</span>
+                                        {% else %}
+                                        <i class="fas fa-video text-danger"></i>
+                                        <span class="text-muted">No Video</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge 
+                                    {% if course.course_status == 'active' or course.course_status == 'open' %}status-open
+                                    {% elif course.course_status == 'ongoing' %}status-ongoing
+                                    {% elif course.course_status == 'closed' %}status-closed
+                                    {% else %}status-inactive{% endif %}">
+                                    <i class="fas fa-{% if course.course_status == 'open' %}door-open{% elif course.course_status == 'active' %}play{% elif course.course_status == 'ongoing' %}spinner{% elif course.course_status == 'closed' %}lock{% else %}circle{% endif %} me-1"></i>
                                     {{ course.get_course_status_display }}
                                 </span>
                             </td>
-                            <td>{{ course.get_mode_display }}</td>
-                            <td>{{ course.max_seats|default:"Unlimited" }}</td>
                             <td>
-                                {% if course.is_featured %}
-                                    <i class="fas fa-star text-warning"></i>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                    <i class="fas fa-{% if course.mode == 'online' %}laptop{% elif course.mode == 'offline' %}building{% else %}sync{% endif %} me-1"></i>
+                                    {{ course.get_mode_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if course.max_seats %}
+                                    <span class="fw-semibold">{{ course.max_seats }}</span>
+                                    {% with seats_left=course.get_seats_available %}
+                                        {% if seats_left <= 5 and seats_left > 0 %}
+                                        <br><small class="text-danger">Only {{ seats_left }} left</small>
+                                        {% elif seats_left <= 0 %}
+                                        <br><small class="text-danger">Full</small>
+                                        {% endif %}
+                                    {% endwith %}
                                 {% else %}
-                                    <i class="fas fa-star text-secondary"></i>
+                                    <span class="text-muted">Not Set</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if course.is_featured %}
+                                    <i class="fas fa-star text-warning fa-lg" title="Featured Course"></i>
+                                {% else %}
+                                    <i class="far fa-star text-secondary fa-lg" title="Not Featured"></i>
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{% url 'course:course_edit' course.id %}" class="btn btn-sm btn-warning">
+                                <div class="action-buttons">
+                                    <a href="{% url 'course:course_edit' course.id %}" 
+                                       class="btn btn-sm btn-warning btn-icon" 
+                                       title="Edit Course">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url 'course:course_delete' course.id %}" class="btn btn-sm btn-danger">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger btn-icon" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal{{ course.id }}"
+                                            title="Delete Course">
                                         <i class="fas fa-trash"></i>
-                                    </a>
+                                    </button>
+                                </div>
+                                
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ course.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">Confirm Delete</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete the course:</p>
+                                                <p class="fw-bold text-danger">{{ course.course_name }}</p>
+                                                <p class="text-muted small">This action cannot be undone. All associated data will be removed.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <a href="{% url 'course:course_delete' course.id %}" class="btn btn-danger">Delete Course</a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <i class="fas fa-book fa-3x mb-2 d-block text-muted"></i>
                                 <p class="text-muted">No courses found. Click "Add New Course" to create one.</p>
+                                <a href="{% url 'course:course_create' %}" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus me-2"></i>Add Your First Course
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -81,6 +276,28 @@
                 </table>
             </div>
         </div>
+        
+        <!-- Table Footer with Stats -->
+        {% if courses %}
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="text-muted small">
+                    <i class="fas fa-chart-line me-1"></i>
+                    Showing {{ courses|length }} course{{ courses|length|pluralize }}
+                </div>
+                <div class="d-flex gap-3">
+                    <div class="text-muted small">
+                        <i class="fas fa-image text-success me-1"></i>
+                        {{ courses|length }} total
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-video text-success me-1"></i>
+                        {{ courses|length }} with video
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -89,12 +306,26 @@
         $('#coursesTable').DataTable({
             pageLength: 10,
             order: [[0, 'asc']],
+            responsive: false,
+            scrollX: true,
+            autoWidth: false,
             language: {
                 search: "Search:",
                 lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries"
-            }
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                emptyTable: "No courses found",
+                zeroRecords: "No matching courses found"
+            },
+            columnDefs: [
+                { orderable: false, targets: [3, 7, 8] } // Disable sorting on media, featured, actions columns
+            ]
         });
+    });
+    
+    // Tooltip initialization
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
     });
 </script>
 {% endblock %}

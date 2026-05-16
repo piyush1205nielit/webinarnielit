@@ -7,8 +7,9 @@ class CourseForm(forms.ModelForm):
         fields = [
             'course_name', 'course_desc', 'course_type', 'course_duration', 'course_status',
             'course_fees', 'start_date', 'end_date', 'event_date', 'registration_deadline',
-            'image', 'syllabus_file', 'modules_info', 'prerequisites',
-            'learning_outcomes', 'mode', 'max_seats', 'available_centres',
+            'image', 'syllabus_file', 'video_file', 'video_url',
+            'modules_info', 'prerequisites', 'learning_outcomes',
+            'mode', 'max_seats', 'available_centres',
             'is_active', 'is_featured'
         ]
         widgets = {
@@ -22,6 +23,7 @@ class CourseForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'id': 'id_end_date'}),
             'event_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'id': 'id_event_date'}),
             'registration_deadline': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'id': 'id_registration_deadline'}),
+            'video_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.youtube.com/embed/VIDEO_ID or https://player.vimeo.com/video/ID'}),
             'modules_info': forms.Textarea(attrs={'rows': 6, 'class': 'form-control', 'placeholder': 'Enter module details...'}),
             'prerequisites': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Any prerequisites for this course'}),
             'learning_outcomes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'What students will learn'}),
@@ -36,6 +38,8 @@ class CourseForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['image'].required = False
         self.fields['syllabus_file'].required = False
+        self.fields['video_file'].required = False
+        self.fields['video_url'].required = False
         self.fields['available_centres'].required = False
         self.fields['course_duration'].required = False
         self.fields['max_seats'].required = False
