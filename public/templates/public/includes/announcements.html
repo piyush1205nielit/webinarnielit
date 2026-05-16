@@ -2,7 +2,9 @@
 {% if announcements %}
 <div class="announcements-section">
     <div class="container-fluid px-0">
-        <div class="announcement-wrapper">
+
+        <!-- ── Desktop layout (ticker strip) ─────────────────── -->
+        <div class="announcement-wrapper d-none d-md-flex">
             <div class="announcement-label">
                 <i class="fas fa-bullhorn me-2"></i>
                 <span>ANNOUNCEMENTS</span>
@@ -13,172 +15,321 @@
                     <div class="announcement-item {% if announcement.is_expired %}expired{% endif %}">
                         <i class="fas fa-{% if announcement.is_expired %}clock{% else %}bell{% endif %} me-2"></i>
                         <span>{{ announcement.content }}</span>
-                        {% comment %} {% if not announcement.is_expired %}
-                        <span class="announcement-date">{{ announcement.created_at|date:"d M Y" }}</span>
-                        {% endif %} {% endcomment %}
                     </div>
                     {% endfor %}
-                    <!-- Duplicate for seamless looping -->
+                    <!-- Duplicate for seamless loop -->
                     {% for announcement in announcements %}
                     <div class="announcement-item {% if announcement.is_expired %}expired{% endif %}">
                         <i class="fas fa-{% if announcement.is_expired %}clock{% else %}bell{% endif %} me-2"></i>
                         <span>{{ announcement.content }}</span>
-                        {% comment %} {% if not announcement.is_expired %}
-                        <span class="announcement-date">{{ announcement.created_at|date:"d M Y" }}</span>
-                        {% endif %} {% endcomment %}
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
+
+        <!-- ── Mobile layout (stacked cards) ─────────────────── -->
+        <div class="d-flex d-md-none mobile-announcements">
+
+            <!-- Header bar -->
+            <div class="mobile-ann-header">
+                <div class="mobile-ann-title">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                    <span class="mobile-ann-count">{{ announcements|length }}</span>
+                </div>
+                <button class="mobile-ann-toggle" id="mobileAnnToggle" aria-expanded="true" aria-label="Toggle announcements">
+                    <i class="fas fa-chevron-up" id="mobileAnnChevron"></i>
+                </button>
+            </div>
+
+            <!-- Collapsible list -->
+            <div class="mobile-ann-body" id="mobileAnnBody">
+                <div class="mobile-ann-list">
+                    {% for announcement in announcements %}
+                    <div class="mobile-ann-item {% if announcement.is_expired %}expired{% endif %}">
+                        <div class="mobile-ann-dot">
+                            <i class="fas fa-{% if announcement.is_expired %}clock{% else %}bell{% endif %}"></i>
+                        </div>
+                        <div class="mobile-ann-text">
+                            <span>{{ announcement.content }}</span>
+                            {% if announcement.is_expired %}
+                            <span class="mobile-ann-expired-tag">Expired</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
 <style>
-    .announcements-section {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        border-bottom: 2px solid #f59e0b;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .announcement-wrapper {
-        display: flex;
-        align-items: center;
-        background: rgba(0, 0, 0, 0.1);
-        position: relative;
-    }
-    
-    .announcement-label {
-        background: #f59e0b;
-        color: #1e3a8a;
-        padding: 8px 12px;
-        font-weight: 800;
-        font-size: 0.85rem;
-        letter-spacing: 1px;
-        white-space: nowrap;
-        display: inline-flex;
-        align-items: center;
-        z-index: 2;
-        position: relative;
-        clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
-        padding-right: 40px;
-    }
-    
-    .announcement-label i {
-        font-size: 1rem;
-    }
-    
-    .announcement-marquee {
-        flex: 1;
-        overflow: hidden;
-        position: relative;
-        background: rgba(0, 0, 0, 0.2);
-    }
-    
-    .marquee-content {
-        display: inline-flex;
-        animation: marquee 15s linear infinite;
-        white-space: nowrap;
-    }
-    
-    .marquee-content:hover {
-        animation-play-state: paused;
-    }
-    
-    .announcement-item {
-        display: inline-flex;
-        align-items: center;
-        padding: 12px 30px;
-        color: white;
-        font-size: 0.85rem;
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .announcement-item i {
-        opacity: 0.9;
-    }
-    
-    .announcement-date {
-        font-size: 0.7rem;
-        background: rgba(255, 255, 255, 0.2);
-        padding: 2px 8px;
-        border-radius: 20px;
-        margin-left: 12px;
-        font-weight: 500;
-    }
-    
-    .announcement-item.expired {
-        opacity: 0.6;
-        text-decoration: line-through;
-    }
-    
-    @keyframes marquee {
-        0% {
-            transform: translateX(0);
-        }
-        100% {
-            transform: translateX(-50%);
-        }
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .announcement-label {
-            padding: 8px 16px;
-            font-size: 0.7rem;
-            padding-right: 30px;
-        }
-        
-        .announcement-label i {
-            font-size: 0.8rem;
-        }
-        
-        .announcement-item {
-            padding: 8px 20px;
-            font-size: 0.75rem;
-        }
-        
-        .announcement-date {
-            font-size: 0.6rem;
-            margin-left: 8px;
-        }
-        
-        @keyframes marquee {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-    }
-    
-    /* Adjust animation speed for different screen sizes */
-    @media (max-width: 576px) {
-        .marquee-content {
-            animation: marquee 10s linear infinite;
-        }
-    }
+
+/* ══════════════════════════════════════════
+   SHARED
+══════════════════════════════════════════ */
+
+.announcements-section {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-bottom: 2px solid #f59e0b;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ══════════════════════════════════════════
+   DESKTOP — ticker strip
+══════════════════════════════════════════ */
+
+.announcement-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.announcement-label {
+    background: #f59e0b;
+    color: #1e3a8a;
+    padding: 8px 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    z-index: 2;
+    position: relative;
+    clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+    padding-right: 40px;
+    flex-shrink: 0;
+}
+
+.announcement-label i { font-size: 1rem; }
+
+.announcement-marquee {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.marquee-content {
+    display: inline-flex;
+    animation: marquee 15s linear infinite;
+    white-space: nowrap;
+}
+
+.marquee-content:hover {
+    animation-play-state: paused;
+}
+
+.announcement-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 30px;
+    color: white;
+    font-size: 0.85rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.announcement-item.expired {
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+
+@keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* ══════════════════════════════════════════
+   MOBILE — stacked collapsible cards
+══════════════════════════════════════════ */
+
+.mobile-announcements {
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* ── Header bar ── */
+.mobile-ann-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: #f59e0b;
+    flex-shrink: 0;
+}
+
+.mobile-ann-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1e3a8a;
+    font-weight: 800;
+    font-size: 0.82rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.mobile-ann-count {
+    background: #1e3a8a;
+    color: #f59e0b;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.mobile-ann-toggle {
+    background: rgba(30, 58, 138, 0.15);
+    border: none;
+    border-radius: 6px;
+    color: #1e3a8a;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.mobile-ann-toggle:hover {
+    background: rgba(30, 58, 138, 0.28);
+}
+
+.mobile-ann-toggle i {
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+/* ── Collapsible body ── */
+.mobile-ann-body {
+    overflow: hidden;
+    max-height: 400px;
+    transition: max-height 0.35s ease, opacity 0.3s ease;
+    opacity: 1;
+}
+
+.mobile-ann-body.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* ── Item list ── */
+.mobile-ann-list {
+    padding: 6px 0 4px;
+}
+
+.mobile-ann-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 4px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background 0.2s ease;
+}
+
+.mobile-ann-item:last-child {
+    border-bottom: none;
+}
+
+.mobile-ann-item:active {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Dot / icon */
+.mobile-ann-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.mobile-ann-dot i {
+    font-size: 0.7rem;
+    color: #f59e0b;
+}
+
+/* Text */
+.mobile-ann-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mobile-ann-text span {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.mobile-ann-expired-tag {
+    display: inline-block;
+    background: rgba(239, 68, 68, 0.25);
+    color: #fca5a5 !important;
+    font-size: 0.65rem !important;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    width: fit-content;
+}
+
+.mobile-ann-item.expired .mobile-ann-text > span:first-child {
+    opacity: 0.55;
+    text-decoration: line-through;
+}
+
 </style>
 
 <script>
-    // Pause animation on hover
-    document.querySelectorAll('.announcement-marquee').forEach(marquee => {
-        marquee.addEventListener('mouseenter', () => {
-            const content = marquee.querySelector('.marquee-content');
-            if (content) {
-                content.style.animationPlayState = 'paused';
-            }
+(function () {
+
+    // ── Desktop: pause marquee on hover ──────────────────────
+    document.querySelectorAll('.announcement-marquee').forEach(function (marquee) {
+        var content = marquee.querySelector('.marquee-content');
+        if (!content) return;
+        marquee.addEventListener('mouseenter', function () {
+            content.style.animationPlayState = 'paused';
         });
-        
-        marquee.addEventListener('mouseleave', () => {
-            const content = marquee.querySelector('.marquee-content');
-            if (content) {
-                content.style.animationPlayState = 'running';
-            }
+        marquee.addEventListener('mouseleave', function () {
+            content.style.animationPlayState = 'running';
         });
     });
+
+    // ── Mobile: collapse toggle ───────────────────────────────
+    var toggleBtn  = document.getElementById('mobileAnnToggle');
+    var body       = document.getElementById('mobileAnnBody');
+    var chevron    = document.getElementById('mobileAnnChevron');
+
+    if (toggleBtn && body && chevron) {
+        toggleBtn.addEventListener('click', function () {
+            var isCollapsed = body.classList.toggle('collapsed');
+            chevron.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+            toggleBtn.setAttribute('aria-expanded', String(!isCollapsed));
+        });
+    }
+
+})();
 </script>
 {% endif %}
