@@ -1,0 +1,83 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Delete Carousel Image{% endblock %}
+
+{% block dashboard_content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6 col-md-8">
+
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+
+                <!-- Header -->
+                <div class="card-header bg-danger text-white py-3">
+
+                    <h3 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Confirm Delete
+                    </h3>
+
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+
+                        {% if object.image %}
+                        <img src="{{ object.image.url }}"
+                             alt="Carousel Image"
+                             class="img-fluid rounded-3 shadow-sm mb-3"
+                             style="max-height: 220px; object-fit: cover;">
+                        {% endif %}
+
+                        <h5 class="fw-bold text-dark">
+                            Delete this carousel image?
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            This action cannot be undone.
+                        </p>
+
+                    </div>
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="d-grid gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-lg">
+
+                                <i class="fas fa-trash me-2"></i>
+                                Confirm Delete
+
+                            </button>
+
+                            <a href="{% url 'dashboard:carousel_list' %}"
+                               class="btn btn-outline-secondary btn-lg">
+
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
