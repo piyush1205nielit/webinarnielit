@@ -4,24 +4,43 @@
 
 {% block dashboard_content %}
 <div class="container-fluid">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 fw-bold text-dark mb-0">
             <i class="fas fa-certificate text-primary me-2"></i>Certificate Approvals
         </h1>
-        <div class="text-muted small">Pending Approvals: {{ students|length }}</div>
+        <div class="text-muted small">
+            Pending Approvals: <strong>{{ pending_approvals_count }}</strong>
+        </div>
     </div>
 
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <!-- Bulk Actions Bar -->
-    <div class="card shadow-sm mb-3" id="bulkActionsBar" style="display: none;">
-        <div class="card-body py-2">
-            <div class="d-flex justify-content-between align-items-center">
-                <span id="selectedCount" class="fw-bold">0 students selected</span>
-                <div>
-                    <button type="button" class="btn btn-success btn-sm" id="bulkApproveBtn">
-                        <i class="fas fa-check-circle me-1"></i>Approve Selected
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="clearSelectionBtn">
+    <div class="card border-0 bg-primary text-white shadow mb-3" id="bulkActionsBar" style="display: none;">
+        <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-check-square fa-lg"></i>
+                    <span class="fw-bold"><span id="selectedCount">0</span> student(s) selected</span>
+                    <button type="button" class="btn btn-sm btn-light text-primary py-0 px-2" id="clearSelectionBtn">
                         <i class="fas fa-times me-1"></i>Clear
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-sm btn-success fw-semibold" id="bulkApproveBtn">
+                        <i class="fas fa-certificate me-1"></i>Issue Certificates for Selected
                     </button>
                 </div>
             </div>
@@ -29,138 +48,223 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-body">
+        <div class="card-body {% if not students %}p-0{% endif %}">
+
             {% if students %}
             <form method="post" id="approveForm" action="{% url 'dashboard:approve_bulk' %}">
                 {% csrf_token %}
                 <div class="table-responsive">
-                    <table class="table table-hover" id="approvalsTable">
+                    <table class="table table-hover align-middle mb-0" id="approvalsTable">
                         <thead class="table-dark">
                             <tr>
-                                <th width="40">
-                                    <input type="checkbox" id="selectAll">
+                                <th width="40" class="text-center">
+                                    <input type="checkbox" id="selectAll" class="form-check-input mt-0">
                                 </th>
                                 <th>Reg. Number</th>
                                 <th>Student Name</th>
+                                <th>Gender / Category</th>
                                 <th>Contact</th>
+                                <th>Location</th>
                                 <th>Course</th>
-                                <th>Center</th>
-                                <th>Registration Date</th>
-                                <th>Actions</th>
+                                <th>Centre</th>
+                                <th>Registered On</th>
+                                <th width="120">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for student in students %}
-                            <tr>
-                                <td>
-                                    <input type="checkbox" name="student_ids" value="{{ student.id }}" class="student-checkbox">
+                            <tr class="student-row" data-id="{{ student.id }}">
+
+                                <td class="text-center">
+                                    <input type="checkbox" name="student_ids" value="{{ student.id }}" class="form-check-input student-checkbox">
                                 </td>
-                                <td><code class="small">{{ student.registration_number }}</code></td>
+
+                                <td>
+                                    <code class="small text-primary fw-semibold">{{ student.registration_number }}</code>
+                                </td>
+
                                 <td>
                                     <strong>{{ student.name }}</strong><br>
-                                    <small class="text-muted">{{ student.father_name }}</small>
+                                    <small class="text-muted">S/O {{ student.father_name }}</small>
                                 </td>
+
                                 <td>
-                                    {{ student.mobile_number }}<br>
-                                    <small class="text-muted">{{ student.email_id|truncatechars:20 }}</small>
+                                    {% if student.gender %}
+                                        <span class="badge bg-light text-dark border">{{ student.get_gender_display }}</span><br>
+                                    {% endif %}
+                                    <small class="text-muted">{{ student.get_category_display }}</small>
                                 </td>
-                                <td>{{ student.course_enrolled.course_name|truncatechars:25 }}</td>
-                                <td>{{ student.preferred_centre.centre_name|truncatechars:20 }}</td>
-                                <td>{{ student.registration_date|date:"d M Y" }}</td>
+
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-success approve-single" data-id="{{ student.id }}">
-                                        <i class="fas fa-check me-1"></i>Approve
-                                    </button>
-                                    <a href="{% url 'dashboard:student_detail' student.id %}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye me-1"></i>
-                                    </a>
+                                    <span class="small">{{ student.mobile_number }}</span><br>
+                                    <small class="text-muted">{{ student.email_id|truncatechars:22 }}</small>
                                 </td>
+
+                                <td>
+                                    <small>
+                                        {% if student.city %}{{ student.city }}{% endif %}
+                                        {% if student.city and student.state %}, {% endif %}
+                                        {% if student.state %}{{ student.state }}{% endif %}
+                                        {% if not student.city and not student.state %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </small>
+                                    {% if student.institute_name %}
+                                        <br><small class="text-muted">{{ student.institute_name|truncatechars:25 }}</small>
+                                    {% endif %}
+                                </td>
+
+                                <td class="small">{{ student.course_enrolled.course_name|truncatechars:28 }}</td>
+
+                                <td class="small">
+                                    {% if student.preferred_centre %}
+                                        {{ student.preferred_centre.centre_name|truncatechars:20 }}
+                                    {% else %}
+                                        <span class="text-muted">Online</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="small text-muted">{{ student.registration_date|date:"d M Y" }}</td>
+
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <button type="button"
+                                                class="btn btn-sm btn-success approve-single"
+                                                data-id="{{ student.id }}"
+                                                title="Approve & Issue Certificate">
+                                            <i class="fas fa-check me-1"></i>Approve
+                                        </button>
+                                        <a href="{% url 'dashboard:student_detail' student.id %}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </form>
+
             {% else %}
             <div class="text-center py-5">
                 <i class="fas fa-check-circle fa-4x text-success mb-3 d-block"></i>
-                <h5>No Pending Approvals</h5>
-                <p class="text-muted">All students have been approved for certificates.</p>
+                <h5 class="fw-bold">No Pending Approvals</h5>
+                <p class="text-muted">All confirmed students have been issued certificates.</p>
                 <a href="{% url 'dashboard:index' %}" class="btn btn-primary mt-2">
                     <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                 </a>
             </div>
             {% endif %}
+
         </div>
     </div>
 </div>
 
 <script>
-$(document).ready(function() {
-    let selectedStudents = new Set();
-    
-    function updateBulkActionsBar() {
-        const count = selectedStudents.size;
-        if (count > 0) {
-            $('#bulkActionsBar').show();
-            $('#selectedCount').text(count + ' student(s) selected');
-        } else {
-            $('#bulkActionsBar').hide();
+document.addEventListener('DOMContentLoaded', function () {
+
+    const selectAll       = document.getElementById('selectAll');
+    const checkboxes      = document.querySelectorAll('.student-checkbox');
+    const bulkActionsBar  = document.getElementById('bulkActionsBar');
+    const selectedCount   = document.getElementById('selectedCount');
+    const clearBtn        = document.getElementById('clearSelectionBtn');
+    const bulkApproveBtn  = document.getElementById('bulkApproveBtn');
+    const approveForm     = document.getElementById('approveForm');
+
+    // ── Update bar ──
+    function updateBar() {
+        const checked = document.querySelectorAll('.student-checkbox:checked').length;
+        const total   = checkboxes.length;
+
+        selectedCount.textContent = checked;
+        bulkActionsBar.style.display = checked > 0 ? 'block' : 'none';
+
+        if (selectAll) {
+            if (checked === 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            } else if (checked === total) {
+                selectAll.checked = true;
+                selectAll.indeterminate = false;
+            } else {
+                selectAll.checked = false;
+                selectAll.indeterminate = true;
+            }
         }
+
+        // Highlight selected rows
+        document.querySelectorAll('.student-row').forEach(row => {
+            const cb = row.querySelector('.student-checkbox');
+            row.classList.toggle('table-active', cb && cb.checked);
+        });
     }
-    
-    $('#selectAll').change(function() {
-        if ($(this).prop('checked')) {
-            $('.student-checkbox').each(function() {
-                selectedStudents.add($(this).val());
-                $(this).prop('checked', true);
-            });
-        } else {
-            selectedStudents.clear();
-            $('.student-checkbox').prop('checked', false);
-        }
-        updateBulkActionsBar();
+
+    // ── Select all ──
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateBar();
+        });
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateBar));
+
+    // ── Clear ──
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+            checkboxes.forEach(cb => cb.checked = false);
+            updateBar();
+        });
+    }
+
+    // ── Bulk approve ──
+    if (bulkApproveBtn) {
+        bulkApproveBtn.addEventListener('click', function () {
+            const count = document.querySelectorAll('.student-checkbox:checked').length;
+            if (count === 0) {
+                alert('Please select at least one student.');
+                return;
+            }
+            if (confirm(`Issue certificates for ${count} student(s)? This cannot be undone.`)) {
+                approveForm.submit();
+            }
+        });
+    }
+
+    // ── Single approve ──
+    document.querySelectorAll('.approve-single').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const studentId = this.dataset.id;
+            if (confirm('Approve this student and issue certificate?')) {
+                // Temporarily add the student_id as hidden input and POST
+                // to the single-approve endpoint
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{% url 'dashboard:approve_certificate' %}";
+
+                const csrf = document.createElement('input');
+                csrf.type  = 'hidden';
+                csrf.name  = 'csrfmiddlewaretoken';
+                csrf.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                form.appendChild(csrf);
+
+                const sid = document.createElement('input');
+                sid.type  = 'hidden';
+                sid.name  = 'student_id';
+                sid.value = studentId;
+                form.appendChild(sid);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     });
-    
-    $('.student-checkbox').change(function() {
-        if ($(this).prop('checked')) {
-            selectedStudents.add($(this).val());
-        } else {
-            selectedStudents.delete($(this).val());
-        }
-        $('#selectAll').prop('checked', $('.student-checkbox:checked').length === $('.student-checkbox').length);
-        updateBulkActionsBar();
-    });
-    
-    $('#clearSelectionBtn').click(function() {
-        selectedStudents.clear();
-        $('.student-checkbox').prop('checked', false);
-        $('#selectAll').prop('checked', false);
-        updateBulkActionsBar();
-    });
-    
-    $('#bulkApproveBtn').click(function() {
-        if (selectedStudents.size === 0) {
-            alert('Please select students to approve.');
-            return;
-        }
-        if (confirm(`Approve ${selectedStudents.size} student(s) for certificate?`)) {
-            $('#approveForm').submit();
-        }
-    });
-    
-    $('.approve-single').click(function() {
-        const studentId = $(this).data('id');
-        if (confirm('Approve this student for certificate?')) {
-            const form = $('#approveForm');
-            $('<input>').attr({
-                type: 'hidden',
-                name: 'student_ids',
-                value: studentId
-            }).appendTo(form);
-            form.submit();
-        }
-    });
+
+    updateBar();
 });
 </script>
 {% endblock %}

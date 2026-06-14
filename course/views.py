@@ -6,6 +6,7 @@ from django.db import models
 from django.http import JsonResponse
 from .models import Course, Centre
 from .forms import CourseForm, CentreForm
+from django.utils import timezone
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -44,8 +45,21 @@ def get_course_centres(request):
 # Admin Views - Course Management
 @user_passes_test(is_admin)
 def course_list(request):
+    # Auto-check and update expired deadlines on page load
+    today = timezone.now().date()
+    expired_courses = Course.objects.filter(
+        registration_deadline__lt=today,
+        course_status__in=['open', 'active']
+    )
+    for course in expired_courses:
+        course.save()  # triggers auto-status logic in model's save()
+
     courses = Course.objects.all()
-    return render(request, 'course/course_list_admin.html', {'courses': courses})
+    context = {
+        'courses': courses,
+        'now': today,
+    }
+    return render(request, 'course/course_list_admin.html', context)
 
 @user_passes_test(is_admin)
 def course_create(request):

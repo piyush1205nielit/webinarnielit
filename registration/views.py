@@ -3,8 +3,9 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import models, IntegrityError
 from django.urls import reverse
+from django.utils import timezone
 from course.models import Course
-from .models import Student, Certificate
+from .models import Student
 from .forms import StudentRegistrationForm, UserLookupForm
 
 
@@ -112,25 +113,28 @@ def user_profile(request):
     return render(request, 'registration/user_profile.html', context)
 
 
-def download_certificate(request, reg_number):
+def view_certificate(request, reg_number):
+    """Redirect to certificate app to view certificate"""
     try:
-        student = Student.objects.get(registration_number=reg_number)
+        student = get_object_or_404(Student, registration_number=reg_number)
+        
+        # Check conditions before redirecting
         if student.status != 'completed':
             messages.error(request, 'Certificate is only available for completed courses.')
             return redirect('registration:user_profile')
         
-        certificate, created = Certificate.objects.get_or_create(student=student)
+        if not student.is_approved:
+            messages.error(request, 'Your certificate is not yet approved. Please contact administration.')
+            return redirect('registration:user_profile')
         
-        return render(request, 'registration/certificate_view.html', {
-            'student': student,
-            'certificate': certificate
-        })
+        # Redirect to certificate app
+        return redirect('certificate:view_certificate', reg_number=reg_number)
+        
     except Student.DoesNotExist:
         messages.error(request, 'Registration not found.')
         return redirect('registration:user_profile')
 
 
 def verify_certificate(request, cert_number):
-    """Public certificate verification"""
-    certificate = get_object_or_404(Certificate, certificate_number=cert_number)
-    return render(request, 'registration/verify_certificate.html', {'certificate': certificate})
+    """Public certificate verification - redirect to certificate app"""
+    return redirect('certificate:verify_certificate', cert_number=cert_number)

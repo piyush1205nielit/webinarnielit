@@ -7,8 +7,12 @@ urlpatterns = [
     path('', views.dashboard_index, name='index'),
     path('students/', views.students_list, name='students_list'),
     path('students/<uuid:pk>/', views.student_detail, name='student_detail'),
+    path('students/<uuid:pk>/edit/', views.edit_student, name='edit_student'),
+    path('students/<uuid:pk>/details/', views.get_student_details, name='student_details'),
     path('approve/', views.approve_certificate, name='approve_certificate'),
     path('approve-bulk/', views.approve_bulk, name='approve_bulk'),
+    path('revoke/', views.revoke_certificate, name='revoke_certificate'),
+    path('revoke-bulk/', views.revoke_bulk, name='revoke_bulk'),
     path('update-status-bulk/', views.update_status_bulk, name='update_status_bulk'),
     path('delete-bulk/', views.delete_bulk, name='delete_bulk'),
     path('update-status/', views.update_status, name='update_status'),
@@ -29,5 +33,4 @@ urlpatterns = [
     path('carousel/<uuid:pk>/edit/', views.carousel_edit, name='carousel_edit'),
     path('carousel/<uuid:pk>/delete/', views.carousel_delete, name='carousel_delete'),
     path('carousel/reorder/', views.carousel_reorder, name='carousel_reorder'),
-
 ]

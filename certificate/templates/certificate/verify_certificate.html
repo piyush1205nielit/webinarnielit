@@ -1,0 +1,530 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Verify Certificate - NIELIT{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verify-page {
+        background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+        min-height: calc(100vh - 300px);
+    }
+    
+    .page-banner {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        padding: 50px 0;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+    }
+    
+    .page-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+    
+    .page-banner h1 {
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-banner p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .breadcrumb-custom {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item a {
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item a:hover {
+        color: white;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item.active {
+        color: #f59e0b;
+    }
+    
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255,255,255,0.6);
+    }
+    
+    /* Verification Card */
+    .verification-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-top: -30px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .verification-header {
+        padding: 25px 30px;
+        text-align: center;
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .verification-header .status-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    
+    .verification-header .status-icon.valid {
+        background: #10b98120;
+        color: #059669;
+    }
+    
+    .verification-header .status-icon.invalid {
+        background: #ef444420;
+        color: #dc2626;
+    }
+    
+    .verification-header .status-icon i {
+        font-size: 40px;
+    }
+    
+    .verification-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .verification-header .valid-title {
+        color: #059669;
+    }
+    
+    .verification-header .invalid-title {
+        color: #dc2626;
+    }
+    
+    .verification-header p {
+        color: #64748b;
+        margin-bottom: 0;
+    }
+    
+    /* Section Styles */
+    .info-section {
+        padding: 20px 25px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .info-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title i {
+        color: #3b82f6;
+        font-size: 1.1rem;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+    
+    .info-value {
+        font-size: 0.9rem;
+        color: #1e293b;
+        font-weight: 500;
+        word-break: break-word;
+    }
+    
+    .info-value code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    
+    .full-width {
+        grid-column: span 2;
+    }
+    
+    /* Verification Badges */
+    .verification-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .verify-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background: #10b98120;
+        color: #059669;
+    }
+    
+    /* Footer Stats */
+    .verification-footer {
+        padding: 15px 25px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .footer-info {
+        color: #64748b;
+        font-size: 0.75rem;
+    }
+    
+    .footer-info i {
+        margin-right: 6px;
+        color: #3b82f6;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h4 {
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #94a3b8;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-banner {
+            padding: 30px 0;
+        }
+        
+        .page-banner h1 {
+            font-size: 1.5rem;
+        }
+        
+        .page-banner p {
+            font-size: 0.9rem;
+        }
+        
+        .verification-header {
+            padding: 20px;
+        }
+        
+        .info-section {
+            padding: 15px 20px;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .full-width {
+            grid-column: span 1;
+        }
+        
+        .verification-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-page">
+    <!-- Page Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Verify Certificate</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-shield-alt me-3"></i>Certificate Verification</h1>
+            <p>Verify the authenticity of NIELIT certificates</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Verification Card -->
+        <div class="verification-card">
+            
+            {% if is_valid %}
+            <!-- Valid Certificate Header -->
+            <div class="verification-header">
+                <div class="status-icon valid">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="valid-title">Certificate Verified</h2>
+                <p>This is a valid certificate issued by NIELIT</p>
+            </div>
+            
+            <!-- Certificate Credentials Section -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-certificate"></i>
+                    <span>Certificate Credentials</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Certificate Number</span>
+                        <span class="info-value"><code>{{ certificate.certificate_number }}</code></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Issue Date</span>
+                        <span class="info-value">{{ certificate.issue_date|date:"d F Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Student Details Section -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Student Details</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Student Name</span>
+                        <span class="info-value"><strong>{{ certificate.student.name }}</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Father's Name</span>
+                        <span class="info-value">{{ certificate.student.father_name }}</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">Student ID (UUID)</span>
+                        <span class="info-value"><code>{{ certificate.student.id }}</code></span>
+                        <div class="verification-badges mt-1">
+                            <span class="verify-badge badge-success">
+                                <i class="fas fa-check-circle"></i> Matches certificate record
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Course Details Section -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-book-open"></i>
+                    <span>Course Details</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item full-width">
+                        <span class="info-label">Course Name</span>
+                        <span class="info-value"><strong>{{ certificate.student.course_enrolled.course_name }}</strong></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Duration</span>
+                        <span class="info-value">{{ certificate.student.course_enrolled.course_duration|default:"Flexible" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Mode</span>
+                        <span class="info-value">{{ certificate.student.course_enrolled.get_mode_display }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Registration Details Section -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-id-card"></i>
+                    <span>Registration Details</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Registration Number</span>
+                        <span class="info-value"><code>{{ certificate.student.registration_number }}</code></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Registration Date</span>
+                        <span class="info-value">{{ certificate.student.registration_date|date:"d F Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Issuing Authority Section -->
+            <div class="info-section">
+                <div class="section-title">
+                    <i class="fas fa-building"></i>
+                    <span>Issuing Authority</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item full-width">
+                        <span class="info-value">
+                            <strong>{{ certificate.issued_by|default:"NIELIT Administration" }}</strong><br>
+                            <span class="small text-muted">National Institute of Electronics & Information Technology<br>Ministry of Electronics & IT, Government of India</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Verification Summary -->
+            <div class="info-section">
+                <div class="verification-badges">
+                    <span class="verify-badge badge-success">
+                        <i class="fas fa-check-circle"></i> Student ID Verified
+                    </span>
+                    <span class="verify-badge badge-success">
+                        <i class="fas fa-check-circle"></i> Certificate Authentic
+                    </span>
+                    <span class="verify-badge badge-success">
+                        <i class="fas fa-check-circle"></i> Issued by NIELIT
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="verification-footer">
+                <div class="footer-info">
+                    <i class="fas fa-clock"></i>
+                    Verified on {% now "d F Y, h:i A" %}
+                </div>
+                <div class="footer-info">
+                    <i class="fas fa-shield-alt"></i>
+                    Real-time verification
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- Invalid Certificate -->
+            <div class="verification-header">
+                <div class="status-icon invalid">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h2 class="invalid-title">Invalid Certificate</h2>
+                <p>No matching certificate found in our records</p>
+            </div>
+            
+            <div class="empty-state">
+                <i class="fas fa-certificate"></i>
+                <h4>Certificate Not Found</h4>
+                <p>We could not find any certificate with the number:</p>
+                <code class="bg-light p-2 d-inline-block rounded">{{ certificate_number }}</code>
+                
+                <div class="text-start mt-4 p-3 bg-light rounded" style="max-width: 400px; margin: 0 auto;">
+                    <strong class="small text-muted">Possible Reasons:</strong>
+                    <ul class="small text-muted mt-2 mb-0">
+                        <li>The certificate number may be entered incorrectly</li>
+                        <li>The certificate may have been issued by a different authority</li>
+                        <li>The certificate may be forged or altered</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'public:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go to Home
+                    </a>
+                    <a href="{% url 'public:contact' %}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+        </div>
+        
+        <!-- Help Section -->
+        <div class="text-center mt-4">
+            <p class="small text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                This verification is performed in real-time. For any discrepancies, please contact NIELIT administration.
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+<style>
+    @media print {
+        .page-banner, .verification-footer, .btn, .no-print {
+            display: none;
+        }
+        .verification-card {
+            margin-top: 0;
+            box-shadow: none;
+        }
+        .verification-header {
+            background: white;
+            border: 1px solid #ddd;
+        }
+    }
+</style>
+{% endblock %}

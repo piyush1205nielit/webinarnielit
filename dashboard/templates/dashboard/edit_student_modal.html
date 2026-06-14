@@ -1,0 +1,82 @@
+{% load static %}
+<form method="post" id="editStudentForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Full Name *</label>
+            <input type="text" name="name" class="form-control form-control-sm" value="{{ student.name }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Father's Name *</label>
+            <input type="text" name="father_name" class="form-control form-control-sm" value="{{ student.father_name }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Date of Birth *</label>
+            <input type="date" name="date_of_birth" class="form-control form-control-sm" value="{{ student.date_of_birth|date:'Y-m-d' }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Category *</label>
+            <select name="category" class="form-select form-select-sm">
+                <option value="general" {% if student.category == 'general' %}selected{% endif %}>General</option>
+                <option value="sc" {% if student.category == 'sc' %}selected{% endif %}>SC</option>
+                <option value="st" {% if student.category == 'st' %}selected{% endif %}>ST</option>
+                <option value="ews" {% if student.category == 'ews' %}selected{% endif %}>EWS</option>
+                <option value="obc" {% if student.category == 'obc' %}selected{% endif %}>OBC</option>
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Mobile Number *</label>
+            <input type="text" name="mobile_number" class="form-control form-control-sm" value="{{ student.mobile_number }}" pattern="[0-9]{10}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Email ID *</label>
+            <input type="email" name="email_id" class="form-control form-control-sm" value="{{ student.email_id }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Course *</label>
+            <select name="course_enrolled" class="form-select form-select-sm" required>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if student.course_enrolled.id == course.id %}selected{% endif %}>
+                    {{ course.course_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Preferred Centre *</label>
+            <select name="preferred_centre" class="form-select form-select-sm">
+                <option value="">-- Select Centre --</option>
+                {% for centre in centres %}
+                <option value="{{ centre.id }}" {% if student.preferred_centre.id == centre.id %}selected{% endif %}>
+                    {{ centre.centre_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+    </div>
+</form>
+
+<script>
+    $('#editStudentForm').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const url = '{% url "dashboard:edit_student" student.id %}';
+        
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: form.serialize(),
+            success: function(response) {
+                $('#editStudentModal').modal('hide');
+                location.reload();
+            },
+            error: function(xhr) {
+                alert('Error updating student. Please try again.');
+            }
+        });
+    });
+</script>

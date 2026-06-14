@@ -19,16 +19,24 @@ class Student(models.Model):
         ('cancelled', 'Cancelled'),
         ('completed', 'Completed'),
     ]
+
+    GENDER = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('Other', 'Other'),
+    ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
-    mobile_number = models.CharField(max_length=10, validators=[
-        RegexValidator(r'^\d{10}$', 'Enter a valid 10-digit mobile number')
-    ])
+    mobile_number = models.CharField(max_length=10, validators=[RegexValidator(r'^\d{10}$', 'Enter a valid 10-digit mobile number')])
     date_of_birth = models.DateField()
+    gender = models.CharField(max_length=200, null = True, blank = True, choices= GENDER)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='general')
     email_id = models.EmailField()
     father_name = models.CharField(max_length=200)
+    state = models.CharField(max_length= 500, null = True, blank = True)
+    city = models.CharField(max_length= 500, null = True, blank = True)
+    institute_name = models.TextField(null = True, blank = True)
     course_enrolled = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
     preferred_centre = models.ForeignKey(Centre, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')  # CHANGED: Allow NULL
     is_approved = models.BooleanField(default=False)
@@ -52,24 +60,9 @@ class Student(models.Model):
         if not self.registration_number:
             year = timezone.now().strftime('%Y')
             unique_id = str(uuid.uuid4().int)[:8]
-            self.registration_number = f"NIELIT/{year}/{unique_id}"
+            self.registration_number = f"NIELIT-{year}-{unique_id}"
         super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.name} - {self.mobile_number}"
 
-
-class Certificate(models.Model):
-    student = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='certificate')
-    certificate_number = models.CharField(max_length=100, unique=True, blank=True)
-    issue_date = models.DateField(auto_now_add=True)
-    certificate_file = models.FileField(upload_to='certificates/', blank=True, null=True)
-    
-    def save(self, *args, **kwargs):
-        if not self.certificate_number:
-            unique_id = str(uuid.uuid4().int)[:8]
-            self.certificate_number = f"CERT/{unique_id}"
-        super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return f"Certificate - {self.student.name}"

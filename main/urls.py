@@ -12,6 +12,7 @@ urlpatterns = [
     path('course/', include('course.urls')),
     path('registration/', include('registration.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('certificate/', include('certificate.urls')),
 ]
 
 if settings.DEBUG:

@@ -1,0 +1,145 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Issue Certificate - Admin{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'dashboard:students_list' %}" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Back to Students
+        </a>
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-certificate text-primary me-2"></i>Issue Certificate
+        </h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Student Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">Student Name:</th>
+                            <td><strong>{{ student.name }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Father's Name:</th>
+                            <td>{{ student.father_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Registration Number:</th>
+                            <td><code>{{ student.registration_number }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>Course:</th>
+                            <td>{{ student.course_enrolled.course_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Mobile:</th>
+                            <td>{{ student.mobile_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ student.email_id }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Certificate Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Issue Date *</label>
+                            {{ form.issue_date }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Issued By</label>
+                            {{ form.issued_by }}
+                            <small class="text-muted">Name of the issuing authority</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Remarks (Optional)</label>
+                            {{ form.remarks }}
+                        </div>
+                        
+                        {% if design %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-palette me-2"></i>
+                            Using certificate design: <strong>{{ design.title }}</strong>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No active certificate design found. Please create one first.
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'dashboard:students_list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success" {% if not design %}disabled{% endif %}>
+                                <i class="fas fa-certificate me-2"></i>Issue Certificate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Certificate Preview</h5>
+                </div>
+                <div class="card-body p-3 text-center">
+                    <div class="certificate-mini-preview" style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <div style="border: 2px solid {{ design.border_color|default:'#1e3a8a' }}; padding: 15px;">
+                            <p class="text-muted small">Certificate will include:</p>
+                            <ul class="list-unstyled small">
+                                <li>Student Name: <strong>{{ student.name }}</strong></li>
+                                <li>Course: <strong>{{ student.course_enrolled.course_name }}</strong></li>
+                                <li>Certificate Number: <strong>NIELIT/{% now "Y" %}/{{ student.course_enrolled.course_name|slice:":10"|upper }}/{{ student.id|slice:":6" }}</strong></li>
+                                <li>Issue Date: <strong id="previewDate">{{ form.issue_date.value|default:"YYYY-MM-DD" }}</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update preview date when date changes
+    const dateInput = document.querySelector('#id_issue_date');
+    const previewDate = document.querySelector('#previewDate');
+    
+    if (dateInput) {
+        dateInput.addEventListener('change', function() {
+            if (this.value) {
+                const date = new Date(this.value);
+                previewDate.textContent = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        });
+    }
+</script>
+{% endblock %}

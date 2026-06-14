@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.db.models import Count,Sum, Q
 from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator
-from registration.models import Student, Certificate
+from registration.models import Student
 from course.models import Course, Centre
 from datetime import datetime, timedelta
 import json
@@ -17,7 +17,7 @@ from .forms import AnnouncementForm, CarouselImageForm
 from datetime import datetime, timedelta, date
 import pandas as pd
 from django.template.loader import get_template
-
+from django.utils import timezone
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from reportlab.platypus import ( SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer )
@@ -187,90 +187,86 @@ def students_list(request):
     # ================= EXCEL EXPORT ================= #
 
     if export_type == "excel":
-
         wb = Workbook()
         ws = wb.active
         ws.title = "Students"
-
         headers = [
-            "Registration No", "Student Name", "Father Name", "Mobile", "Email", "Course", "Center", "Status", "Certificate", "Registration Date",
+            "Registration No", "Student Name", "Father Name", "Gender", "DOB",
+            "Category", "Mobile", "Email", "State", "City", "Institute",
+            "Course", "Center", "Status", "Certificate", "Registration Date",
         ]
         ws.append(headers)
 
-        # Header Styling
         for cell in ws[1]:
             cell.font = Font(bold=True)
 
-        # Data Rows
         for student in students:
-
             ws.append([
                 student.registration_number,
                 student.name,
                 student.father_name,
+                student.get_gender_display() if student.gender else '',
+                student.date_of_birth.strftime('%d-%m-%Y') if student.date_of_birth else '',
+                student.get_category_display(),
                 student.mobile_number,
                 student.email_id,
-                student.course_enrolled.course_name if student.course_enrolled else "",
-                student.preferred_centre.centre_name if student.preferred_centre else "",
+                student.state or '',
+                student.city or '',
+                student.institute_name or '',
+                student.course_enrolled.course_name if student.course_enrolled else '',
+                student.preferred_centre.centre_name if student.preferred_centre else '',
                 student.get_status_display(),
                 "Issued" if student.is_approved else "Pending",
                 student.registration_date.strftime("%d-%m-%Y"),
             ])
 
-        # Column Widths
         column_widths = {
-            "A": 22, "B": 28, "C": 28, "D": 18, "E": 35, "F": 30, "G": 25, "H": 18, "I": 18, "J": 18,
+            "A": 22, "B": 28, "C": 28, "D": 12, "E": 14,
+            "F": 12, "G": 16, "H": 35, "I": 20, "J": 18,
+            "K": 30, "L": 30, "M": 25, "N": 15, "O": 15, "P": 18,
         }
-
         for column, width in column_widths.items():
             ws.column_dimensions[column].width = width
 
         response = HttpResponse(
             content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
-
-        response["Content-Disposition"] = (
-            'attachment; filename="students.xlsx"'
-        )
-
+        response["Content-Disposition"] = 'attachment; filename="students.xlsx"'
         wb.save(response)
         return response
 
     # ================= PDF EXPORT ================= #
 
     if export_type == "pdf":
-
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="students.pdf"'
 
         buffer = BytesIO()
-
-        doc = SimpleDocTemplate( buffer, pagesize=landscape(A4), rightMargin=20, leftMargin=20, topMargin=20, bottomMargin=20)
+        doc = SimpleDocTemplate(
+            buffer, pagesize=landscape(A4),
+            rightMargin=15, leftMargin=15, topMargin=20, bottomMargin=20
+        )
 
         elements = []
         styles = getSampleStyleSheet()
-
-        title = Paragraph(
-            "<b>Students Report</b>",
-            styles['Title']
-        )
-
-        elements.append(title)
+        elements.append(Paragraph("<b>Students Report</b>", styles['Title']))
         elements.append(Spacer(1, 12))
 
         data = [[
-            "Reg No", "Student", "Mobile", "Email", "Course", "Center", "Status", "Certificate", "Date",
+            "Reg No", "Name", "Gender", "Mobile", "Email",
+            "State", "Course", "Center", "Status", "Certificate", "Date",
         ]]
 
         for student in students:
-
             data.append([
                 student.registration_number,
                 student.name,
+                student.get_gender_display() if student.gender else '-',
                 student.mobile_number,
                 student.email_id,
-                student.course_enrolled.course_name if student.course_enrolled else "",
-                student.preferred_centre.centre_name if student.preferred_centre else "",
+                student.state or '-',
+                student.course_enrolled.course_name if student.course_enrolled else '',
+                student.preferred_centre.centre_name if student.preferred_centre else '-',
                 student.get_status_display(),
                 "Issued" if student.is_approved else "Pending",
                 student.registration_date.strftime("%d-%m-%Y"),
@@ -279,46 +275,30 @@ def students_list(request):
         table = Table(
             data,
             repeatRows=1,
-            colWidths=[ 80, 100, 75, 130, 110, 90, 60, 70, 70 ]
+            colWidths=[80, 90, 50, 65, 110, 60, 95, 75, 55, 55, 60]
         )
 
         table.setStyle(TableStyle([
-
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e293b")),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
-
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
-
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-
-            ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
-
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [
-                colors.whitesmoke,
-                colors.HexColor("#f8fafc")
-            ]),
-
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.HexColor("#f8fafc")]),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-
-            ('LEFTPADDING', (0, 0), (-1, -1), 6),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-            ('TOPPADDING', (0, 0), (-1, -1), 6),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-
+            ('LEFTPADDING', (0, 0), (-1, -1), 5),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 5),
+            ('TOPPADDING', (0, 0), (-1, -1), 5),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
         ]))
 
         elements.append(table)
-
         doc.build(elements)
 
         pdf = buffer.getvalue()
         buffer.close()
-
         response.write(pdf)
-
         return response
 
     # ───────────────── Pagination ───────────────── #
@@ -350,42 +330,105 @@ def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
     return render(request, 'dashboard/student_detail.html', {'student': student})
 
+
 @user_passes_test(is_admin)
 def approve_certificate(request):
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        if student_id:
+            from certificate.models import CertificateDesign, StudentCertificate
+            from django.utils import timezone
+
+            try:
+                student = Student.objects.get(id=student_id)
+                design = CertificateDesign.objects.filter(is_active=True).first()
+
+                if not design:
+                    messages.error(request, 'No active certificate design found.')
+                    return redirect('dashboard:approve_certificate')
+
+                if student.status == 'confirmed' and not student.is_approved:
+                    certificate, created = StudentCertificate.objects.get_or_create(
+                        student=student,
+                        defaults={
+                            'design': design,
+                            'issue_date': timezone.now().date(),
+                            'issued_by': request.user.get_full_name() or 'NIELIT Administration'
+                        }
+                    )
+                    certificate.save()
+
+                    student.is_approved = True
+                    student.status = 'completed'
+                    student.save()
+
+                    messages.success(request, f'Certificate approved for {student.name}!')
+                else:
+                    messages.warning(request, f'{student.name} is not eligible — must be Confirmed and not already approved.')
+
+            except Student.DoesNotExist:
+                messages.error(request, 'Student not found.')
+
+        return redirect('dashboard:approve_certificate')
+
+    # GET — show pending approvals
     students = Student.objects.filter(
-        status='confirmed', 
+        status='confirmed',
         is_approved=False
-    ).select_related('course_enrolled', 'preferred_centre')
-    
+    ).select_related('course_enrolled', 'preferred_centre').order_by('-registration_date')
+
     context = {
         'students': students,
         'pending_approvals_count': students.count(),
     }
     return render(request, 'dashboard/approve_certificate.html', context)
 
+
+ 
 @user_passes_test(is_admin)
 def approve_bulk(request):
-    """Bulk approve students for certificate"""
+
     if request.method == 'POST':
         student_ids = request.POST.getlist('student_ids')
         if student_ids:
+            from certificate.models import CertificateDesign, StudentCertificate
+            from django.utils import timezone
+            
+            design = CertificateDesign.objects.filter(is_active=True).first()
+            
+            if not design:
+                messages.error(request, 'No active certificate design found. Please create one first.')
+                return redirect('dashboard:students_list')
+            
             count = 0
             for student_id in student_ids:
                 try:
                     student = Student.objects.get(id=student_id)
                     if student.status == 'confirmed' and not student.is_approved:
+                        # Create certificate (no QR code image saved)
+                        certificate, created = StudentCertificate.objects.get_or_create(
+                            student=student,
+                            defaults={
+                                'design': design,
+                                'issue_date': timezone.now().date(),
+                                'issued_by': request.user.get_full_name() or 'NIELIT Administration'
+                            }
+                        )
+                        
+                        # Update student status
                         student.is_approved = True
                         student.status = 'completed'
                         student.save()
-                        Certificate.objects.get_or_create(student=student)
                         count += 1
                 except Student.DoesNotExist:
                     continue
+            
             messages.success(request, f'{count} student(s) have been approved for certification!')
         else:
             messages.warning(request, 'No students selected for approval.')
         return redirect('dashboard:students_list')
     return redirect('dashboard:students_list')
+
 
 @user_passes_test(is_admin)
 def update_status_bulk(request):
@@ -416,10 +459,11 @@ def delete_bulk(request):
     if request.method == 'POST':
         student_ids = request.POST.getlist('student_ids')
         if student_ids:
+            from certificate.models import StudentCertificate
             # Delete certificates first (due to foreign key)
-            Certificate.objects.filter(student_id__in=student_ids).delete()
+            StudentCertificate.objects.filter(student_id__in=student_ids).delete()
             # Delete students
-            count = Student.objects.filter(id__in=student_ids).delete()[0]
+            count, _ = Student.objects.filter(id__in=student_ids).delete()
             messages.success(request, f'{count} student(s) have been deleted successfully!')
         else:
             messages.warning(request, 'No students selected for deletion.')
@@ -428,7 +472,7 @@ def delete_bulk(request):
 
 @user_passes_test(is_admin)
 def update_status(request):
-    """Single student status update via AJAX"""
+
     if request.method == 'POST':
         student_id = request.POST.get('student_id')
         new_status = request.POST.get('status')
@@ -680,3 +724,125 @@ def carousel_reorder(request):
         return JsonResponse({'success': True})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+    
+# Add these new functions to dashboard/views.py
+
+@user_passes_test(is_admin)
+def revoke_certificate(request):
+    """Revoke certificate for a student (single)"""
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        if student_id:
+            from certificate.models import StudentCertificate
+            
+            try:
+                student = Student.objects.get(id=student_id)
+                
+                if student.is_approved and student.status == 'completed':
+                    # Update student status
+                    student.is_approved = False
+                    student.status = 'confirmed'
+                    student.save()
+                    
+                    # Optional: Delete or mark certificate as revoked
+                    # StudentCertificate.objects.filter(student=student).delete()
+                    
+                    messages.success(request, f'Certificate revoked for {student.name}! Status set back to Confirmed.')
+                else:
+                    messages.error(request, 'Certificate cannot be revoked for this student.')
+            except Student.DoesNotExist:
+                messages.error(request, 'Student not found.')
+        
+        return redirect('dashboard:students_list')
+    return redirect('dashboard:students_list')
+
+
+@user_passes_test(is_admin)
+def revoke_bulk(request):
+    """Bulk revoke certificates for students"""
+    if request.method == 'POST':
+        student_ids = request.POST.getlist('student_ids')
+        if student_ids:
+            count = 0
+            for student_id in student_ids:
+                try:
+                    student = Student.objects.get(id=student_id)
+                    if student.is_approved and student.status == 'completed':
+                        student.is_approved = False
+                        student.status = 'confirmed'
+                        student.save()
+                        count += 1
+                except Student.DoesNotExist:
+                    continue
+            messages.success(request, f'{count} certificate(s) have been revoked!')
+        else:
+            messages.warning(request, 'No students selected.')
+        return redirect('dashboard:students_list')
+    return redirect('dashboard:students_list')
+
+
+@user_passes_test(is_admin)
+def edit_student(request, pk):
+    """Edit student details"""
+    student = get_object_or_404(Student, pk=pk)
+
+    if request.method == 'POST':
+        student.name = request.POST.get('name')
+        student.father_name = request.POST.get('father_name')
+        student.mobile_number = request.POST.get('mobile_number')
+        student.email_id = request.POST.get('email_id')
+        student.date_of_birth = request.POST.get('date_of_birth')
+        student.gender = request.POST.get('gender') or None
+        student.category = request.POST.get('category')
+        student.state = request.POST.get('state') or None
+        student.city = request.POST.get('city') or None
+        student.institute_name = request.POST.get('institute_name') or None
+
+        course_id = request.POST.get('course_enrolled')
+        centre_id = request.POST.get('preferred_centre')
+
+        if course_id:
+            student.course_enrolled_id = course_id
+        if centre_id:
+            student.preferred_centre_id = centre_id
+
+        student.save()
+        messages.success(request, f'Student {student.name} details updated successfully!')
+        return redirect('dashboard:students_list')
+
+    courses = Course.objects.filter(is_active=True)
+    centres = Centre.objects.all()
+
+    context = {
+        'student': student,
+        'courses': courses,
+        'centres': centres,
+    }
+    return render(request, 'dashboard/edit_student_modal.html', context)
+
+
+@user_passes_test(is_admin)
+def get_student_details(request, pk):
+    """Get student details for modal view"""
+    student = get_object_or_404(Student, pk=pk)
+    data = {
+        'id': str(student.id),
+        'registration_number': student.registration_number,
+        'name': student.name,
+        'father_name': student.father_name,
+        'date_of_birth': student.date_of_birth.strftime('%d %B %Y'),
+        'gender': student.get_gender_display() if student.gender else 'NA',
+        'category': student.get_category_display(),
+        'mobile_number': student.mobile_number,
+        'email_id': student.email_id,
+        'state': student.state or 'NA',
+        'city': student.city or 'NA',
+        'institute_name': student.institute_name or 'NA',
+        'course_name': student.course_enrolled.course_name,
+        'centre_name': student.preferred_centre.centre_name if student.preferred_centre else 'NA',
+        'registration_date': student.registration_date.strftime('%d %B %Y, %I:%M %p'),
+        'status': student.get_status_display(),
+        'is_approved': student.is_approved,
+        'certificate_number': student.student_certificate.certificate_number if hasattr(student, 'student_certificate') else 'Not issued',
+    }
+    return JsonResponse(data)

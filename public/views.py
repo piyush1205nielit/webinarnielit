@@ -147,3 +147,6 @@ def announcements(request):
     context = {'announcements': announcements_list,}
     
     return render(request, 'public/announcements.html', context)
+
+def maintenance_page(request):
+    return render(request, 'public/maintenance_page.html')

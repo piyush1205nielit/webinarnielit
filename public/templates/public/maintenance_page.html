@@ -1,0 +1,619 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Portal Maintenance - NIELIT Delhi{% endblock %}
+
+{% block extra_css %}
+<style>
+
+:root{
+    --primary:#0f2b6d;
+    --primary-dark:#0a1f4f;
+    --primary-light:#1e40af;
+    --accent:#f59e0b;
+    --bg:#f8fafc;
+    --border:#e2e8f0;
+}
+
+/* ==========================================
+   DISABLE ALL SITE NAVIGATION
+========================================== */
+
+/* Header logo */
+.navbar-brand{
+    pointer-events:none !important;
+    cursor:not-allowed;
+    opacity:.7;
+}
+
+/* Desktop navigation */
+.main-nav .nav-link{
+    pointer-events:none !important;
+    cursor:not-allowed;
+    opacity:.55;
+}
+
+/* Mobile menu button */
+#mobileMenuBtn{
+    pointer-events:none !important;
+    cursor:not-allowed;
+    opacity:.55;
+}
+
+/* Mobile menu links */
+.mobile-menu-body .nav-link{
+    pointer-events:none !important;
+    cursor:not-allowed;
+    opacity:.55;
+}
+
+/* Footer links */
+footer a{
+    pointer-events:none !important;
+    cursor:not-allowed;
+    opacity:.55;
+    text-decoration:none !important;
+}
+
+/* External links in footer */
+footer a:hover{
+    color:inherit !important;
+}
+
+/* Social media icons */
+.social-links a{
+    pointer-events:none !important;
+    cursor:not-allowed;
+    opacity:.55;
+}
+
+/* Prevent hover animations */
+.social-links a:hover{
+    transform:none !important;
+    color:inherit !important;
+}
+
+/* Optional visual overlay */
+.navbar-brand::after,
+.main-nav .nav-link::after{
+    display:none !important;
+}
+
+#mobileMenuBtn{
+    opacity:.55;
+    pointer-events:none;
+    cursor:not-allowed;
+}
+
+/* Page */
+body{
+    background:
+        radial-gradient(circle at top right,
+        rgba(15,43,109,.08),
+        transparent 30%),
+
+        radial-gradient(circle at bottom left,
+        rgba(245,158,11,.08),
+        transparent 30%),
+
+        #f8fafc;
+}
+
+/* Background bubbles */
+.bg-bubble{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(15,43,109,.06);
+    animation:floatBubble 15s infinite ease-in-out;
+    z-index:0;
+    pointer-events:none;
+}
+
+@keyframes floatBubble{
+    0%{
+        transform:translateY(0px) rotate(0deg);
+        opacity:.4;
+    }
+    50%{
+        transform:translateY(-40px) rotate(5deg);
+        opacity:.7;
+    }
+    100%{
+        transform:translateY(0px) rotate(0deg);
+        opacity:.4;
+    }
+}
+
+.maintenance-wrapper{
+    position:relative;
+    overflow:hidden;
+    padding:20px 0;
+    min-height:70vh;
+}
+
+/* Card */
+.maintenance-card{
+    position:relative;
+    z-index:10;
+
+    background:#fff;
+
+    border-radius:24px;
+
+    border:1px solid var(--border);
+
+    box-shadow:
+        0 10px 40px rgba(15,43,109,.08);
+
+    padding:3rem;
+}
+
+/* Robot Animation */
+.cute-robot{
+    text-align:center;
+    margin-bottom:25px;
+    font-size:4rem;
+
+    animation:bounceHappy 2.2s infinite;
+}
+
+@keyframes bounceHappy{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-12px);
+    }
+}
+
+/* Badge */
+.sorry-text{
+    display:inline-block;
+
+    background:#eff6ff;
+
+    color:var(--primary);
+
+    border:1px solid #dbeafe;
+
+    padding:.55rem 1.2rem;
+
+    border-radius:50px;
+
+    font-size:.95rem;
+    font-weight:600;
+}
+
+/* Heading */
+.maintenance-title{
+    color:var(--primary);
+    font-weight:700;
+    margin-top:20px;
+    margin-bottom:15px;
+}
+
+.maintenance-subtitle{
+    color:#64748b;
+    font-size:1.05rem;
+    max-width:700px;
+    margin:auto;
+}
+
+/* Tool Icons */
+.cute-tools{
+    display:flex;
+    justify-content:center;
+    gap:2rem;
+    margin:30px 0;
+    flex-wrap:wrap;
+}
+
+.tool-icon{
+    width:90px;
+    height:90px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:2.2rem;
+    color:white;
+
+    animation:gentlePulse 2s infinite ease-in-out;
+
+    box-shadow:
+        0 10px 25px rgba(15,43,109,.15);
+}
+
+.tool-icon:nth-child(1){
+    background:linear-gradient(
+        135deg,
+        #0f2b6d,
+        #0a1f4f
+    );
+}
+
+.tool-icon:nth-child(2){
+    background:linear-gradient(
+        135deg,
+        #f59e0b,
+        #d97706
+    );
+    animation-delay:.3s;
+}
+
+.tool-icon:nth-child(3){
+    background:linear-gradient(
+        135deg,
+        #1e40af,
+        #2563eb
+    );
+    animation-delay:.6s;
+}
+
+@keyframes gentlePulse{
+    0%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.07);
+    }
+    100%{
+        transform:scale(1);
+    }
+}
+
+/* Progress */
+.progress{
+    height:14px;
+    border-radius:30px;
+    background:#e2e8f0;
+}
+
+.progress-bar{
+    background:
+        linear-gradient(
+            90deg,
+            #0f2b6d,
+            #1e40af,
+            #2563eb
+        );
+
+    animation:progressGlow 1.8s infinite alternate;
+}
+
+@keyframes progressGlow{
+    0%{
+        opacity:.85;
+    }
+    100%{
+        opacity:1;
+    }
+}
+
+.countdown-message{
+    margin-top:15px;
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    display:inline-block;
+
+    padding:.75rem 1rem;
+
+    border-radius:30px;
+
+    color:#475569;
+
+    font-size:.9rem;
+}
+
+/* Info Box */
+.maintenance-info{
+    background:#f8fafc;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    padding:20px;
+
+    margin-top:25px;
+
+    text-align:left;
+}
+
+.maintenance-info h6{
+    color:var(--primary);
+    font-weight:700;
+}
+
+.maintenance-info ul{
+    margin-bottom:0;
+}
+
+/* Button */
+.btn-notify{
+    background:var(--primary);
+    color:white;
+    border:none;
+
+    padding:12px 25px;
+
+    border-radius:50px;
+
+    font-weight:600;
+
+    margin-top:25px;
+
+    transition:.3s;
+}
+
+.btn-notify:hover{
+    background:var(--primary-dark);
+    color:white;
+}
+
+/* Social */
+.social-links{
+    margin-top:25px;
+}
+
+.social-links a{
+    font-size:1.6rem;
+    color:var(--primary);
+    margin:0 10px;
+    transition:.3s;
+}
+
+.social-links a:hover{
+    color:var(--accent);
+    transform:translateY(-5px);
+}
+
+footer p{
+    margin-bottom:0;
+}
+
+@media(max-width:768px){
+
+    .maintenance-card{
+        padding:2rem 1.5rem;
+    }
+
+    .maintenance-title{
+        font-size:2rem;
+    }
+
+    .tool-icon{
+        width:70px;
+        height:70px;
+        font-size:1.8rem;
+    }
+
+    .cute-robot{
+        font-size:3rem;
+    }
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="maintenance-wrapper">
+
+    <div class="bg-bubble"
+         style="width:180px;height:180px;top:5%;left:-50px;">
+    </div>
+
+    <div class="bg-bubble"
+         style="width:240px;height:240px;bottom:0;right:-70px;">
+    </div>
+
+    <div class="bg-bubble"
+         style="width:100px;height:100px;top:20%;right:8%;">
+    </div>
+
+    <div class="bg-bubble"
+         style="width:140px;height:140px;bottom:15%;left:3%;">
+    </div>
+
+    <div class="bg-bubble"
+         style="width:70px;height:70px;top:70%;right:15%;">
+    </div>
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+                <div class="maintenance-card text-center">
+
+                    <div class="cute-robot">
+                        🔧 ⚙️ 🛠️
+                    </div>
+
+                    <div class="sorry-text">
+                        <i class="fas fa-tools me-2"></i>
+                        Scheduled Maintenance Notice
+                    </div>
+
+                    <h1 class="maintenance-title">
+                        Portal Under Maintenance
+                    </h1>
+
+                    <p class="maintenance-subtitle">
+                        The NIELIT Delhi Registration Portal is currently
+                        undergoing scheduled maintenance and system upgrades
+                        to improve security, performance and overall user
+                        experience.
+                    </p>
+
+                    <div class="cute-tools">
+
+                        <div class="tool-icon">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+
+                        <div class="tool-icon">
+                            <i class="fas fa-gear"></i>
+                        </div>
+
+                        <div class="tool-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar"
+                             style="width:68%">
+                        </div>
+                    </div>
+
+                    <div class="countdown-message">
+                        <i class="fas fa-hourglass-half me-2"></i>
+                        Estimated completion:
+                        <strong id="eta-message">
+                            very soon
+                        </strong>
+                    </div>
+
+                    <div class="maintenance-info">
+
+                        <h6>
+                            <i class="fas fa-circle-info me-2"></i>
+                            Maintenance Activity
+                        </h6>
+
+                        <p class="text-muted">
+                            Our technical team is currently performing
+                            essential system maintenance and upgrades.
+                        </p>
+
+                   
+
+                    </div>
+
+                    <button class="btn-notify"
+                            id="notifyBtn">
+                        <i class="fas fa-bell me-2"></i>
+                        Notify Me
+                    </button>
+
+
+                    <hr class="my-4">
+
+                    <div class="text-muted small">
+                        NIELIT Delhi Registration Portal •
+                        System Maintenance In Progress
+                    </div>
+
+                    <div class="small mt-2 text-secondary">
+                        Last Maintenance Check:
+                        <span id="liveTimestamp"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('a').forEach(link => {
+
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+
+        link.removeAttribute('href');
+        link.style.pointerEvents = 'none';
+        link.style.cursor = 'not-allowed';
+    });
+
+});
+
+(function(){
+
+    const timestampSpan =
+        document.getElementById('liveTimestamp');
+
+    function refreshTime(){
+
+        const now = new Date();
+
+        timestampSpan.innerText =
+            now.toLocaleString();
+    }
+
+    refreshTime();
+
+    setInterval(refreshTime,60000);
+
+    const etaMessages = [
+        "10-15 minutes",
+        "Almost Complete",
+        "System Verification Running",
+        "Final Deployment Stage",
+        "Very Soon"
+    ];
+
+    const eta =
+        document.getElementById('eta-message');
+
+    eta.innerText =
+        etaMessages[
+            Math.floor(
+                Math.random()*etaMessages.length
+            )
+        ];
+
+    const notifyBtn =
+        document.getElementById('notifyBtn');
+
+    notifyBtn.addEventListener('click',function(){
+
+        const alertDiv =
+            document.createElement('div');
+
+        alertDiv.className =
+            'alert alert-primary position-fixed top-0 start-50 translate-middle-x mt-4 shadow';
+
+        alertDiv.style.zIndex = '9999';
+
+        alertDiv.innerHTML =
+            '<i class="fas fa-check-circle me-2"></i>Thank you. You will be notified once the portal is available.';
+
+        document.body.appendChild(alertDiv);
+
+        setTimeout(()=>{
+            alertDiv.remove();
+        },4000);
+    });
+
+})();
+
+</script>
+
+{% endblock %}

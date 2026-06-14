@@ -528,7 +528,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Certificate / Status Banner -->
+                                {% comment %} <!-- Certificate / Status Banner -->
                                 {% if student.status == 'completed' %}
                                 <div class="cert-banner success">
                                     <div class="cert-text" style="color:#065f46;">
@@ -553,7 +553,27 @@
                                         <small>Your registration is currently under review.</small>
                                     </div>
                                 </div>
-                                {% endif %}
+                                {% endif %} {% endcomment %}
+
+{% if student.status == 'completed' and student.is_approved %}
+    <a href="{% url 'registration:view_certificate' student.registration_number %}" 
+       class="btn btn-success w-100" target="_blank">
+        <i class="fas fa-certificate me-2"></i>View / Download Certificate
+    </a>
+{% elif student.status == 'completed' and not student.is_approved %}
+    <button class="btn btn-warning w-100" disabled>
+        <i class="fas fa-clock me-2"></i>Certificate Pending Approval
+    </button>
+{% elif student.status == 'confirmed' %}
+    <button class="btn btn-info w-100" disabled>
+        <i class="fas fa-hourglass-half me-2"></i>Course in Progress
+    </button>
+{% else %}
+    <button class="btn btn-secondary w-100" disabled>
+        <i class="fas fa-clock me-2"></i>Pending Confirmation
+    </button>
+{% endif %}
+
 
                             </div><!-- /card-body -->
                         </div><!-- /profile-card -->

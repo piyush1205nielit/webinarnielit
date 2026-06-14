@@ -5,327 +5,607 @@
 
 {% block extra_css %}
 <style>
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .courses-management { padding: 20px 0; }
+
+    /* ── Stat Cards ── */
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 18px 22px;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
     }
-    
-    .courses-table {
-        min-width: 1000px;
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .stat-info h3 { font-size: 28px; font-weight: 700; margin: 0; color: #1e293b; }
+    .stat-info p  { font-size: 13px; color: #64748b; margin: 0; }
+    .stat-icon {
+        width: 50px; height: 50px;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
     }
-    
-    .courses-table th,
-    .courses-table td {
-        vertical-align: middle;
+    .stat-icon i { font-size: 22px; }
+    .stat-icon.blue  { background: #dbeafe; color: #1e3a8a; }
+    .stat-icon.green { background: #dcfce7; color: #166534; }
+    .stat-icon.amber { background: #fef3c7; color: #92400e; }
+    .stat-icon.red   { background: #fee2e2; color: #b91c1c; }
+
+    /* ── Table ── */
+    .table-courses { font-size: 13px; }
+    .table-courses thead th {
+        background: #1e293b; color: white;
+        padding: 12px 14px; font-weight: 600; font-size: 11px;
         white-space: nowrap;
     }
-    
-    .courses-table td:first-child,
-    .courses-table th:first-child {
-        white-space: normal;
-        min-width: 220px;
+    .table-courses tbody td { padding: 12px 14px; vertical-align: middle; }
+    .table-courses tbody tr:hover { background: #f8fafc; cursor: pointer; }
+
+    /* ── Course name cell ── */
+    .course-name-link {
+        font-weight: 600; color: #1e3a8a;
+        font-size: 13px; margin-bottom: 3px;
+        text-decoration: none; display: block;
     }
-    
-    .status-badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+    .course-name-link:hover { text-decoration: underline; color: #1e40af; }
+    .course-code { font-size: 10px; color: #94a3b8; font-family: monospace; }
+
+    /* ── Badges ── */
+    .badge-status {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 10px; border-radius: 30px;
+        font-size: 11px; font-weight: 600; white-space: nowrap;
     }
-    
-    .status-active {
-        background: #10b98120;
-        color: #059669;
+    .badge-open     { background: #dbeafe; color: #1e40af; }
+    .badge-active   { background: #dcfce7; color: #166534; }
+    .badge-ongoing  { background: #fed7aa; color: #9a3412; }
+    .badge-closed   { background: #fee2e2; color: #b91c1c; }
+    .badge-inactive { background: #f1f5f9; color: #475569; }
+    .badge-completed{ background: #ede9fe; color: #5b21b6; }
+
+    .badge-mode {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 10px; border-radius: 30px;
+        font-size: 11px; font-weight: 500;
+        background: #f1f5f9; color: #475569;
     }
-    
-    .status-open {
-        background: #3b82f620;
-        color: #2563eb;
+    .badge-type {
+        display: inline-block; padding: 3px 10px;
+        border-radius: 30px; font-size: 10px; font-weight: 500;
+        background: #e0e7ff; color: #1e3a8a;
     }
-    
-    .status-ongoing {
-        background: #f59e0b20;
-        color: #d97706;
+
+    /* ── Deadline warning ── */
+    .deadline-expired { color: #dc2626; font-weight: 600; }
+    .deadline-soon    { color: #d97706; font-weight: 600; }
+    .deadline-ok      { color: #64748b; }
+
+    /* ── Media icons ── */
+    .media-icons { display: flex; gap: 8px; align-items: center; justify-content: center; }
+    .media-icon.has { color: #10b981; font-size: 14px; }
+    .media-icon.no  { color: #cbd5e1; font-size: 14px; }
+
+    /* ── Action buttons ── */
+    .action-btns { display: flex; gap: 5px; justify-content: center; }
+    .action-btn {
+        width: 30px; height: 30px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: all 0.2s; font-size: 12px; text-decoration: none;
+        border: none; cursor: pointer;
     }
-    
-    .status-closed {
-        background: #ef444420;
-        color: #dc2626;
+    .action-btn:hover { transform: translateY(-2px); }
+    .btn-view   { background: #e0e7ff; color: #1e3a8a; }
+    .btn-view:hover { background: #1e3a8a; color: white; }
+    .btn-edit   { background: #fef3c7; color: #d97706; }
+    .btn-edit:hover { background: #d97706; color: white; }
+    .btn-delete { background: #fee2e2; color: #dc2626; }
+    .btn-delete:hover { background: #dc2626; color: white; }
+
+    /* ── Fee ── */
+    .fee-free { background: #10b981; color: white; padding: 3px 10px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+    .fee-paid { font-weight: 700; color: #1e3a8a; font-size: 13px; }
+    .seat-warning { font-size: 10px; color: #dc2626; margin-top: 2px; }
+
+    /* ── Star ── */
+    .star-icon.filled { color: #f59e0b; }
+    .star-icon.empty  { color: #cbd5e1; }
+
+    /* ── Detail Modal ── */
+    .detail-modal .modal-header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
     }
-    
-    .status-inactive {
-        background: #64748b20;
-        color: #475569;
+    .detail-modal .modal-header .btn-close { filter: invert(1); }
+
+    .detail-section { margin-bottom: 22px; }
+    .detail-section-title {
+        font-weight: 700; color: #1e3a8a;
+        border-left: 3px solid #1e3a8a;
+        padding-left: 10px; margin-bottom: 12px;
+        font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;
     }
-    
-    .media-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.75rem;
-    }
-    
-    .media-indicator i {
-        font-size: 0.85rem;
-    }
-    
-    .media-indicator .text-success {
-        color: #10b981;
-    }
-    
-    .media-indicator .text-danger {
-        color: #ef4444;
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 6px;
-    }
-    
-    .btn-icon {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-    }
-    
+    .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .detail-item { display: flex; flex-direction: column; }
+    .detail-label { font-size: 10px; color: #64748b; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.05em; }
+    .detail-value { font-size: 13px; color: #1e293b; font-weight: 500; }
+    .full-width { grid-column: span 2; }
+
+    /* ── Delete Modal ── */
+    .delete-modal .modal-header { background: #dc2626; color: white; }
+    .delete-modal .modal-header .btn-close { filter: invert(1); }
+
     @media (max-width: 768px) {
-        .courses-table td:first-child,
-        .courses-table th:first-child {
-            min-width: 180px;
-        }
-        
-        .btn-icon {
-            width: 28px;
-            height: 28px;
-        }
-        
-        .media-indicator {
-            font-size: 0.7rem;
-        }
+        .detail-grid { grid-template-columns: 1fr; }
+        .full-width { grid-column: span 1; }
     }
 </style>
 {% endblock %}
 
 {% block dashboard_content %}
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 fw-bold text-dark mb-0">
-            <i class="fas fa-book text-primary me-2"></i>Manage Courses
-        </h1>
-        <a href="{% url 'course:course_create' %}" class="btn btn-success">
-            <i class="fas fa-plus me-2"></i>Add New Course
-        </a>
-    </div>
+<div class="courses-management">
+    <div class="container-fluid px-3">
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 courses-table" id="coursesTable">
-                    <thead class="table-dark">
-                        <tr>
-                            <th style="min-width: 220px;">Course Name</th>
-                            <th>Duration</th>
-                            <th>Fees</th>
-                            <th>Media</th>
-                            <th>Status</th>
-                            <th>Mode</th>
-                            <th>Seats</th>
-                            <th class="text-center">Featured</th>
-                            <th style="min-width: 100px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for course in courses %}
-                        <tr>
-                            <td>
-                                <strong>{{ course.course_name }}</strong>
-                                <br>
-                            </td>
-                            <td>
-                                {% if course.course_duration %}
-                                    {{ course.course_duration }}
-                                {% else %}
-                                    <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if course.is_free %}
-                                    <span class="badge bg-success">Free</span>
-                                {% else %}
-                                    <strong class="text-primary">₹{{ course.course_fees|floatformat:0 }}</strong>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="d-flex flex-column gap-1">
-                                    <!-- Image Indicator -->
-                                    <div class="media-indicator">
-                                        {% if course.image %}
-                                        <i class="fas fa-image text-success"></i>
-                                        <span class="text-success">Image</span>
-                                        {% else %}
-                                        <i class="fas fa-image text-danger"></i>
-                                        <span class="text-muted">No Image</span>
-                                        {% endif %}
-                                    </div>
-                                    <!-- Video Indicator -->
-                                    <div class="media-indicator">
-                                        {% if course.video_file or course.video_url %}
-                                        <i class="fas fa-video text-success"></i>
-                                        <span class="text-success">Video</span>
-                                        {% else %}
-                                        <i class="fas fa-video text-danger"></i>
-                                        <span class="text-muted">No Video</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="status-badge 
-                                    {% if course.course_status == 'active' or course.course_status == 'open' %}status-open
-                                    {% elif course.course_status == 'ongoing' %}status-ongoing
-                                    {% elif course.course_status == 'closed' %}status-closed
-                                    {% else %}status-inactive{% endif %}">
-                                    <i class="fas fa-{% if course.course_status == 'open' %}door-open{% elif course.course_status == 'active' %}play{% elif course.course_status == 'ongoing' %}spinner{% elif course.course_status == 'closed' %}lock{% else %}circle{% endif %} me-1"></i>
-                                    {{ course.get_course_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary bg-opacity-10 text-secondary">
-                                    <i class="fas fa-{% if course.mode == 'online' %}laptop{% elif course.mode == 'offline' %}building{% else %}sync{% endif %} me-1"></i>
-                                    {{ course.get_mode_display }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if course.max_seats %}
-                                    <span class="fw-semibold">{{ course.max_seats }}</span>
-                                    {% with seats_left=course.get_seats_available %}
-                                        {% if seats_left <= 5 and seats_left > 0 %}
-                                        <br><small class="text-danger">Only {{ seats_left }} left</small>
-                                        {% elif seats_left <= 0 %}
-                                        <br><small class="text-danger">Full</small>
-                                        {% endif %}
-                                    {% endwith %}
-                                {% else %}
-                                    <span class="text-muted">Not Set</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-center">
-                                {% if course.is_featured %}
-                                    <i class="fas fa-star text-warning fa-lg" title="Featured Course"></i>
-                                {% else %}
-                                    <i class="far fa-star text-secondary fa-lg" title="Not Featured"></i>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="{% url 'course:course_edit' course.id %}" 
-                                       class="btn btn-sm btn-warning btn-icon" 
-                                       title="Edit Course">
-                                        <i class="fas fa-edit"></i>
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-0">
+                    <i class="fas fa-book-open text-primary me-2"></i>Manage Courses
+                </h3>
+                <p class="text-muted small mb-0">Click a course name to view details</p>
+            </div>
+            <a href="{% url 'course:course_create' %}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Add New Course
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>{{ courses|length }}</h3>
+                        <p>Total Courses</p>
+                    </div>
+                    <div class="stat-icon blue"><i class="fas fa-book"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>{% with count=0 %}{% for c in courses %}{% if c.course_status == 'open' or c.course_status == 'active' %}{% with count=count|add:1 %}{% endwith %}{% endif %}{% endfor %}{{ courses|length }}{% endwith %}</h3>
+                        <p>Open / Active</p>
+                    </div>
+                    <div class="stat-icon green"><i class="fas fa-play-circle"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>{% for c in courses %}{% if c.is_featured %}⭐{% endif %}{% endfor %}</h3>
+                        <p>Featured Courses</p>
+                    </div>
+                    <div class="stat-icon amber"><i class="fas fa-star"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>{% for c in courses %}{% if c.course_status == 'closed' %}🔒{% endif %}{% endfor %}</h3>
+                        <p>Registration Closed</p>
+                    </div>
+                    <div class="stat-icon red"><i class="fas fa-lock"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-courses mb-0" id="coursesTable">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Mode</th>
+                                <th>Deadline</th>
+                                <th>Fees</th>
+                                <th>Seats</th>
+                                <th class="text-center">Media</th>
+                                <th class="text-center">⭐</th>
+                                <th class="text-center" width="100">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <!-- Course Name — clickable to open modal -->
+                                <td>
+                                    <a href="#"
+                                       class="course-name-link"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#viewModal{{ course.id }}">
+                                        {{ course.course_name|truncatechars:38 }}
                                     </a>
-                                    <button type="button" 
-                                            class="btn btn-sm btn-danger btn-icon" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#deleteModal{{ course.id }}"
-                                            title="Delete Course">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                                
-                                <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteModal{{ course.id }}" tabindex="-1">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title">Confirm Delete</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    <div class="course-code">{{ course.course_duration|default:"" }}</div>
+                                </td>
+
+                                <!-- Type -->
+                                <td>
+                                    {% if course.course_type %}
+                                        <span class="badge-type">{{ course.get_course_type_display|truncatechars:12 }}</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Status -->
+                                <td>
+                                    <span class="badge-status
+                                        {% if course.course_status == 'open' %}badge-open
+                                        {% elif course.course_status == 'active' %}badge-active
+                                        {% elif course.course_status == 'ongoing' %}badge-ongoing
+                                        {% elif course.course_status == 'closed' %}badge-closed
+                                        {% elif course.course_status == 'completed' %}badge-completed
+                                        {% else %}badge-inactive{% endif %}">
+                                        <i class="fas fa-xs
+                                            {% if course.course_status == 'open' %}fa-door-open
+                                            {% elif course.course_status == 'active' %}fa-play
+                                            {% elif course.course_status == 'ongoing' %}fa-spinner
+                                            {% elif course.course_status == 'closed' %}fa-lock
+                                            {% elif course.course_status == 'completed' %}fa-check-circle
+                                            {% else %}fa-circle{% endif %}">
+                                        </i>
+                                        {{ course.get_course_status_display }}
+                                    </span>
+                                </td>
+
+                                <!-- Mode -->
+                                <td>
+                                    <span class="badge-mode">
+                                        <i class="fas fa-xs
+                                            {% if course.mode == 'online' %}fa-laptop
+                                            {% elif course.mode == 'offline' %}fa-building
+                                            {% else %}fa-sync{% endif %}">
+                                        </i>
+                                        {{ course.get_mode_display }}
+                                    </span>
+                                </td>
+
+                                <!-- Registration Deadline -->
+                                <td style="font-size: 11px; white-space: nowrap;">
+                                    {% if course.registration_deadline %}
+                                        {% if course.registration_deadline < now %}
+                                            <span class="deadline-expired">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                {{ course.registration_deadline|date:"d/m/Y" }}<br>
+                                                <small>Expired</small>
+                                            </span>
+                                        {% elif course.registration_deadline|timeuntil|slice:":2" == "0 " %}
+                                            <span class="deadline-soon">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ course.registration_deadline|date:"d/m/Y" }}<br>
+                                                <small>Closing soon</small>
+                                            </span>
+                                        {% else %}
+                                            <span class="deadline-ok">
+                                                <i class="far fa-calendar-alt me-1"></i>
+                                                {{ course.registration_deadline|date:"d/m/Y" }}
+                                            </span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">No deadline</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Fees -->
+                                <td>
+                                    {% if course.is_free %}
+                                        <span class="fee-free">Free</span>
+                                    {% else %}
+                                        <span class="fee-paid">₹{{ course.course_fees|floatformat:0 }}</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Seats -->
+                                <td class="text-center">
+                                    {% if course.max_seats %}
+                                        {% with seats_left=course.get_seats_available %}
+                                            <div class="fw-semibold">{{ seats_left }}/{{ course.max_seats }}</div>
+                                            {% if seats_left <= 5 and seats_left > 0 %}
+                                                <div class="seat-warning">Almost full</div>
+                                            {% elif seats_left <= 0 %}
+                                                <div class="seat-warning">Full</div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% else %}
+                                        <span class="text-muted">∞</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Media -->
+                                <td class="text-center">
+                                    <div class="media-icons">
+                                        {% if course.image %}
+                                            <i class="fas fa-image media-icon has" title="Has Image"></i>
+                                        {% else %}
+                                            <i class="far fa-image media-icon no" title="No Image"></i>
+                                        {% endif %}
+                                        {% if course.video_file or course.video_url %}
+                                            <i class="fas fa-video media-icon has" title="Has Video"></i>
+                                        {% else %}
+                                            <i class="far fa-video media-icon no" title="No Video"></i>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <!-- Featured -->
+                                <td class="text-center">
+                                    {% if course.is_featured %}
+                                        <i class="fas fa-star star-icon filled"></i>
+                                    {% else %}
+                                        <i class="far fa-star star-icon empty"></i>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="text-center">
+                                    <div class="action-btns">
+                                        <button type="button"
+                                                class="action-btn btn-view"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewModal{{ course.id }}"
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <a href="{% url 'course:course_edit' course.id %}"
+                                           class="action-btn btn-edit"
+                                           title="Edit Course">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="action-btn btn-delete"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ course.id }}"
+                                                title="Delete Course">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- ── View Detail Modal ── -->
+                            <div class="modal fade detail-modal" id="viewModal{{ course.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <div>
+                                                <h5 class="modal-title mb-1">
+                                                    <i class="fas fa-book-open me-2"></i>{{ course.course_name }}
+                                                </h5>
+                                                <div class="d-flex gap-2 flex-wrap">
+                                                    <span class="badge bg-light text-dark">{{ course.get_course_type_display }}</span>
+                                                    <span class="badge bg-light text-dark">{{ course.get_mode_display }}</span>
+                                                    <span class="badge {% if course.course_status == 'open' %}bg-primary{% elif course.course_status == 'active' %}bg-success{% elif course.course_status == 'closed' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                        {{ course.get_course_status_display }}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div class="modal-body">
-                                                <p>Are you sure you want to delete the course:</p>
-                                                <p class="fw-bold text-danger">{{ course.course_name }}</p>
-                                                <p class="text-muted small">This action cannot be undone. All associated data will be removed.</p>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <!-- Basic Info -->
+                                            <div class="detail-section">
+                                                <div class="detail-section-title">Basic Information</div>
+                                                <div class="detail-grid">
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Duration</span>
+                                                        <span class="detail-value">{{ course.course_duration|default:"Not specified" }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Fees</span>
+                                                        <span class="detail-value">{% if course.is_free %}Free{% else %}₹{{ course.course_fees|floatformat:2 }}{% endif %}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Max Seats</span>
+                                                        <span class="detail-value">{{ course.max_seats|default:"Unlimited" }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Seats Available</span>
+                                                        <span class="detail-value">{{ course.get_seats_available }}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Featured</span>
+                                                        <span class="detail-value">{% if course.is_featured %}⭐ Yes{% else %}No{% endif %}</span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Active</span>
+                                                        <span class="detail-value">{% if course.is_active %}✅ Yes{% else %}❌ No{% endif %}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <a href="{% url 'course:course_delete' course.id %}" class="btn btn-danger">Delete Course</a>
+
+                                            <!-- Schedule -->
+                                            <div class="detail-section">
+                                                <div class="detail-section-title">Schedule</div>
+                                                <div class="detail-grid">
+                                                    {% if course.course_type == 'workshop' or course.course_type == 'seminar' or course.course_type == 'webinar' %}
+                                                        <div class="detail-item full-width">
+                                                            <span class="detail-label">Event Date</span>
+                                                            <span class="detail-value">{{ course.event_date|date:"d F Y"|default:"Not set" }}</span>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">Start Date</span>
+                                                            <span class="detail-value">{{ course.start_date|date:"d F Y"|default:"Not set" }}</span>
+                                                        </div>
+                                                        <div class="detail-item">
+                                                            <span class="detail-label">End Date</span>
+                                                            <span class="detail-value">{{ course.end_date|date:"d F Y"|default:"Not set" }}</span>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="detail-item full-width">
+                                                        <span class="detail-label">Registration Deadline</span>
+                                                        <span class="detail-value {% if course.registration_deadline and course.registration_deadline < now %}text-danger fw-bold{% endif %}">
+                                                            {{ course.registration_deadline|date:"d F Y"|default:"No deadline set" }}
+                                                            {% if course.registration_deadline and course.registration_deadline < now %}
+                                                                <span class="badge bg-danger ms-2">Expired</span>
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
+
+                                            <!-- Description -->
+                                            {% if course.course_desc %}
+                                            <div class="detail-section">
+                                                <div class="detail-section-title">Description</div>
+                                                <p class="detail-value" style="line-height: 1.7;">{{ course.course_desc }}</p>
+                                            </div>
+                                            {% endif %}
+
+                                            <!-- Learning -->
+                                            {% if course.learning_outcomes or course.prerequisites %}
+                                            <div class="detail-section">
+                                                <div class="detail-section-title">Learning Details</div>
+                                                <div class="detail-grid">
+                                                    {% if course.prerequisites %}
+                                                    <div class="detail-item full-width">
+                                                        <span class="detail-label">Prerequisites</span>
+                                                        <span class="detail-value">{{ course.prerequisites }}</span>
+                                                    </div>
+                                                    {% endif %}
+                                                    {% if course.learning_outcomes %}
+                                                    <div class="detail-item full-width">
+                                                        <span class="detail-label">Learning Outcomes</span>
+                                                        <span class="detail-value">{{ course.learning_outcomes }}</span>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                            <!-- Centres -->
+                                            {% if course.available_centres.all %}
+                                            <div class="detail-section">
+                                                <div class="detail-section-title">Available Centres</div>
+                                                <div>
+                                                    {% for centre in course.available_centres.all %}
+                                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary me-1 mb-1 px-3 py-2">
+                                                            <i class="fas fa-building me-1"></i>{{ centre.centre_name }}
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                            <!-- Media -->
+                                            <div class="detail-section">
+                                                <div class="detail-section-title">Media</div>
+                                                <div class="d-flex gap-3 flex-wrap">
+                                                    <span class="{% if course.image %}text-success{% else %}text-muted{% endif %}">
+                                                        <i class="fas fa-image me-1"></i>
+                                                        {% if course.image %}Image uploaded{% else %}No image{% endif %}
+                                                    </span>
+                                                    <span class="{% if course.syllabus_file %}text-success{% else %}text-muted{% endif %}">
+                                                        <i class="fas fa-file-pdf me-1"></i>
+                                                        {% if course.syllabus_file %}Syllabus uploaded{% else %}No syllabus{% endif %}
+                                                    </span>
+                                                    <span class="{% if course.video_file or course.video_url %}text-success{% else %}text-muted{% endif %}">
+                                                        <i class="fas fa-video me-1"></i>
+                                                        {% if course.video_file or course.video_url %}Video available{% else %}No video{% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <a href="{% url 'course:course_edit' course.id %}" class="btn btn-primary">
+                                                <i class="fas fa-edit me-2"></i>Edit Course
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="9" class="text-center py-5">
-                                <i class="fas fa-book fa-3x mb-2 d-block text-muted"></i>
-                                <p class="text-muted">No courses found. Click "Add New Course" to create one.</p>
-                                <a href="{% url 'course:course_create' %}" class="btn btn-primary mt-2">
-                                    <i class="fas fa-plus me-2"></i>Add Your First Course
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            </div>
+
+                            <!-- ── Delete Modal ── -->
+                            <div class="modal fade delete-modal" id="deleteModal{{ course.id }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete:</p>
+                                            <p class="fw-bold text-danger fs-6">{{ course.course_name }}</p>
+                                            <p class="text-muted small mb-0">
+                                                <i class="fas fa-warning me-1"></i>
+                                                This will also delete all student registrations for this course. This action cannot be undone.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form method="post" action="{% url 'course:course_delete' course.id %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash me-2"></i>Delete Course
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-5">
+                                    <i class="fas fa-book fa-3x mb-3 d-block text-muted"></i>
+                                    <h5 class="text-muted">No courses found</h5>
+                                    <a href="{% url 'course:course_create' %}" class="btn btn-primary mt-2">
+                                        <i class="fas fa-plus me-2"></i>Add First Course
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        
-        <!-- Table Footer with Stats -->
-        {% if courses %}
-        <div class="card-footer bg-white">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="text-muted small">
-                    <i class="fas fa-chart-line me-1"></i>
-                    Showing {{ courses|length }} course{{ courses|length|pluralize }}
-                </div>
-                <div class="d-flex gap-3">
-                    <div class="text-muted small">
-                        <i class="fas fa-image text-success me-1"></i>
-                        {{ courses|length }} total
-                    </div>
-                    <div class="text-muted small">
-                        <i class="fas fa-video text-success me-1"></i>
-                        {{ courses|length }} with video
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
+
     </div>
 </div>
 
 <script>
-    $(document).ready(function() {
-        $('#coursesTable').DataTable({
-            pageLength: 10,
-            order: [[0, 'asc']],
-            responsive: false,
-            scrollX: true,
-            autoWidth: false,
-            language: {
-                search: "Search:",
-                lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                emptyTable: "No courses found",
-                zeroRecords: "No matching courses found"
-            },
-            columnDefs: [
-                { orderable: false, targets: [3, 7, 8] } // Disable sorting on media, featured, actions columns
-            ]
-        });
+$(document).ready(function () {
+    $('#coursesTable').DataTable({
+        pageLength: 15,
+        order: [[0, 'asc']],
+        responsive: true,
+        columnDefs: [
+            { orderable: false, targets: [7, 8, 9] }
+        ],
+        language: {
+            search: "Search courses:",
+            lengthMenu: "Show _MENU_ courses",
+            info: "Showing _START_ to _END_ of _TOTAL_ courses",
+            emptyTable: "No courses found",
+            zeroRecords: "No matching courses found"
+        }
     });
-    
-    // Tooltip initialization
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
+
+    // Tooltips
+    document.querySelectorAll('[title]').forEach(el => {
+        new bootstrap.Tooltip(el, { trigger: 'hover' });
     });
+});
 </script>
 {% endblock %}

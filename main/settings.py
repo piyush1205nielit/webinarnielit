@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'registration',
     'dashboard',
     "public",
+    'certificate',
 ]
 
 MIDDLEWARE = [

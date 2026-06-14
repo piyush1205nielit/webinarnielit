@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Student, Certificate
+from .models import Student
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
@@ -39,8 +39,3 @@ class StudentAdmin(admin.ModelAdmin):
         self.message_user(request, f'{updated} registrations marked as completed.')
     complete_registrations.short_description = 'Mark as completed'
 
-@admin.register(Certificate)
-class CertificateAdmin(admin.ModelAdmin):
-    list_display = ['certificate_number', 'student', 'issue_date']
-    search_fields = ['certificate_number', 'student__name', 'student__registration_number']
-    readonly_fields = ['certificate_number', 'issue_date']

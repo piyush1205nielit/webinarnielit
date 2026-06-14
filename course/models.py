@@ -106,10 +106,24 @@ class Course(models.Model):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
+
         if self.course_fees == 0 or self.course_fees is None:
             self.is_free = True
         else:
             self.is_free = False
+
+        # Auto-update status based on registration deadline
+        today = timezone.now().date()
+        if self.registration_deadline:
+            if self.registration_deadline < today:
+                # Deadline passed → close registration (only if it was open/active)
+                if self.course_status in ['open', 'active']:
+                    self.course_status = 'closed'
+            else:
+                # Deadline is in future → reopen if it was closed due to deadline
+                if self.course_status == 'closed':
+                    self.course_status = 'open'
+
         super().save(*args, **kwargs)
     
     @property
