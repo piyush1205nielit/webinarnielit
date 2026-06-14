@@ -102,35 +102,19 @@
     .cert-line-5 { font-size: 14px; color: {{ design.line_5_color|default:"#333" }}; margin-bottom: 8px; }
 
     /* ── Single signatory ── */
-    .cert-sig-row-single {
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        margin: 8px 0;
-        width: 100%;
-    }
-
-    .cert-sig-block-single-left {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 200px;
+     .cert-sig-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0 8px; width: 100%; }
+    .cert-sig-row.single-sig { justify-content: center; }
+    .cert-sig-block { display: flex; flex-direction: column; flex: 1; }
+    .cert-sig-block.single-sig-left { 
+        align-items: flex-start; 
+        width: 200px; 
         margin-left: 50px;
     }
-
-    .cert-sig-block-single-center {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+    .cert-sig-block.single-sig-center { align-items: center; width: 200px; }
+    .cert-sig-block.single-sig-right { 
+        align-items: flex-end; 
         width: 200px;
-    }
-
-    .cert-sig-block-single-right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        width: 200px;
-        margin-right: 50px;
+        margin-right: 50px; 
     }
 
     /* ── Dual signatory ── */
@@ -259,16 +243,12 @@
 
             {% if design.signatory_count == 1 %}
                 <!-- Single signatory -->
-                <div class="cert-sig-row-single">
-                    <div class="cert-sig-block-single-{{ design.signature_1_position|default:'center' }}">
+              <div class="cert-sig-row single-sig">
+                    <div class="cert-sig-block single-sig-{{ design.signature_1_position|default:'center' }}">
                         {% if design.signature_1_image %}
                             <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
                         {% else %}
-                            <div class="cert-sig-line
-                                {% if design.signature_1_position == 'center' %}mx-auto
-                                {% elif design.signature_1_position == 'right' %}ms-auto
-                                {% endif %}">
-                            </div>
+                            <div class="cert-sig-line {% if design.signature_1_position == 'center' %}mx-auto{% elif design.signature_1_position == 'right' %}ms-auto{% endif %}"></div>
                         {% endif %}
                         <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
                         <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
