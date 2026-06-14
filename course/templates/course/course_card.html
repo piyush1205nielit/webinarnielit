@@ -35,11 +35,9 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen>
             </iframe>
-            {% endif %}
-           
+            {% endif %}    
         </div>
         {% endif %}
-
         <!-- Top Right Fee Badge -->
         <div class="position-absolute top-0 end-0 m-3 z-2">
             {% if course.is_free %}
@@ -54,7 +52,6 @@
             </span>
             {% endif %}
         </div>
-
         <!-- Top Left Mode Badge -->
         <div class="position-absolute top-0 start-0 m-3 z-2">
             <span class="course-mode-badge">
@@ -62,7 +59,6 @@
                 {{ course.get_mode_display }}
             </span>
         </div>
-
         <!-- Bottom Right Course Type -->
         {% if course.course_type and course.course_type != 'regular' %}
         <div class="position-absolute bottom-0 end-0 m-3 z-2">
@@ -84,7 +80,6 @@
             {% endif %}
         </div>
         {% endif %}
-
         <!-- Video Indicator Badge (only if video exists) -->
         {% if course.has_video %}
         <div class="position-absolute bottom-0 start-0 m-3 z-2">
@@ -94,28 +89,21 @@
             </span>
         </div>
         {% endif %}
-        
     </div>
-
     <!-- =====================================================
          CONTENT
     ====================================================== -->
-
     <div class="card-body course-content d-flex flex-column">
-
         <!-- Title -->
         <h5 class="course-title">
             {{ course.course_name }}
         </h5>
-
         <!-- Description -->
         <p class="course-description">
             {{ course.course_desc|truncatewords:18 }}
         </p>
-
         <!-- Meta -->
         <div class="course-meta">
-
             <div class="meta-item">
                 <i class="far fa-clock"></i>
                 <span>
@@ -128,7 +116,6 @@
                     {% endif %}
                 </span>
             </div>
-
             <div class="meta-item">
                 <i class="far fa-calendar-alt"></i>
                 <span>
@@ -149,10 +136,8 @@
             </div>
 
         </div>
-
         <!-- Status Chips -->
         <div class="status-chip-wrapper">
-
             {% if course.course_status == 'open' %}
             <span class="status-chip chip-success">
                 <i class="fas fa-door-open me-1"></i>
@@ -169,7 +154,6 @@
                 Closed
             </span>
             {% endif %}
-
             {% if course.max_seats and course.max_seats > 0 %}
                 {% with seats_available=course.get_seats_available %}
                     {% if seats_available <= 5 and seats_available > 0 %}
@@ -185,27 +169,19 @@
                     {% endif %}
                 {% endwith %}
             {% endif %}
-
         </div>
-
         <div class="mt-auto"></div>
-
     </div>
-
     <!-- =====================================================
          FOOTER BUTTONS
     ====================================================== -->
-
     <div class="card-footer course-footer bg-white border-0">
-
         <div class="course-btn-group">
-
             <a href="{% url 'public:course_detail' course.slug %}"
                class="btn btn-course-outline">
                 View Details
                 <i class="fas fa-arrow-right ms-2"></i>
             </a>
-
             {% if course.is_available_for_registration %}
             <a href="{% url 'registration:register_with_course' course.id %}"
                class="btn btn-course-primary">
@@ -218,13 +194,9 @@
                 Closed
             </button>
             {% endif %}
-
         </div>
-
     </div>
-
 </div>
-
 <style>
 
     /* =====================================================
