@@ -4,8 +4,8 @@ from . import views
 app_name = 'public'
 
 urlpatterns = [
-    path('1', views.home, name='home'),
-    path('', views.maintenance_page, name='maintenance_page'),
+    path('', views.home, name='home'),
+    path('11', views.maintenance_page, name='maintenance_page'),
     path('courses/', views.courses, name='courses'),
     path('course/<slug:slug>/', views.course_detail, name='course_detail'),
     path('centres/', views.centres, name='centres'),
