@@ -846,3 +846,275 @@ def get_student_details(request, pk):
         'certificate_number': student.student_certificate.certificate_number if hasattr(student, 'student_certificate') else 'Not issued',
     }
     return JsonResponse(data)
+
+
+
+from django.views.decorators.http import require_POST
+from kyndryl.models import KyndrylRegistration
+
+
+def kyndryl_student_list(request):
+    """Main list view with filters, search, export."""
+    qs = KyndrylRegistration.objects.all()
+
+    # ── Filters ──
+    selected_qualification = request.GET.get('qualification', '')
+    selected_category      = request.GET.get('category', '')
+    selected_employment    = request.GET.get('employment', '')
+    selected_cloud         = request.GET.get('cloud', '')
+    search_query           = request.GET.get('search', '').strip()
+
+    if selected_qualification:
+        qs = qs.filter(highest_qualification=selected_qualification)
+    if selected_category:
+        qs = qs.filter(category=selected_category)
+    if selected_employment:
+        qs = qs.filter(current_employment_status=selected_employment)
+    if selected_cloud:
+        qs = qs.filter(expertise_in_cloud_computing=selected_cloud)
+    if search_query:
+        qs = qs.filter(
+            Q(name__icontains=search_query) |
+            Q(email_id__icontains=search_query) |
+            Q(mobile_number__icontains=search_query) |
+            Q(registration_number__icontains=search_query) |
+            Q(city__icontains=search_query) |
+            Q(state__icontains=search_query)
+        )
+
+    # ── Export ──
+    export = request.GET.get('export', '')
+    if export == 'excel':
+        return _export_excel(qs)
+    if export == 'pdf':
+        return _export_pdf(qs)
+
+    # ── Paginate ──
+    paginator  = Paginator(qs, 20)
+    page_obj   = paginator.get_page(request.GET.get('page', 1))
+
+    context = {
+        'page_obj':               page_obj,
+        'search_query':           search_query,
+        'selected_qualification': selected_qualification,
+        'selected_category':      selected_category,
+        'selected_employment':    selected_employment,
+        'selected_cloud':         selected_cloud,
+        # Choice tuples for filter dropdowns
+        'qualification_choices':  KyndrylRegistration.QUALIFICATION_CHOICES,
+        'category_choices':       KyndrylRegistration.CATEGORY_CHOICES,
+        'employment_choices':     KyndrylRegistration.CURRENT_EMPLOYMENT_STATUS_CHOICES,
+        'cloud_choices':          KyndrylRegistration.CLOUD_COMPUTING_CHOICES,
+        'beneficiary_choices':    KyndrylRegistration.BENEFICIARY_BELONGING_CHOICES,
+    }
+    return render(request, 'dashboard/kyndryl_students.html', context)
+
+
+def kyndryl_student_detail_api(request, pk):
+    """AJAX endpoint — returns student JSON for the modal."""
+    student = get_object_or_404(KyndrylRegistration, pk=pk)
+    beneficiary_display = dict(KyndrylRegistration.BENEFICIARY_BELONGING_CHOICES).get(
+        student.beneficiary_belonging, student.beneficiary_belonging or '—'
+    )
+    data = {
+        'id':                               str(student.id),
+        'registration_number':              student.registration_number,
+        'name':                             student.name,
+        'father_name':                      student.father_name or '—',
+        'mother_name':                      student.mother_name or '—',
+        'father_occupation':                student.father_occupation or '—',
+        'mother_occupation':                student.mother_occupation or '—',
+        'date_of_birth':                    student.date_of_birth.strftime('%d %b %Y') if student.date_of_birth else '—',
+        'gender':                           student.get_gender_display() if student.gender else '—',
+        'category':                         student.get_category_display(),
+        'mobile_number':                    student.mobile_number,
+        'email_id':                         student.email_id,
+        'address':                          student.address or '—',
+        'city':                             student.city or '—',
+        'state':                            student.state or '—',
+        'pin_code':                         student.pin_code,
+        'aadhar_number':                    student.aadhar_number,
+        'highest_qualification':            student.get_highest_qualification_display() if student.highest_qualification else '—',
+        'current_employment_status':        student.get_current_employment_status_display() if student.current_employment_status else '—',
+        'expertise_in_cloud_computing':     student.get_expertise_in_cloud_computing_display() if student.expertise_in_cloud_computing else '—',
+        'beneficiary_belonging':            beneficiary_display,
+        'registration_date':                student.registration_date.strftime('%d %b %Y, %I:%M %p'),
+        'photo_url':                        student.photo.url if student.photo else None,
+    }
+    return JsonResponse(data)
+
+
+def kyndryl_student_edit(request, pk):
+    """Edit view — reuses your KyndrylRegistrationForm."""
+    from kyndryl.forms import KyndrylRegistrationForm
+    student = get_object_or_404(KyndrylRegistration, pk=pk)
+
+    if request.method == 'POST':
+        form = KyndrylRegistrationForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'{student.name} updated successfully.')
+            return redirect('dashboard:kyndryl_students')
+        else:
+            messages.error(request, 'Please fix the errors below.')
+    else:
+        form = KyndrylRegistrationForm(instance=student)
+
+    return render(request, 'dashboard/kyndryl_student_edit.html', {
+        'form': form,
+        'student': student,
+    })
+
+
+@require_POST
+def kyndryl_student_delete_bulk(request):
+    """Delete one or many students."""
+    ids = request.POST.getlist('student_ids')
+    if ids:
+        deleted, _ = KyndrylRegistration.objects.filter(id__in=ids).delete()
+        messages.success(request, f'{deleted} student(s) deleted.')
+    else:
+        messages.warning(request, 'No students selected.')
+    return redirect('dashboard:kyndryl_students')
+
+
+@require_POST
+def kyndryl_student_delete_single(request, pk):
+    student = get_object_or_404(KyndrylRegistration, pk=pk)
+    name = student.name
+    student.delete()
+    messages.success(request, f'{name} deleted successfully.')
+    return redirect('dashboard:kyndryl_students')
+
+
+# ── Export helpers ──────────────────────────────────────────────────────────
+
+def _export_excel(qs):
+    try:
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+    except ImportError:
+        return HttpResponse('openpyxl not installed. Run: pip install openpyxl', status=500)
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Kyndryl Registrations'
+
+    headers = [
+        'Reg. Number', 'Name', 'Father Name', 'Gender', 'Date of Birth',
+        'Mobile', 'Email', 'Aadhaar', 'Category', 'Qualification',
+        'Employment Status', 'Cloud Expertise', 'Beneficiary',
+        'Address', 'City', 'State', 'PIN Code', 'Registration Date',
+    ]
+
+    # Header row styling
+    header_fill = PatternFill('solid', fgColor='0F172A')
+    header_font = Font(color='FFFFFF', bold=True, size=10)
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.fill   = header_fill
+        cell.font   = header_font
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    beneficiary_map = dict(KyndrylRegistration.BENEFICIARY_BELONGING_CHOICES)
+
+    for row_idx, s in enumerate(qs, 2):
+        ws.append([
+            s.registration_number,
+            s.name,
+            s.father_name or '',
+            s.get_gender_display() if s.gender else '',
+            s.date_of_birth.strftime('%d/%m/%Y') if s.date_of_birth else '',
+            s.mobile_number,
+            s.email_id,
+            s.aadhar_number,
+            s.get_category_display(),
+            s.get_highest_qualification_display() if s.highest_qualification else '',
+            s.get_current_employment_status_display() if s.current_employment_status else '',
+            s.get_expertise_in_cloud_computing_display() if s.expertise_in_cloud_computing else '',
+            beneficiary_map.get(s.beneficiary_belonging, s.beneficiary_belonging or ''),
+            s.address or '',
+            s.city or '',
+            s.state or '',
+            s.pin_code,
+            s.registration_date.strftime('%d/%m/%Y %H:%M'),
+        ])
+        # Alternate row shading
+        if row_idx % 2 == 0:
+            for col in range(1, len(headers) + 1):
+                ws.cell(row=row_idx, column=col).fill = PatternFill('solid', fgColor='F1F5F9')
+
+    # Auto column width
+    for col in ws.columns:
+        max_len = max((len(str(cell.value or '')) for cell in col), default=10)
+        ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="kyndryl_registrations.xlsx"'
+    wb.save(response)
+    return response
+
+
+def _export_pdf(qs):
+    try:
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.lib import colors
+        from reportlab.lib.units import cm
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    except ImportError:
+        return HttpResponse('reportlab not installed. Run: pip install reportlab', status=500)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="kyndryl_registrations.pdf"'
+
+    doc    = SimpleDocTemplate(response, pagesize=landscape(A4), leftMargin=1*cm, rightMargin=1*cm, topMargin=1.5*cm, bottomMargin=1*cm)
+    styles = getSampleStyleSheet()
+    story  = []
+
+    # Title
+    title_style = ParagraphStyle('title', parent=styles['Heading1'], fontSize=14, textColor=colors.HexColor('#0F172A'), spaceAfter=4)
+    sub_style   = ParagraphStyle('sub',   parent=styles['Normal'],   fontSize=9,  textColor=colors.HexColor('#64748B'), spaceAfter=12)
+    story.append(Paragraph('NIELIT × Kyndryl — DevSecOps Registrations', title_style))
+    story.append(Paragraph(f'Total records: {qs.count()}', sub_style))
+    story.append(Spacer(1, 0.3*cm))
+
+    headers = ['Reg. No.', 'Name', 'Mobile', 'Email', 'Category', 'Qualification', 'City', 'State', 'Reg. Date']
+    data    = [headers]
+
+    cell_style = ParagraphStyle('cell', fontSize=7, leading=9)
+    for s in qs:
+        data.append([
+            Paragraph(s.registration_number, cell_style),
+            Paragraph(s.name, cell_style),
+            Paragraph(s.mobile_number, cell_style),
+            Paragraph(s.email_id, cell_style),
+            Paragraph(s.get_category_display(), cell_style),
+            Paragraph(s.get_highest_qualification_display() if s.highest_qualification else '—', cell_style),
+            Paragraph(s.city or '—', cell_style),
+            Paragraph(s.state or '—', cell_style),
+            Paragraph(s.registration_date.strftime('%d/%m/%Y'), cell_style),
+        ])
+
+    col_widths = [3.5*cm, 4*cm, 2.8*cm, 5*cm, 2.2*cm, 3.5*cm, 2.5*cm, 2.5*cm, 2.5*cm]
+    table = Table(data, colWidths=col_widths, repeatRows=1)
+    table.setStyle(TableStyle([
+        ('BACKGROUND',  (0,0), (-1,0),  colors.HexColor('#0F172A')),
+        ('TEXTCOLOR',   (0,0), (-1,0),  colors.white),
+        ('FONTNAME',    (0,0), (-1,0),  'Helvetica-Bold'),
+        ('FONTSIZE',    (0,0), (-1,0),  8),
+        ('ALIGN',       (0,0), (-1,0),  'CENTER'),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#F8FAFC')]),
+        ('FONTSIZE',    (0,1), (-1,-1), 7),
+        ('GRID',        (0,0), (-1,-1), 0.4, colors.HexColor('#E2E8F0')),
+        ('VALIGN',      (0,0), (-1,-1), 'TOP'),
+        ('TOPPADDING',  (0,0), (-1,-1), 4),
+        ('BOTTOMPADDING',(0,0),(-1,-1), 4),
+        ('LEFTPADDING', (0,0), (-1,-1), 4),
+        ('RIGHTPADDING',(0,0), (-1,-1), 4),
+    ]))
+    story.append(table)
+    doc.build(story)
+    return response

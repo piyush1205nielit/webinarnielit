@@ -423,6 +423,14 @@
             <span>Student Management</span>
           </a>
 
+          <a
+            class="nav-link {% if request.resolver_match.url_name == 'kyndryl_students' %}active{% endif %}"
+            href="{% url 'dashboard:kyndryl_students' %}"
+          >
+            <i class="fas fa-users"></i>
+            <span>Kyndryl Registrations</span>
+          </a>
+
           {% comment %} <a
             class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}"
             href="{% url 'dashboard:reports' %}"

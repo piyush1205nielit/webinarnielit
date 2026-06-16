@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'dashboard',
     "public",
     'certificate',
+    'kyndryl',
 ]
 
 MIDDLEWARE = [

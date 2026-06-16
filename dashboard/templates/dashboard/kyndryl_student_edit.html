@@ -1,0 +1,102 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Edit – {{ student.name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{% url 'dashboard:kyndryl_students' %}" class="btn btn-sm btn-outline-secondary" style="border-radius:8px;">
+            <i class="fas fa-arrow-left me-1"></i>Back
+        </a>
+        <div>
+            <h4 class="fw-bold mb-0" style="color:#0f172a;">Edit Applicant</h4>
+            <div class="text-muted small">{{ student.registration_number }}</div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="alert alert-danger alert-dismissible fade show mb-3">
+        <strong>Please fix the following errors:</strong>
+        <ul class="mb-0 mt-1" style="font-size:0.82rem;">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <li>{% if field != '__all__' %}<strong>{{ field|title }}:</strong> {% endif %}{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
+        <div class="card-header py-3 px-4" style="background:linear-gradient(135deg,#0f172a,#be0000);color:white;border:none;">
+            <h6 class="mb-0 fw-bold"><i class="fas fa-user-edit me-2"></i>{{ student.name }}</h6>
+            <div style="font-size:0.75rem;opacity:0.75;">Editing registration — all changes are saved immediately</div>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Full Name *</label>{{ form.name }}{% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors }}</div>{% endif %}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Father's Name</label>{{ form.father_name }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Mother's Name</label>{{ form.mother_name }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Father's Occupation</label>{{ form.father_occupation }}</div>
+                    <div class="col-md-4"><label class="form-label fw-semibold small">Date of Birth *</label>{{ form.date_of_birth }}{% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors }}</div>{% endif %}</div>
+                    <div class="col-md-4"><label class="form-label fw-semibold small">Gender</label>{{ form.gender }}</div>
+                    <div class="col-md-4"><label class="form-label fw-semibold small">Category</label>{{ form.category }}</div>
+
+                    <div class="col-12"><hr class="my-1"><div class="text-muted small fw-bold text-uppercase" style="letter-spacing:.6px;">Contact & Address</div></div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Email *</label>{{ form.email_id }}{% if form.email_id.errors %}<div class="text-danger small mt-1">{{ form.email_id.errors }}</div>{% endif %}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Mobile *</label>{{ form.mobile_number }}{% if form.mobile_number.errors %}<div class="text-danger small mt-1">{{ form.mobile_number.errors }}</div>{% endif %}</div>
+                    <div class="col-12"><label class="form-label fw-semibold small">Address</label>{{ form.address }}</div>
+                    <div class="col-md-4"><label class="form-label fw-semibold small">State</label>{{ form.state }}</div>
+                    <div class="col-md-4"><label class="form-label fw-semibold small">City</label>{{ form.city }}</div>
+                    <div class="col-md-4"><label class="form-label fw-semibold small">PIN Code *</label>{{ form.pin_code }}</div>
+
+                    <div class="col-12"><hr class="my-1"><div class="text-muted small fw-bold text-uppercase" style="letter-spacing:.6px;">Qualifications & Profile</div></div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Aadhaar Number *</label>{{ form.aadhar_number }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Highest Qualification</label>{{ form.highest_qualification }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Employment Status</label>{{ form.current_employment_status }}</div>
+                    <div class="col-md-6"><label class="form-label fw-semibold small">Cloud Expertise</label>{{ form.expertise_in_cloud_computing }}</div>
+                    <div class="col-12"><label class="form-label fw-semibold small">Beneficiary Category</label>{{ form.beneficiary_belonging }}</div>
+
+                    <div class="col-12"><hr class="my-1"><div class="text-muted small fw-bold text-uppercase" style="letter-spacing:.6px;">Documents</div></div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Photo</label>
+                        {% if student.photo %}<div class="mb-1"><img src="{{ student.photo.url }}" style="height:48px;border-radius:8px;border:1px solid #e2e8f0;"></div>{% endif %}
+                        {{ form.photo }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Aadhaar Card</label>
+                        {% if student.aadhaar_card %}<div class="mb-1 text-success small"><i class="fas fa-check-circle me-1"></i>File uploaded</div>{% endif %}
+                        {{ form.aadhaar_card }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Qualification Certificate</label>
+                        {% if student.highest_qualification_certificate %}<div class="mb-1 text-success small"><i class="fas fa-check-circle me-1"></i>File uploaded</div>{% endif %}
+                        {{ form.highest_qualification_certificate }}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="{% url 'dashboard:kyndryl_students' %}" class="btn btn-outline-secondary" style="border-radius:9px;">Cancel</a>
+                    <button type="submit" class="btn fw-bold" style="background:linear-gradient(135deg,#8b0000,#be0000);color:white;border-radius:9px;padding:9px 24px;">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

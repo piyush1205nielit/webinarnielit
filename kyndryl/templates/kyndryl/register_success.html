@@ -1,0 +1,908 @@
+{% extends 'public/base.html' %}
+{% load static %}
+
+{% block title %}Registration Successful – NIELIT × Kyndryl DevSecOps{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(160deg, #f0f4f8 0%, #e8eef6 100%);
+    }
+
+    .success-page { padding: 0 0 60px; }
+
+    /* ── Banner ── */
+    .success-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1a1a2e 45%, #be0000 100%);
+        padding: 40px 0 80px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .success-banner::before {
+        content: '';
+        position: absolute;
+        width: 340px; height: 340px;
+        border-radius: 50%;
+        background: rgba(190,0,0,0.12);
+        top: -130px; right: -80px;
+        pointer-events: none;
+    }
+    .success-banner::after {
+        content: '';
+        position: absolute;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.04);
+        bottom: -80px; left: -40px;
+        pointer-events: none;
+    }
+    .success-banner .inner { position: relative; z-index: 1; }
+
+    .collab-row {
+        display: flex; align-items: center; gap: 8px;
+        margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .collab-tag {
+        font-size: 0.72rem; font-weight: 800; letter-spacing: 0.8px;
+        padding: 4px 13px; border-radius: 7px;
+    }
+    .collab-tag.nielit   { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); }
+    .collab-tag.kyndryl  { background: rgba(190,0,0,0.4);      color: #fca5a5; border: 1px solid rgba(190,0,0,0.5); }
+    .collab-x            { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+
+    /* Animated success icon */
+    .success-icon-wrap {
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 0 0 0 rgba(16,185,129,0.4);
+        animation: pulse-green 2s ease-in-out 3;
+    }
+    .success-icon-wrap i { font-size: 2rem; color: white; }
+    @keyframes pulse-green {
+        0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.45); }
+        70%  { box-shadow: 0 0 0 18px rgba(16,185,129,0); }
+        100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    .success-banner h1 {
+        font-size: 1.9rem; font-weight: 800;
+        margin-bottom: 8px; line-height: 1.2;
+    }
+    .success-banner h1 span { color: #86efac; }
+    .success-banner .tagline { font-size: 0.88rem; opacity: 0.8; margin: 0; }
+
+    .breadcrumb-custom { background: transparent; padding: 0; margin-bottom: 16px; }
+    .breadcrumb-custom .breadcrumb-item a { color: rgba(255,255,255,0.7); text-decoration: none; }
+    .breadcrumb-custom .breadcrumb-item a:hover { color: white; }
+    .breadcrumb-custom .breadcrumb-item.active { color: #fca5a5; }
+    .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.35); }
+
+    /* ── Content area ── */
+    .content-area {
+        margin-top: -44px;
+        position: relative; z-index: 2;
+    }
+
+    /* ── Reg number hero card ── */
+    .reg-hero-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #dbe4f0;
+        box-shadow: 0 12px 40px rgba(15,23,42,0.08), 0 2px 8px rgba(15,23,42,0.04);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+    .reg-hero-top {
+        background: linear-gradient(135deg, #065f46, #10b981);
+        padding: 28px 32px;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    .reg-hero-top::before {
+        content: '';
+        position: absolute;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        top: -60px; right: -40px;
+    }
+    .reg-hero-top-icon {
+        width: 60px; height: 60px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        position: relative; z-index: 1;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .reg-hero-top-text { position: relative; z-index: 1; }
+    .reg-hero-top-text .label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        margin-bottom: 6px;
+    }
+    .reg-hero-top-text .reg-number {
+        font-size: 1.6rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        font-family: monospace;
+        line-height: 1;
+    }
+    .reg-hero-top-text .reg-sub {
+        font-size: 0.78rem;
+        opacity: 0.75;
+        margin-top: 5px;
+    }
+    .reg-hero-top .copy-btn {
+        margin-left: auto;
+        position: relative; z-index: 1;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: white;
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .reg-hero-top .copy-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* Status chips row */
+    .reg-status-row {
+        padding: 16px 32px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+    .status-chip {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.78rem; font-weight: 600;
+    }
+    .status-chip.received { background: #ecfdf5; color: #065f46; border: 1.5px solid #a7f3d0; }
+    .status-chip.pending  { background: #fffbeb; color: #92400e; border: 1.5px solid #fde68a; }
+    .status-chip.batch    { background: #eff6ff; color: #1e3a8a; border: 1.5px solid #bfdbfe; }
+    .status-chip i { font-size: 0.72rem; }
+
+    /* Alert / notice strip */
+    .notice-strip {
+        padding: 14px 32px;
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        border-bottom: 1px solid #fde68a;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        font-size: 0.82rem;
+        color: #78350f;
+        line-height: 1.55;
+    }
+    .notice-strip i { color: #d97706; margin-top: 2px; flex-shrink: 0; font-size: 0.9rem; }
+
+    /* ── Details grid ── */
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #dbe4f0;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+    }
+    .detail-card-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .detail-card-header-icon {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.82rem; flex-shrink: 0;
+    }
+    .icon-red    { background: linear-gradient(135deg,#fee2e2,#fef2f2); color: #be0000; border: 1px solid #fecaca; }
+    .icon-blue   { background: linear-gradient(135deg,#dbeafe,#eff6ff); color: #1e3a8a; border: 1px solid #bfdbfe; }
+    .icon-green  { background: linear-gradient(135deg,#d1fae5,#ecfdf5); color: #059669; border: 1px solid #a7f3d0; }
+    .icon-purple { background: linear-gradient(135deg,#ede9fe,#f5f3ff); color: #7c3aed; border: 1px solid #ddd6fe; }
+
+    .detail-card-header h6 { margin: 0; font-size: 0.85rem; font-weight: 700; color: #0f172a; }
+    .detail-card-header small { color: #94a3b8; font-size: 0.72rem; }
+
+    .detail-card-body { padding: 0; }
+    .detail-row {
+        display: flex;
+        padding: 10px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.82rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { width: 45%; font-weight: 600; color: #374151; }
+    .detail-value { width: 55%; color: #475569; }
+
+    /* ── Next steps card ── */
+    .next-steps-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #dbe4f0;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+        margin-bottom: 24px;
+    }
+    .next-steps-header {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        color: white;
+        padding: 16px 24px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .next-steps-header h6 { margin: 0; font-size: 0.9rem; font-weight: 700; }
+    .next-steps-header i  { font-size: 1rem; color: #93c5fd; }
+
+    .steps-list { padding: 20px 24px; }
+    .step-item {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    .step-item:last-child { margin-bottom: 0; }
+    .step-num {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #be0000, #8b0000);
+        color: white;
+        font-size: 0.78rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .step-content .step-title {
+        font-size: 0.88rem; font-weight: 700; color: #0f172a;
+        margin-bottom: 3px;
+    }
+    .step-content .step-desc {
+        font-size: 0.78rem; color: #64748b; line-height: 1.55;
+    }
+
+    /* ── Portal update card ── */
+    .portal-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1a1a2e 50%, #7f0000 100%);
+        border-radius: 16px;
+        padding: 24px 28px;
+        color: white;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(15,23,42,0.15);
+    }
+    .portal-card::before {
+        content: '';
+        position: absolute;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: rgba(190,0,0,0.15);
+        top: -80px; right: -60px;
+    }
+    .portal-card::after {
+        content: '';
+        position: absolute;
+        width: 120px; height: 120px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.04);
+        bottom: -40px; left: -30px;
+    }
+    .portal-card-inner { position: relative; z-index: 1; }
+    .portal-card .portal-icon {
+        width: 48px; height: 48px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 14px;
+    }
+    .portal-card h5 {
+        font-size: 1rem; font-weight: 800;
+        margin-bottom: 8px;
+        color: white;
+    }
+    .portal-card p {
+        font-size: 0.84rem;
+        opacity: 0.82;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+    .portal-card p strong { color: #fca5a5; opacity: 1; }
+    .portal-check-list {
+        list-style: none; padding: 0; margin: 0 0 18px;
+    }
+    .portal-check-list li {
+        display: flex; gap: 8px; align-items: flex-start;
+        font-size: 0.8rem; opacity: 0.85;
+        margin-bottom: 7px; line-height: 1.45;
+    }
+    .portal-check-list li i { color: #86efac; margin-top: 2px; flex-shrink: 0; font-size: 0.72rem; }
+    .portal-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 16px 0; }
+    .portal-urgency {
+        background: rgba(251,191,36,0.15);
+        border: 1px solid rgba(251,191,36,0.3);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.78rem;
+        color: #fde68a;
+        display: flex; align-items: flex-start; gap: 9px;
+        line-height: 1.5;
+    }
+    .portal-urgency i { flex-shrink: 0; margin-top: 2px; }
+
+    /* ── Course summary sidebar card ── */
+    .course-summary-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #dbe4f0;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+        margin-bottom: 20px;
+    }
+    .course-summary-top {
+        background: linear-gradient(135deg, #0f172a, #1a1a2e, #be0000);
+        padding: 18px 20px;
+        color: white;
+        position: relative; overflow: hidden;
+    }
+    .course-summary-top::before {
+        content: ''; position: absolute;
+        width: 100px; height: 100px; border-radius: 50%;
+        background: rgba(190,0,0,0.18); top: -40px; right: -30px;
+    }
+    .course-summary-top .cs-collab {
+        display: flex; gap: 5px; margin-bottom: 10px; position: relative; z-index:1;
+    }
+    .cs-tag {
+        font-size: 0.62rem; font-weight: 800; letter-spacing: 0.6px;
+        padding: 2px 9px; border-radius: 5px;
+    }
+    .cs-tag.nielit   { background: rgba(255,255,255,0.15); color: white; }
+    .cs-tag.kyndryl  { background: rgba(190,0,0,0.45); color: #fca5a5; border: 1px solid rgba(190,0,0,0.5); }
+    .course-summary-top .cs-name {
+        font-size: 1.05rem; font-weight: 800; line-height: 1.2;
+        margin-bottom: 4px; position: relative; z-index: 1;
+    }
+    .course-summary-top .cs-sub {
+        font-size: 0.72rem; opacity: 0.72;
+        position: relative; z-index: 1;
+    }
+    .course-info-rows { padding: 12px 16px; display: grid; gap: 7px; }
+    .ci-row {
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 12px; background: #f8fafc;
+        border: 1px solid #e8eef6; border-radius: 9px;
+    }
+    .ci-row-icon {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        background: linear-gradient(135deg,#fee2e2,#fef2f2);
+        color: #be0000;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.72rem; flex-shrink: 0;
+    }
+    .ci-row small { display: block; color: #94a3b8; font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.4px; }
+    .ci-row strong { color: #1e293b; font-size: 0.8rem; font-weight: 600; }
+
+    /* ── Document checklist ── */
+    .doc-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #dbe4f0;
+        padding: 16px 20px;
+        box-shadow: 0 2px 8px rgba(15,23,42,0.04);
+        margin-bottom: 20px;
+    }
+    .doc-card h6 { font-size: 0.82rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+    .doc-card h6 i { color: #be0000; }
+    .doc-item {
+        display: flex; align-items: center; gap: 9px;
+        padding: 7px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.79rem; color: #374151;
+    }
+    .doc-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .doc-item i { color: #10b981; font-size: 0.72rem; }
+
+    /* ── Action buttons ── */
+    .action-row {
+        display: flex; gap: 12px; flex-wrap: wrap;
+        margin-bottom: 24px;
+    }
+    .btn-print {
+        background: #0f172a; color: white;
+        border: none; border-radius: 11px;
+        padding: 11px 22px; font-size: 0.85rem; font-weight: 600;
+        transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+    }
+    .btn-print:hover { background: #1e293b; color: white; transform: translateY(-1px); }
+    .btn-home {
+        background: white; color: #475569;
+        border: 1.5px solid #cbd5e1; border-radius: 11px;
+        padding: 11px 22px; font-size: 0.85rem; font-weight: 600;
+        transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+        text-decoration: none;
+    }
+    .btn-home:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
+
+    /* ── Footer note ── */
+    .footer-note {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 0.78rem;
+        color: #64748b;
+        display: flex; gap: 10px; align-items: flex-start;
+        line-height: 1.55;
+    }
+    .footer-note i { color: #be0000; flex-shrink: 0; margin-top: 2px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 992px) {
+        .details-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+        .success-banner { padding: 28px 0 70px; }
+        .success-banner h1 { font-size: 1.5rem; }
+        .reg-hero-top { flex-direction: column; align-items: flex-start; gap: 14px; }
+        .reg-hero-top .copy-btn { margin-left: 0; }
+        .reg-status-row { padding: 14px 20px; }
+        .notice-strip { padding: 12px 20px; }
+        .action-row { flex-direction: column; }
+        .btn-print, .btn-home { width: 100%; justify-content: center; }
+    }
+
+    @media print {
+        .success-banner, .action-row, nav, .btn-print, .btn-home { display: none !important; }
+        body { background: white !important; }
+        .content-area { margin-top: 0 !important; }
+        .reg-hero-card, .detail-card, .next-steps-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-page">
+
+    <!-- ── Banner ── -->
+    <div class="success-banner">
+        <div class="container">
+            <div class="inner">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-custom">
+                        <li class="breadcrumb-item"><a href="{% url 'public:home' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'kyndryl:register' %}">Registration</a></li>
+                        <li class="breadcrumb-item active">Confirmed</li>
+                    </ol>
+                </nav>
+
+                <div class="collab-row">
+                    <span class="collab-tag nielit">NIELIT</span>
+                    <span class="collab-x">×</span>
+                    <span class="collab-tag kyndryl">KYNDRYL</span>
+                </div>
+
+                <div class="success-icon-wrap">
+                    <i class="fas fa-check"></i>
+                </div>
+
+                <h1>
+                    Registration <span>Successful!</span>
+                </h1>
+                <p class="tagline">
+                    Your application for the Free DevSecOps Training Program has been received and is under review.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container content-area">
+
+        <!-- ── Registration Number Hero ── -->
+        <div class="reg-hero-card">
+
+            <div class="reg-hero-top">
+                <div class="reg-hero-top-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="reg-hero-top-text">
+                    <div class="label">Your Registration Number</div>
+                    <div class="reg-number" id="regNumber">{{ registration.registration_number }}</div>
+
+                </div>
+                <button class="copy-btn" onclick="copyRegNumber()" id="copyBtn">
+                    <i class="fas fa-copy me-1"></i>Copy
+                </button>
+            </div>
+
+            <div class="reg-status-row">
+                <span class="status-chip received">
+                    <i class="fas fa-check-circle"></i>Application Received
+                </span>
+                <span class="status-chip pending">
+                    <i class="fas fa-hourglass-half"></i>Review Pending
+                </span>
+                <span class="status-chip batch">
+                    <i class="fas fa-calendar-alt"></i>Batch: 15 July 2026
+                </span>
+            </div>
+
+            <div class="notice-strip">
+                <i class="fas fa-bell"></i>
+                <span>
+                    <strong>Stay updated and kindly check the portal regularly for any updates.</strong>
+
+                  
+                </span>
+            </div>
+        </div>
+
+        <!-- ── Two-column layout ── -->
+        <div class="row g-4">
+
+            <!-- LEFT column -->
+            <div class="col-lg-8">
+
+            
+
+                <!-- Personal details -->
+                <div class="details-grid">
+
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-icon icon-red"><i class="fas fa-user"></i></div>
+                            <div>
+                                <h6>Personal Information</h6>
+                                <small>Applicant details</small>
+                            </div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <div class="detail-label">Full Name</div>
+                                <div class="detail-value"><strong>{{ registration.name }}</strong></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Father's Name</div>
+                                <div class="detail-value">{{ registration.father_name|default:"—" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Date of Birth</div>
+                                <div class="detail-value">{{ registration.date_of_birth|date:"d M Y" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Gender</div>
+                                <div class="detail-value">{{ registration.get_gender_display|default:"—" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Category</div>
+                                <div class="detail-value">{{ registration.get_category_display }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Aadhaar Number</div>
+                                <div class="detail-value">XXXX-XXXX-{{ registration.aadhar_number|slice:"-4:" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-icon icon-blue"><i class="fas fa-address-card"></i></div>
+                            <div>
+                                <h6>Contact & Address</h6>
+                                <small>Communication details</small>
+                            </div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <div class="detail-label">Email</div>
+                                <div class="detail-value" style="word-break:break-all;">{{ registration.email_id }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Mobile</div>
+                                <div class="detail-value">{{ registration.mobile_number }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">City</div>
+                                <div class="detail-value">{{ registration.city|default:"—" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">State / UT</div>
+                                <div class="detail-value">{{ registration.state|default:"—" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">PIN Code</div>
+                                <div class="detail-value">{{ registration.pin_code }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-icon icon-green"><i class="fas fa-graduation-cap"></i></div>
+                            <div>
+                                <h6>Qualification & Profile</h6>
+                                <small>Academic & employment info</small>
+                            </div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <div class="detail-label">Qualification</div>
+                                <div class="detail-value">{{ registration.get_highest_qualification_display|default:"—" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Employment</div>
+                                <div class="detail-value">{{ registration.get_current_employment_status_display|default:"—" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Cloud Expertise</div>
+                                <div class="detail-value">{{ registration.get_expertise_in_cloud_computing_display|default:"—" }}</div>
+                            </div>
+                            {% if registration.beneficiary_belonging %}
+                            <div class="detail-row">
+                                <div class="detail-label">Beneficiary</div>
+                                <div class="detail-value">{{ registration.get_beneficiary_belonging_display }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <div class="detail-card-header-icon icon-purple"><i class="fas fa-file-alt"></i></div>
+                            <div>
+                                <h6>Registration Summary</h6>
+                                <small>Submission details</small>
+                            </div>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <div class="detail-label">Reg. Number</div>
+                                <div class="detail-value"><code style="font-size:0.78rem;background:#f1f5f9;padding:2px 6px;border-radius:5px;">{{ registration.registration_number }}</code></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Applied On</div>
+                                <div class="detail-value">{{ registration.registration_date|date:"d M Y, g:i A" }}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Program</div>
+                                <div class="detail-value">DevSecOps — Free Online</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Mode</div>
+                                <div class="detail-value">Online · Instructor-Led</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Duration</div>
+                                <div class="detail-value">120 Hours</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Current Status</div>
+                                <div class="detail-value">
+                                    <span style="background:#fef3c7;color:#92400e;border-radius:50px;padding:2px 10px;font-size:0.72rem;font-weight:700;">
+                                        <i class="fas fa-hourglass-half me-1"></i>Under Review
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Next Steps -->
+                <div class="next-steps-card">
+                    <div class="next-steps-header">
+                        <i class="fas fa-list-ol"></i>
+                        <h6>What Happens Next</h6>
+                    </div>
+                    <div class="steps-list">
+                        <div class="step-item">
+                            <div class="step-num">1</div>
+                            <div class="step-content">
+                                <div class="step-title">Application Review</div>
+                                <div class="step-desc">
+                                    NIELIT will verify your submitted details and documents. This may take a few working days.
+                                    Ensure your documents are clearly legible and correctly uploaded.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">2</div>
+                            <div class="step-content">
+                                <div class="step-title">Eligibility Confirmation</div>
+                                <div class="step-desc">
+                                    Shortlisted candidates will receive an eligibility confirmation via email and SMS
+                                    at the contact details you provided. Priority is given to EWS, women, Tier 2/3 city
+                                    residents, and minority community candidates.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">3</div>
+                            <div class="step-content">
+                                <div class="step-title">Seat Allotment</div>
+                                <div class="step-desc">
+                                    Confirmed candidates will be allotted a seat in the batch starting
+                                    <strong>15th July 2026</strong>. Seat availability is limited — apply early and
+                                    check your portal status regularly.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">4</div>
+                            <div class="step-content">
+                                <div class="step-title">Induction & Orientation</div>
+                                <div class="step-desc">
+                                    Selected students will receive a joining link and orientation schedule before
+                                    the batch start date. You may also be invited for a Kyndryl corporate exposure
+                                    visit as part of the program.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">5</div>
+                            <div class="step-content">
+                                <div class="step-title">NIELIT Certification</div>
+                                <div class="step-desc">
+                                    Upon successful completion of the 120-hour program and assessments,
+                                    you will receive a <strong>NIELIT Certified DevSecOps</strong> certificate
+                                    recognised under MeitY, Government of India.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer note -->
+                <div class="footer-note">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>
+                        Your personal information is securely stored and will only be used for program administration
+                        under NIELIT's data policy. This is a Government of India initiative under MeitY in
+                        collaboration with Kyndryl. For queries, contact NIELIT Delhi directly.
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- RIGHT sidebar -->
+            <div class="col-lg-4">
+
+                <!-- Course summary -->
+                <div class="course-summary-card">
+                    <div class="course-summary-top">
+                        <div class="cs-collab">
+                            <span class="cs-tag nielit">NIELIT</span>
+                            <span class="cs-tag kyndryl">KYNDRYL</span>
+                        </div>
+                        <div class="cs-name">DevSecOps<br>Training Program</div>
+                        <div class="cs-sub">Online Instructor-Led · Free of Cost</div>
+                    </div>
+                    <div class="course-info-rows">
+                        <div class="ci-row">
+                            <div class="ci-row-icon"><i class="fas fa-laptop-code"></i></div>
+                            <div><small>Mode</small><strong>Online · Instructor-Led</strong></div>
+                        </div>
+                        <div class="ci-row">
+                            <div class="ci-row-icon"><i class="fas fa-clock"></i></div>
+                            <div><small>Duration</small><strong>120 Hours</strong></div>
+                        </div>
+                        <div class="ci-row">
+                            <div class="ci-row-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div><small>Batch Starts</small><strong>15th July 2026</strong></div>
+                        </div>
+                        <div class="ci-row">
+                            <div class="ci-row-icon"><i class="fas fa-certificate"></i></div>
+                            <div><small>Certification</small><strong>NIELIT · MeitY Recognised</strong></div>
+                        </div>
+                        <div class="ci-row">
+                            <div class="ci-row-icon"><i class="fas fa-building"></i></div>
+                            <div><small>Corporate Exposure</small><strong>Kyndryl Office Visit</strong></div>
+                        </div>
+                        <div class="ci-row">
+                            <div class="ci-row-icon"><i class="fas fa-rupee-sign"></i></div>
+                            <div><small>Course Fee</small><strong style="color:#059669;">100% Free</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portal check reminder -->
+                <div class="portal-card">
+                    <div class="portal-card-inner">
+                        <div class="portal-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h5>Stay Updated</h5>
+                        <p>
+                            <strong>Kindly check the portal regularly for any updates</strong> regarding
+                            your application status, seat confirmation, batch schedule, and joining instructions.
+                        </p>
+                        <ul class="portal-check-list">
+                            <li><i class="fas fa-circle-check"></i>Application status updates</li>
+                            <li><i class="fas fa-circle-check"></i>Seat confirmation notification</li>
+                            <li><i class="fas fa-circle-check"></i>Batch schedule & joining link</li>
+                            <li><i class="fas fa-circle-check"></i>Document verification status</li>
+                            <li><i class="fas fa-circle-check"></i>Kyndryl orientation details</li>
+                        </ul>
+                        <div class="portal-divider"></div>
+                        <div class="portal-urgency">
+                            <i class="fas fa-triangle-exclamation"></i>
+                            <span>
+                                Seats are <strong>limited</strong>. Candidates who do not respond to
+                                confirmation requests within the stipulated time may lose their seat
+                                to the next eligible applicant.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents submitted -->
+                <div class="doc-card">
+                    <h6><i class="fas fa-paperclip"></i>Documents Submitted</h6>
+                    <div class="doc-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Passport Size Photo</span>
+                    </div>
+                    <div class="doc-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Aadhaar Card</span>
+                    </div>
+                    <div class="doc-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Highest Qualification Certificate</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyRegNumber() {
+    const text = document.getElementById('regNumber').textContent.trim();
+    const btn  = document.getElementById('copyBtn');
+    navigator.clipboard.writeText(text).then(() => {
+        btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+        btn.style.background = 'rgba(16,185,129,0.3)';
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-copy me-1"></i>Copy';
+            btn.style.background = '';
+        }, 2500);
+    }).catch(() => {
+        // Fallback for older browsers
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+        setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy me-1"></i>Copy'; }, 2500);
+    });
+}
+</script>
+{% endblock %}

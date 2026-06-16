@@ -150,3 +150,6 @@ def announcements(request):
 
 def maintenance_page(request):
     return render(request, 'public/maintenance_page.html')
+
+def home_page_2(request):
+    return render(request, 'public/home2.html')

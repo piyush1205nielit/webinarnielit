@@ -1,0 +1,646 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Kyndryl Registrations – Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --k-red:   #be0000;
+        --k-dark:  #0f172a;
+        --k-blue:  #1e3a8a;
+    }
+
+    /* ── Page header ── */
+    .kk-page-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1a1a2e 50%, #be0000 100%);
+        border-radius: 16px;
+        padding: 22px 28px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .kk-page-header::before {
+        content: '';
+        position: absolute;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: rgba(190,0,0,0.15);
+        top: -80px; right: -60px;
+        pointer-events: none;
+    }
+    .kk-page-header .kk-title { font-size: 1.25rem; font-weight: 800; margin: 0; }
+    .kk-page-header .kk-sub   { font-size: 0.78rem; opacity: 0.7; margin: 3px 0 0; }
+    .kk-collab { display: flex; gap: 6px; margin-bottom: 8px; }
+    .kk-tag {
+        font-size: 0.65rem; font-weight: 800; letter-spacing: 0.8px;
+        padding: 2px 10px; border-radius: 5px;
+    }
+    .kk-tag.nielit  { background: rgba(255,255,255,0.15); color: white; }
+    .kk-tag.kyndryl { background: rgba(190,0,0,0.45); color: #fca5a5; border: 1px solid rgba(190,0,0,0.5); }
+    .kk-stat-pills  { display: flex; gap: 10px; flex-wrap: wrap; }
+    .kk-stat-pill {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 50px;
+        padding: 5px 14px;
+        font-size: 0.78rem;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .kk-stat-pill strong { font-size: 1rem; font-weight: 800; }
+
+    /* ── Filter card ── */
+    .filter-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        padding: 18px 22px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+    }
+    .filter-card .filter-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .filter-card .filter-title i { color: var(--k-red); }
+
+    /* ── Bulk actions bar ── */
+    .bulk-bar {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        border-radius: 12px;
+        padding: 12px 18px;
+        margin-bottom: 16px;
+        display: none;
+        color: white;
+    }
+    .bulk-bar.visible { display: flex; }
+    .bulk-bar .bulk-count {
+        font-size: 0.88rem; font-weight: 700;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .bulk-bar .bulk-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-left: auto; }
+
+    /* ── Table card ── */
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(15,23,42,0.06);
+    }
+    .table > thead > tr > th {
+        background: #0f172a;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        padding: 12px 14px;
+        border: none;
+        white-space: nowrap;
+    }
+    .table > tbody > tr > td { padding: 12px 14px; vertical-align: middle; font-size: 0.85rem; }
+    .table > tbody > tr:hover { background: #f8fafc; }
+    .table > tbody > tr.row-selected { background: #eff6ff !important; }
+
+    /* ── Reg number pill ── */
+    .reg-pill {
+        font-family: monospace;
+        font-size: 0.75rem;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 3px 8px;
+        color: #0f172a;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* ── Category badge ── */
+    .cat-badge {
+        font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px;
+        padding: 3px 9px; border-radius: 50px;
+    }
+    .cat-general  { background: #f1f5f9; color: #475569; }
+    .cat-sc       { background: #fef3c7; color: #92400e; }
+    .cat-st       { background: #fce7f3; color: #9d174d; }
+    .cat-ews      { background: #d1fae5; color: #065f46; }
+    .cat-obc      { background: #ede9fe; color: #5b21b6; }
+    .cat-pwd      { background: #dbeafe; color: #1e3a8a; }
+
+    /* ── Qualification badge ── */
+    .qual-badge {
+        font-size: 0.68rem; font-weight: 600;
+        padding: 3px 9px; border-radius: 50px;
+        background: #f8fafc; border: 1px solid #e2e8f0;
+        color: #475569;
+    }
+
+    /* ── Action buttons ── */
+    .action-btns { display: flex; gap: 5px; }
+    .action-btn {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 0.75rem;
+        border: none; cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .action-btn:hover { transform: translateY(-2px); }
+    .btn-view   { background: #dbeafe; color: #1e3a8a; }
+    .btn-view:hover   { background: #1e3a8a; color: white; }
+    .btn-edit   { background: #fef3c7; color: #d97706; }
+    .btn-edit:hover   { background: #d97706; color: white; }
+    .btn-delete { background: #fee2e2; color: #dc2626; }
+    .btn-delete:hover { background: #dc2626; color: white; }
+
+    /* ── Export buttons ── */
+    .export-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; }
+    .btn-export-excel { background: #16a34a; color: white; border: none; border-radius: 9px; padding: 7px 16px; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; }
+    .btn-export-excel:hover { background: #15803d; color: white; transform: translateY(-1px); }
+    .btn-export-pdf   { background: #dc2626; color: white; border: none; border-radius: 9px; padding: 7px 16px; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; }
+    .btn-export-pdf:hover   { background: #b91c1c; color: white; transform: translateY(-1px); }
+
+    /* ── Modal ── */
+    .detail-modal .modal-header {
+        background: linear-gradient(135deg, #0f172a, #be0000);
+        color: white; border: none;
+    }
+    .detail-modal .modal-header .btn-close { filter: invert(1); }
+    .detail-section-title {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 800;
+        color: #be0000;
+        margin: 16px 0 8px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #fee2e2;
+    }
+    .detail-row {
+        display: flex;
+        padding: 7px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.84rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { width: 38%; font-weight: 600; color: #374151; }
+    .detail-value { width: 62%; color: #475569; }
+    .detail-photo {
+        width: 80px; height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 3px solid #e2e8f0;
+        margin-bottom: 12px;
+    }
+
+    /* ── Pagination ── */
+    .pagination .page-link { border-radius: 8px; margin: 0 2px; font-size: 0.82rem; color: #0f172a; border: 1px solid #e2e8f0; }
+    .pagination .page-item.active .page-link { background: #0f172a; border-color: #0f172a; color: white; }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+
+    <!-- ── Page Header ── -->
+    <div class="kk-page-header">
+        <div style="position:relative;z-index:1;">
+            <div class="kk-collab">
+                <span class="kk-tag nielit">NIELIT</span>
+                <span class="kk-tag kyndryl">KYNDRYL</span>
+            </div>
+            <div class="kk-title"><i class="fas fa-users me-2"></i>DevSecOps Registrations</div>
+            <div class="kk-sub">Free Online Instructor-Led Training Program — applicant management</div>
+        </div>
+        <div class="kk-stat-pills" style="position:relative;z-index:1;">
+            <div class="kk-stat-pill">
+                <i class="fas fa-users"></i>
+                <div><strong>{{ page_obj.paginator.count }}</strong><br><span style="font-size:0.68rem;opacity:0.75;">Total Registered</span></div>
+            </div>
+            <div class="kk-stat-pill">
+                <i class="fas fa-calendar-alt"></i>
+                <div><strong>15 Jul 2026</strong><br><span style="font-size:0.68rem;opacity:0.75;">Batch Start</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Filters ── -->
+    <div class="filter-card">
+        <div class="filter-title"><i class="fas fa-filter"></i> Filter Registrations</div>
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Qualification</label>
+                <select name="qualification" class="form-select form-select-sm">
+                    <option value="">All Qualifications</option>
+                    {% for val, label in qualification_choices %}
+                    <option value="{{ val }}" {% if selected_qualification == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Category</label>
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">All Categories</option>
+                    {% for val, label in category_choices %}
+                    <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Employment</label>
+                <select name="employment" class="form-select form-select-sm">
+                    <option value="">All Status</option>
+                    {% for val, label in employment_choices %}
+                    <option value="{{ val }}" {% if selected_employment == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold mb-1">Cloud Expertise</label>
+                <select name="cloud" class="form-select form-select-sm">
+                    <option value="">All Levels</option>
+                    {% for val, label in cloud_choices %}
+                    <option value="{{ val }}" {% if selected_cloud == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold mb-1">Search</label>
+                <input type="text" name="search" class="form-control form-control-sm"
+                       placeholder="Name, Mobile, Email, Reg No, City..."
+                       value="{{ search_query|default:'' }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-sm w-100" style="background:#0f172a;color:white;border-radius:8px;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            {% if selected_qualification or selected_category or selected_employment or selected_cloud or search_query %}
+            <div class="col-12">
+                <a href="{% url 'dashboard:kyndryl_students' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>Clear Filters
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- ── Bulk Actions Bar ── -->
+    <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-count">
+            <i class="fas fa-check-square fa-lg"></i>
+            <span id="selectedCount">0</span> selected
+            <button type="button" class="btn btn-sm btn-light py-0 px-2 ms-1" id="clearSelBtn" style="font-size:0.75rem;">
+                <i class="fas fa-times me-1"></i>Clear
+            </button>
+        </div>
+        <div class="bulk-actions">
+            <button type="button" class="btn btn-sm btn-danger fw-semibold" id="bulkDeleteBtn">
+                <i class="fas fa-trash me-1"></i>Delete Selected
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Export + table ── -->
+    <div class="export-bar">
+        <a href="?export=excel{% if selected_qualification %}&qualification={{ selected_qualification }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_employment %}&employment={{ selected_employment }}{% endif %}{% if selected_cloud %}&cloud={{ selected_cloud }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+           class="btn-export-excel"><i class="fas fa-file-excel me-1"></i>Export Excel</a>
+        <a href="?export=pdf{% if selected_qualification %}&qualification={{ selected_qualification }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_employment %}&employment={{ selected_employment }}{% endif %}{% if selected_cloud %}&cloud={{ selected_cloud }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+           class="btn-export-pdf" target="_blank"><i class="fas fa-file-pdf me-1"></i>Export PDF</a>
+        <span class="text-muted small ms-auto">
+            Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} records
+        </span>
+    </div>
+
+    <!-- Hidden bulk delete form -->
+    <form id="bulkDeleteForm" method="post" action="{% url 'dashboard:kyndryl_student_delete_bulk' %}">
+        {% csrf_token %}
+        <div id="bulkInputs"></div>
+    </form>
+
+    <!-- ── Table ── -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="40" class="text-center">
+                            <input type="checkbox" id="selectAll" class="form-check-input mt-0">
+                        </th>
+                        <th>Reg. Number</th>
+                        <th>Applicant</th>
+                        <th>Contact</th>
+                        <th>Location</th>
+                        <th>Category</th>
+                        <th>Qualification</th>
+                        <th>Cloud Level</th>
+                        <th>Registered On</th>
+                        <th width="100">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in page_obj %}
+                    <tr class="student-row" data-id="{{ student.id }}">
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input student-cb" value="{{ student.id }}">
+                        </td>
+                        <td>
+                            <button type="button" class="border-0 bg-transparent p-0 view-student" data-id="{{ student.id }}">
+                                <span class="reg-pill">{{ student.registration_number }}</span>
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="border-0 bg-transparent p-0 text-start view-student" data-id="{{ student.id }}">
+                                <div class="fw-bold text-dark" style="font-size:0.88rem;">{{ student.name }}</div>
+                                <div class="text-muted" style="font-size:0.75rem;">S/o {{ student.father_name|default:"—" }}</div>
+                            </button>
+                        </td>
+                        <td>
+                            <div style="font-size:0.82rem;">{{ student.mobile_number }}</div>
+                            <div class="text-muted" style="font-size:0.74rem;">{{ student.email_id|truncatechars:24 }}</div>
+                        </td>
+                        <td>
+                            <div style="font-size:0.82rem;">{{ student.city|default:"—" }}</div>
+                            <div class="text-muted" style="font-size:0.74rem;">{{ student.state|default:"—" }}</div>
+                        </td>
+                        <td>
+                            <span class="cat-badge cat-{{ student.category }}">
+                                {{ student.get_category_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if student.highest_qualification %}
+                            <span class="qual-badge">{{ student.get_highest_qualification_display }}</span>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if student.expertise_in_cloud_computing == 'basic_level' %}
+                                <span class="badge" style="background:#dbeafe;color:#1e3a8a;font-size:0.7rem;">Basic</span>
+                            {% elif student.expertise_in_cloud_computing == 'middle_level' %}
+                                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:0.7rem;">Middle</span>
+                            {% elif student.expertise_in_cloud_computing == 'advance_level' %}
+                                <span class="badge" style="background:#d1fae5;color:#065f46;font-size:0.7rem;">Advanced</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted" style="font-size:0.78rem;">{{ student.registration_date|date:"d M Y" }}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button type="button" class="action-btn btn-view view-student" data-id="{{ student.id }}" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a href="{% url 'dashboard:kyndryl_student_edit' student.id %}" class="action-btn btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="action-btn btn-delete delete-single" data-id="{{ student.id }}" data-name="{{ student.name }}" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted d-block mb-3"></i>
+                            <p class="text-muted mb-0">No registrations found matching your filters.</p>
+                            <a href="{% url 'dashboard:kyndryl_students' %}" class="btn btn-sm btn-outline-secondary mt-2">Clear Filters</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="p-3 border-top bg-white">
+            <nav>
+                <ul class="pagination pagination-sm justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&qualification={{ selected_qualification }}&category={{ selected_category }}&employment={{ selected_employment }}&cloud={{ selected_cloud }}&search={{ search_query }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}&qualification={{ selected_qualification }}&category={{ selected_category }}&employment={{ selected_employment }}&cloud={{ selected_cloud }}&search={{ search_query }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&qualification={{ selected_qualification }}&category={{ selected_category }}&employment={{ selected_employment }}&cloud={{ selected_cloud }}&search={{ search_query }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── Detail Modal ── -->
+<div class="modal fade detail-modal" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-id-card me-2"></i>Applicant Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body px-4 py-3" id="modalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border" style="color:#be0000;" role="status"></div>
+                    <div class="text-muted small mt-2">Loading details...</div>
+                </div>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" class="btn btn-sm fw-semibold" id="modalEditBtn"
+                   style="background:#be0000;color:white;border-radius:8px;">
+                    <i class="fas fa-edit me-1"></i>Edit Applicant
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete Confirm Modal ── -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <div class="w-100 text-center pt-2">
+                    <div style="width:56px;height:56px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                        <i class="fas fa-trash" style="color:#dc2626;font-size:1.2rem;"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">Delete Applicant</h5>
+                    <p class="text-muted small mb-0" id="deleteModalName"></p>
+                </div>
+            </div>
+            <div class="modal-body text-center pb-0">
+                <p class="text-muted small">This will permanently delete the registration and all uploaded documents. This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="border-radius:8px;min-width:80px;">Cancel</button>
+                <form id="deleteForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger fw-semibold" style="border-radius:8px;min-width:80px;">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Checkbox / bulk selection ──────────────────────────────────────
+    const selectAll   = document.getElementById('selectAll');
+    const checkboxes  = document.querySelectorAll('.student-cb');
+    const bulkBar     = document.getElementById('bulkBar');
+    const countSpan   = document.getElementById('selectedCount');
+    const bulkInputs  = document.getElementById('bulkInputs');
+    const bulkForm    = document.getElementById('bulkDeleteForm');
+
+    function syncBulkBar() {
+        const checked = [...checkboxes].filter(c => c.checked);
+        const n = checked.length;
+        bulkBar.classList.toggle('visible', n > 0);
+        countSpan.textContent = n;
+        if (selectAll) {
+            selectAll.checked       = n === checkboxes.length && n > 0;
+            selectAll.indeterminate = n > 0 && n < checkboxes.length;
+        }
+        document.querySelectorAll('.student-row').forEach(row => {
+            const cb = row.querySelector('.student-cb');
+            row.classList.toggle('row-selected', cb && cb.checked);
+        });
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            syncBulkBar();
+        });
+    }
+    checkboxes.forEach(cb => cb.addEventListener('change', syncBulkBar));
+
+    document.getElementById('clearSelBtn')?.addEventListener('click', function () {
+        checkboxes.forEach(cb => cb.checked = false);
+        syncBulkBar();
+    });
+
+    // Bulk delete
+    document.getElementById('bulkDeleteBtn')?.addEventListener('click', function () {
+        const ids = [...checkboxes].filter(c => c.checked).map(c => c.value);
+        if (!ids.length) return;
+        if (!confirm(`Permanently delete ${ids.length} applicant(s)? This cannot be undone.`)) return;
+        bulkInputs.innerHTML = ids.map(id => `<input type="hidden" name="student_ids" value="${id}">`).join('');
+        bulkForm.submit();
+    });
+
+    syncBulkBar();
+
+
+    // ── View Detail Modal ──────────────────────────────────────────────
+    const detailModal  = new bootstrap.Modal(document.getElementById('detailModal'));
+    const modalBody    = document.getElementById('modalBody');
+    const modalEditBtn = document.getElementById('modalEditBtn');
+
+    document.querySelectorAll('.view-student').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.dataset.id;
+            modalBody.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border" style="color:#be0000;" role="status"></div>
+                    <div class="text-muted small mt-2">Loading details...</div>
+                </div>`;
+            modalEditBtn.href = `/dashboard/kyndryl/students/${id}/edit/`;
+            detailModal.show();
+
+            fetch(`/dashboard/kyndryl/students/${id}/detail/`)
+                .then(r => r.json())
+                .then(d => {
+                    const benef = d.beneficiary_belonging || '—';
+                    modalBody.innerHTML = `
+                        ${d.photo_url ? `<div class="text-center mb-3"><img src="${d.photo_url}" class="detail-photo" alt="Photo"></div>` : ''}
+
+                        <div class="detail-section-title"><i class="fas fa-id-badge me-2"></i>Registration</div>
+                        <div class="detail-row"><div class="detail-label">Reg. Number</div><div class="detail-value"><code>${d.registration_number}</code></div></div>
+                        <div class="detail-row"><div class="detail-label">Registration Date</div><div class="detail-value">${d.registration_date}</div></div>
+
+                        <div class="detail-section-title"><i class="fas fa-user me-2"></i>Personal</div>
+                        <div class="detail-row"><div class="detail-label">Full Name</div><div class="detail-value"><strong>${d.name}</strong></div></div>
+                        <div class="detail-row"><div class="detail-label">Father's Name</div><div class="detail-value">${d.father_name}</div></div>
+                        <div class="detail-row"><div class="detail-label">Mother's Name</div><div class="detail-value">${d.mother_name}</div></div>
+                        <div class="detail-row"><div class="detail-label">Father's Occupation</div><div class="detail-value">${d.father_occupation}</div></div>
+                        <div class="detail-row"><div class="detail-label">Date of Birth</div><div class="detail-value">${d.date_of_birth}</div></div>
+                        <div class="detail-row"><div class="detail-label">Gender</div><div class="detail-value">${d.gender}</div></div>
+                        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${d.category}</div></div>
+                        <div class="detail-row"><div class="detail-label">Aadhaar Number</div><div class="detail-value"><code>${d.aadhar_number}</code></div></div>
+
+                        <div class="detail-section-title"><i class="fas fa-address-card me-2"></i>Contact & Address</div>
+                        <div class="detail-row"><div class="detail-label">Mobile</div><div class="detail-value">${d.mobile_number}</div></div>
+                        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${d.email_id}</div></div>
+                        <div class="detail-row"><div class="detail-label">Address</div><div class="detail-value">${d.address}</div></div>
+                        <div class="detail-row"><div class="detail-label">City</div><div class="detail-value">${d.city}</div></div>
+                        <div class="detail-row"><div class="detail-label">State</div><div class="detail-value">${d.state}</div></div>
+                        <div class="detail-row"><div class="detail-label">PIN Code</div><div class="detail-value">${d.pin_code}</div></div>
+
+                        <div class="detail-section-title"><i class="fas fa-graduation-cap me-2"></i>Qualification & Profile</div>
+                        <div class="detail-row"><div class="detail-label">Highest Qualification</div><div class="detail-value">${d.highest_qualification}</div></div>
+                        <div class="detail-row"><div class="detail-label">Employment Status</div><div class="detail-value">${d.current_employment_status}</div></div>
+                        <div class="detail-row"><div class="detail-label">Cloud Expertise</div><div class="detail-value">${d.expertise_in_cloud_computing}</div></div>
+                        <div class="detail-row"><div class="detail-label">Beneficiary Category</div><div class="detail-value">${benef}</div></div>
+                    `;
+                })
+                .catch(() => {
+                    modalBody.innerHTML = '<div class="alert alert-danger m-3">Failed to load details. Please try again.</div>';
+                });
+        });
+    });
+
+
+    // ── Delete Single ──────────────────────────────────────────────────
+    const deleteModal   = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteForm    = document.getElementById('deleteForm');
+    const deleteModalName = document.getElementById('deleteModalName');
+
+    document.querySelectorAll('.delete-single').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id   = this.dataset.id;
+            const name = this.dataset.name;
+            deleteModalName.textContent = name;
+            deleteForm.action = `/dashboard/kyndryl/students/${id}/delete/`;
+            deleteModal.show();
+        });
+    });
+
+});
+</script>
+{% endblock %}

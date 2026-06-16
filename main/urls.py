@@ -13,6 +13,7 @@ urlpatterns = [
     path('registration/', include('registration.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('certificate/', include('certificate.urls')),
+    path('kyndryl/', include('kyndryl.urls')),
 ]
 
 if settings.DEBUG:
