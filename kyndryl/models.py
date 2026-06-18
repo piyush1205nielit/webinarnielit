@@ -33,6 +33,8 @@ class KyndrylRegistration(models.Model):
         ('10th', 'Class 10th'),
         ('12th', 'Class 12th'),
         ('diploma', 'Diploma'),
+        ('3rd_year_graduation', '3rd Year in Graduation'),
+        ('4th_year_graduation', '4th Year in Graduation'),
         ('graduate', 'Graduate'),
         ('postgraduate', 'Postgraduate'),
         ('phd', 'PhD'),

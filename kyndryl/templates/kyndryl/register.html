@@ -1,7 +1,7 @@
 {% extends 'public/base.html' %}
 {% load static %}
 
-{% block title %}Free DevSecOps Training Registration – NIELIT × Kyndryl{% endblock %}
+{% block title %}Free DevSecOps Training Registration – NIELIT - Kyndryl{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -9,11 +9,23 @@
         --primary:    #0f172a;
         --secondary:  #1e3a8a;
         --accent:     #2563eb;
+        --accent-light: #3b82f6;
+        --accent-dark: #1d4ed8;
         --kyndryl:    #be0000;
         --kyndryl-dk: #8b0000;
         --border:     #e2e8f0;
         --success:    #10b981;
         --danger:     #dc2626;
+        --gray-50:    #f8fafc;
+        --gray-100:   #f1f5f9;
+        --gray-200:   #e2e8f0;
+        --gray-300:   #cbd5e1;
+        --gray-400:   #94a3b8;
+        --gray-500:   #64748b;
+        --gray-600:   #475569;
+        --gray-700:   #334155;
+        --gray-800:   #1e293b;
+        --gray-900:   #0f172a;
     }
 
     body {
@@ -124,18 +136,79 @@
     .breadcrumb-custom .breadcrumb-item.active { color: #fca5a5; }
     .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.35); }
 
-    /* ── Layout ── */
+    /* ── Content Area ── */
     .content-area {
         margin-top: -40px;
         position: relative;
         z-index: 2;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 15px;
+        padding-right: 15px;
     }
-    .registration-grid {
-        display: grid;
-        grid-template-columns: 7fr 3fr;
-        gap: 32px;
-        align-items: start;
+
+    /* ── Floating Progress Bar ── */
+    .floating-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--gray-200);
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
+    .floating-progress.visible {
+        transform: translateY(0);
+    }
+    .floating-progress .fp-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        white-space: nowrap;
+    }
+    .floating-progress .fp-bar-wrap {
+        flex: 1;
+        min-width: 120px;
+    }
+    .floating-progress .fp-bar {
+        height: 6px;
+        border-radius: 50px;
+        background: var(--gray-200);
+        overflow: hidden;
+    }
+    .floating-progress .fp-bar-inner {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        border-radius: 50px;
+        transition: width 0.4s ease;
+        width: 0%;
+    }
+    .floating-progress .fp-pct {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--accent);
+        min-width: 36px;
+        text-align: right;
+    }
+    .floating-progress .fp-close {
+        background: none;
+        border: none;
+        color: var(--gray-500);
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0 4px;
+        line-height: 1;
+    }
+    .floating-progress .fp-close:hover { color: var(--gray-700); }
 
     /* ── Alerts ── */
     .alert { border-radius: 12px; border: none; padding: 14px 18px; font-size: 0.88rem; }
@@ -153,10 +226,11 @@
         box-shadow:
             0 10px 30px rgba(15,23,42,0.06),
             0 2px 8px rgba(15,23,42,0.04);
+        margin-bottom: 24px;
     }
 
     .form-card-header {
-        padding: 20px 24px 16px;
+        padding: 20px 28px 16px;
         border-bottom: 1px solid var(--border);
         background: #fcfdff;
         display: flex;
@@ -165,34 +239,23 @@
         gap: 16px;
         flex-wrap: wrap;
     }
-    .form-card-header h4 { margin: 0; font-weight: 700; color: #0f172a; font-size: 1rem; }
-    .form-card-header p  { margin: 3px 0 0; color: #64748b; font-size: 0.8rem; }
+    .form-card-header h4 { margin: 0; font-weight: 700; color: var(--gray-900); font-size: 1.1rem; }
+    .form-card-header h4 i { color: var(--accent); }
+    .form-card-header p  { margin: 3px 0 0; color: var(--gray-500); font-size: 0.8rem; }
 
-    .progress-wrap { min-width: 160px; }
-    .progress { height: 7px; border-radius: 50px; background: #e2e8f0; }
-    .progress-bar {
-        background: linear-gradient(90deg, #be0000, #2563eb);
-        transition: width 0.4s ease;
-    }
-    .progress-label {
-        display: flex; justify-content: space-between;
-        margin-top: 5px; font-size: 0.72rem; color: #64748b;
-    }
-    .progress-label span { font-weight: 700; color: #be0000; }
-
-    .form-body { padding: 32px; }
+    .form-body { padding: 28px 32px; }
 
     /* ── Form Sections ── */
     .form-section {
         margin-bottom: 28px;
-        padding: 24px;
-        background: #f8fafc;
-        border: 1px solid #dbe4ee;
+        padding: 24px 28px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
         border-radius: 14px;
         transition: all 0.25s ease;
     }
     .form-section:hover {
-        border-color: #c4cfe0;
+        border-color: var(--gray-300);
         background: #fbfcfe;
     }
     .form-section:last-of-type { margin-bottom: 0; }
@@ -203,22 +266,17 @@
         gap: 14px;
         margin-bottom: 22px;
         padding-bottom: 14px;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--gray-200);
     }
     .section-divider-icon {
         width: 42px; height: 42px;
         border-radius: 12px;
-        background: linear-gradient(135deg, #fee2e2, #fef2f2);
-        color: #be0000;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        color: var(--accent);
         display: flex; align-items: center; justify-content: center;
-        border: 1px solid #fecaca;
+        border: 1px solid #bfdbfe;
         font-size: 1rem;
         flex-shrink: 0;
-    }
-    .section-divider-icon.blue {
-        background: linear-gradient(135deg, #dbeafe, #eff6ff);
-        color: #1e3a8a;
-        border-color: #bfdbfe;
     }
     .section-divider-icon.green {
         background: linear-gradient(135deg, #d1fae5, #ecfdf5);
@@ -230,39 +288,60 @@
         color: #7c3aed;
         border-color: #ddd6fe;
     }
-    .section-divider-text h6 { margin: 0; font-size: 0.95rem; font-weight: 700; color: #0f172a; }
-    .section-divider-text small { color: #94a3b8; font-size: 0.75rem; }
+    .section-divider-text h6 { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gray-900); }
+    .section-divider-text small { color: var(--gray-400); font-size: 0.75rem; }
     .section-divider-line {
         flex: 1; height: 1px;
-        background: linear-gradient(to right, #e2e8f0, transparent);
+        background: linear-gradient(to right, var(--gray-200), transparent);
     }
 
     /* ── Fields ── */
-    .form-label { font-weight: 600; color: #374151; margin-bottom: 6px; font-size: 0.88rem; }
-    .required { color: #dc2626; }
+    .form-label { 
+        font-weight: 600; 
+        color: var(--gray-700); 
+        margin-bottom: 6px; 
+        font-size: 0.85rem; 
+    }
+    .required { color: var(--danger); }
 
     .form-control, .form-select {
-        height: 48px;
+        height: 46px;
         border-radius: 10px;
-        padding: 12px 16px;
+        padding: 10px 16px;
         font-size: 0.88rem;
         background: #ffffff;
-        border: 1.5px solid #dbe4ee;
-        color: #1e293b;
+        border: 1.5px solid var(--gray-200);
+        color: var(--gray-800);
         transition: all 0.2s ease;
     }
-    .form-control:hover, .form-select:hover { border-color: #cbd5e1; }
+    .form-control:hover, .form-select:hover { border-color: var(--gray-300); }
     .form-control:focus, .form-select:focus {
-        border-color: #be0000;
+        border-color: var(--accent);
         background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(190,0,0,0.08);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         outline: none;
     }
-    textarea.form-control { height: auto; }
-    .form-control.is-invalid, .form-select.is-invalid { border-color: #dc2626; }
+    .form-control.is-invalid, .form-select.is-invalid { border-color: var(--danger); }
+    .form-control.is-valid, .form-select.is-valid { border-color: var(--success); }
 
-    .field-hint { margin-top: 5px; font-size: 0.74rem; color: #64748b; }
-    .errorlist { list-style: none; padding: 0; margin: 4px 0 0; color: #dc2626; font-size: 0.78rem; }
+    textarea.form-control { height: auto; min-height: 80px; }
+
+    .field-hint { 
+        margin-top: 5px; 
+        font-size: 0.73rem; 
+        color: var(--gray-500); 
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .field-hint i { color: var(--accent); font-size: 0.7rem; }
+    .errorlist { 
+        list-style: none; 
+        padding: 0; 
+        margin: 4px 0 0; 
+        color: var(--danger); 
+        font-size: 0.78rem; 
+    }
 
     /* Checkbox group for beneficiary */
     .checkbox-group {
@@ -276,25 +355,25 @@
         gap: 10px;
         padding: 10px 12px;
         background: white;
-        border: 1.5px solid #dbe4ee;
+        border: 1.5px solid var(--gray-200);
         border-radius: 10px;
         cursor: pointer;
         transition: all 0.2s;
         font-size: 0.82rem;
-        color: #374151;
+        color: var(--gray-700);
         line-height: 1.4;
     }
-    .checkbox-item:hover { border-color: #be0000; background: #fff5f5; }
+    .checkbox-item:hover { border-color: var(--accent); background: #f0f7ff; }
     .checkbox-item input[type="checkbox"] {
         width: 16px; height: 16px;
-        accent-color: #be0000;
+        accent-color: var(--accent);
         flex-shrink: 0;
         margin-top: 2px;
     }
-    .checkbox-item input[type="checkbox"]:checked + span { color: #0f172a; font-weight: 600; }
+    .checkbox-item input[type="checkbox"]:checked + span { color: var(--gray-900); font-weight: 600; }
     .checkbox-item:has(input:checked) {
-        border-color: #be0000;
-        background: #fff5f5;
+        border-color: var(--accent);
+        background: #f0f7ff;
     }
 
     /* File input */
@@ -309,40 +388,93 @@
     .file-hint {
         margin-top: 5px;
         font-size: 0.73rem;
-        color: #94a3b8;
+        color: var(--gray-400);
+        display: flex;
+        align-items: center;
+        gap: 4px;
     }
-    .file-hint i { color: #be0000; }
+    .file-hint i { color: var(--accent); font-size: 0.7rem; }
+    .file-hint .file-error {
+        color: var(--danger);
+        font-weight: 500;
+    }
+
+    /* ── Instructions Box ── */
+    .instructions-box {
+        background: #f0f7ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+    }
+    .instructions-box h6 {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--gray-900);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .instructions-box h6 i { color: var(--accent); }
+    .instructions-box ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 20px;
+    }
+    .instructions-box ul li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 0.82rem;
+        color: var(--gray-700);
+        line-height: 1.5;
+    }
+    .instructions-box ul li i {
+        color: var(--accent);
+        font-size: 0.7rem;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+    .instructions-box ul li .highlight {
+        color: var(--danger);
+        font-weight: 600;
+    }
 
     /* ── Form Footer ── */
     .form-footer {
         padding: 18px 28px;
-        background: linear-gradient(to right, #f8fafc, #f1f5f9);
-        border-top: 1px solid #e2e8f0;
+        background: linear-gradient(to right, var(--gray-50), var(--gray-100));
+        border-top: 1px solid var(--gray-200);
         display: flex;
         justify-content: flex-end;
         gap: 12px;
+        flex-wrap: wrap;
     }
-    .btn-register {
-        background: linear-gradient(135deg, #8b0000, #be0000);
+    .btn-preview {
+        background: var(--accent);
         color: white; border: none;
         border-radius: 10px; padding: 11px 26px;
         font-weight: 600; font-size: 0.88rem;
         transition: all 0.3s ease;
     }
-    .btn-register:hover {
+    .btn-preview:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(190,0,0,0.3);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
         color: white;
     }
-    .btn-register:disabled { opacity: 0.7; transform: none; }
+    .btn-preview:disabled { opacity: 0.7; transform: none; }
     .btn-back {
         border-radius: 10px; padding: 11px 20px;
         font-weight: 600; font-size: 0.88rem;
-        border: 1.5px solid #cbd5e1;
-        background: white; color: #475569;
+        border: 1.5px solid var(--gray-300);
+        background: white; color: var(--gray-600);
         transition: all 0.2s;
     }
-    .btn-back:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .btn-back:hover { background: var(--gray-100); border-color: var(--gray-400); }
 
     .loading-spinner {
         display: inline-block; width: 14px; height: 14px;
@@ -352,228 +484,169 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Sidebar ── */
-    .course-sidebar {
-        position: sticky;
-        top: 90px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
+    /* ── Preview Modal ── */
+    .modal-preview .modal-content {
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal-preview .modal-header {
+        border-bottom: 1px solid var(--gray-200);
+        padding: 18px 24px;
+        background: var(--gray-50);
+        border-radius: 18px 18px 0 0;
+    }
+    .modal-preview .modal-header h5 {
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+    .modal-preview .modal-header h5 i { color: var(--accent); }
+    .modal-preview .modal-body {
+        padding: 24px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    .modal-preview .modal-footer {
+        border-top: 1px solid var(--gray-200);
+        padding: 18px 24px;
+        background: var(--gray-50);
+        border-radius: 0 0 18px 18px;
+        flex-wrap: wrap;
     }
 
-    .sidebar-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid rgba(226,232,240,0.8);
-        box-shadow: 0 4px 24px rgba(15,23,42,0.07);
+    .preview-section {
+        margin-bottom: 20px;
     }
-
-    /* Course header card */
-    .course-header-card {
-        background: linear-gradient(135deg, #0f172a 0%, #1a1a2e 50%, #be0000 100%);
-        color: white;
-        padding: 22px;
-        position: relative;
-        overflow: hidden;
-    }
-    .course-header-card::before {
-        content: '';
-        position: absolute;
-        width: 150px; height: 150px;
-        border-radius: 50%;
-        background: rgba(190,0,0,0.2);
-        top: -50px; right: -50px;
-    }
-    .course-header-card::after {
-        content: '';
-        position: absolute;
-        width: 80px; height: 80px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.05);
-        bottom: -20px; left: -20px;
-    }
-    .c-collab {
-        display: flex; gap: 6px; margin-bottom: 14px; position: relative; z-index: 1;
-    }
-    .c-collab-tag {
-        font-size: 0.68rem;
-        font-weight: 800;
-        letter-spacing: 0.8px;
-        padding: 3px 10px;
-        border-radius: 6px;
-    }
-    .c-collab-tag.nielit { background: rgba(255,255,255,0.15); color: white; }
-    .c-collab-tag.kyndryl { background: rgba(190,0,0,0.5); border: 1px solid rgba(190,0,0,0.7); color: #fca5a5; }
-    .c-free-tag {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        font-size: 0.7rem; font-weight: 800;
-        padding: 3px 12px; border-radius: 50px;
-        letter-spacing: 1px;
-        position: relative; z-index: 1;
-        display: inline-block;
+    .preview-section h6 {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--gray-700);
         margin-bottom: 10px;
-    }
-    .c-name {
-        font-size: 1.15rem; font-weight: 800;
-        line-height: 1.3; margin-bottom: 4px;
-        position: relative; z-index: 1;
-    }
-    .c-subtitle {
-        font-size: 0.76rem; opacity: 0.75;
-        margin-bottom: 0;
-        position: relative; z-index: 1;
-    }
-
-    .course-info-body {
-        padding: 14px;
-        display: grid;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        align-items: center;
         gap: 8px;
     }
-    .info-row {
-        display: flex; align-items: center; gap: 12px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: #f8fafc;
-        border: 1px solid #e8eef6;
-    }
-    .info-row-icon {
-        width: 32px; height: 32px;
-        border-radius: 9px;
-        background: linear-gradient(135deg, #fee2e2, #fef2f2);
-        color: #be0000;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 0.78rem; flex-shrink: 0;
-    }
-    .info-row small {
-        display: block; color: #94a3b8;
-        font-size: 0.67rem; text-transform: uppercase;
-        letter-spacing: 0.5px; margin-bottom: 1px;
-    }
-    .info-row strong { color: #1e293b; font-size: 0.82rem; font-weight: 600; }
-
-    .batch-pill {
-        margin: 0 14px 14px;
-        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-        border: 1px solid #a7f3d0;
-        border-radius: 10px;
-        padding: 10px 14px;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .batch-pill i { color: #059669; font-size: 0.85rem; }
-    .batch-pill span { font-size: 0.8rem; font-weight: 600; color: #065f46; }
-
-    /* Eligibility card */
-    .eligibility-card { padding: 16px 18px; }
-    .eligibility-card h6 {
-        font-weight: 700; font-size: 0.82rem;
-        color: #0f172a; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 7px;
-    }
-    .eligibility-card h6 i { color: #be0000; }
-    .eligibility-block {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-        font-size: 0.79rem;
-        color: #475569;
-        line-height: 1.55;
-    }
-    .eligibility-block:last-child { margin-bottom: 0; }
-    .eligibility-block .elig-label {
-        font-weight: 700; color: #be0000;
-        font-size: 0.75rem; margin-bottom: 4px;
-        letter-spacing: 0.3px;
-    }
-
-    /* Features card */
-    .features-card { padding: 16px 18px; }
-    .features-card h6 {
-        font-weight: 700; font-size: 0.82rem;
-        color: #0f172a; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 7px;
-    }
-    .features-card h6 i { color: #2563eb; }
-    .features-grid {
+    .preview-section h6 i { color: var(--accent); }
+    .preview-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 7px;
+        gap: 6px 20px;
     }
-    .feature-chip {
-        display: flex; align-items: center; gap: 7px;
-        padding: 7px 10px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.76rem;
-        color: #374151;
+    .preview-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        font-size: 0.85rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .preview-item .label {
+        color: var(--gray-500);
         font-weight: 500;
     }
-    .feature-chip i { color: #2563eb; font-size: 0.7rem; flex-shrink: 0; }
+    .preview-item .value {
+        color: var(--gray-800);
+        font-weight: 600;
+        text-align: right;
+        max-width: 60%;
+        word-break: break-word;
+    }
+    .preview-item .value .file-badge {
+        background: var(--gray-100);
+        padding: 2px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--gray-600);
+    }
+    .preview-full {
+        grid-column: 1 / -1;
+    }
 
-    /* Target card */
-    .target-card { padding: 16px 18px; }
-    .target-card h6 {
-        font-weight: 700; font-size: 0.82rem;
-        color: #0f172a; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 7px;
+    .undertaking-section {
+        background: #f0f7ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-top: 16px;
     }
-    .target-card h6 i { color: #7c3aed; }
-    .target-list { padding: 0; margin: 0; list-style: none; }
-    .target-list li {
-        display: flex; gap: 9px;
-        margin-bottom: 7px;
-        font-size: 0.79rem;
-        color: #475569;
-        line-height: 1.45;
+    .undertaking-section .form-check {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
     }
-    .target-list li:last-child { margin-bottom: 0; }
-    .target-list i { color: #7c3aed; margin-top: 2px; flex-shrink: 0; font-size: 0.72rem; }
+    .undertaking-section .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+    }
+    .undertaking-section .form-check-label {
+        font-size: 0.85rem;
+        color: var(--gray-700);
+        line-height: 1.5;
+    }
+    .undertaking-section .form-check-label strong {
+        color: var(--gray-900);
+    }
 
-    /* Info card */
-    .info-card { padding: 16px 18px; }
-    .info-card h6 {
-        font-weight: 700; font-size: 0.82rem;
-        color: #0f172a; margin-bottom: 12px;
-        display: flex; align-items: center; gap: 7px;
+    .btn-submit-final {
+        background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 11px 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
     }
-    .info-card h6 i { color: #2563eb; }
-    .info-list { padding: 0; margin: 0; list-style: none; }
-    .info-list li {
-        display: flex; gap: 9px;
-        margin-bottom: 7px;
-        font-size: 0.79rem;
-        color: #475569;
-        line-height: 1.45;
+    .btn-submit-final:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        color: white;
     }
-    .info-list li:last-child { margin-bottom: 0; }
-    .info-list i { color: #10b981; margin-top: 2px; flex-shrink: 0; font-size: 0.72rem; }
+    .btn-submit-final:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-    /* Divider between sidebar sections */
-    .sidebar-divider {
-        height: 1px;
-        background: #e2e8f0;
-        margin: 0 18px;
+    .btn-edit-form {
+        border-radius: 10px;
+        padding: 11px 20px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        border: 1.5px solid var(--gray-300);
+        background: white;
+        color: var(--gray-600);
+        transition: all 0.2s;
     }
+    .btn-edit-form:hover { background: var(--gray-100); border-color: var(--gray-400); }
 
     /* ── Responsive ── */
-    @media (max-width: 1200px) {
-        .registration-grid { grid-template-columns: 1fr; }
-        .course-sidebar { position: relative; top: 0; order: -1; }
-        .checkbox-group { grid-template-columns: 1fr; }
-    }
     @media (max-width: 768px) {
         .page-banner { padding: 28px 0 60px; }
         .page-banner h1 { font-size: 1.5rem; }
-        .form-body { padding: 20px; }
-        .form-footer { padding: 16px 20px; flex-direction: column; }
-        .form-footer .btn-register,
+        .form-body { padding: 16px; }
+        .form-section { padding: 16px; }
+        .form-card-header { padding: 16px 18px; flex-direction: column; align-items: stretch; }
+        .form-footer { padding: 16px 18px; flex-direction: column; }
+        .form-footer .btn-preview,
         .form-footer .btn-back { width: 100%; text-align: center; }
-        .features-grid { grid-template-columns: 1fr; }
         .checkbox-group { grid-template-columns: 1fr; }
+        .instructions-box ul { grid-template-columns: 1fr; }
+        .preview-grid { grid-template-columns: 1fr; }
+        .floating-progress { padding: 6px 12px; gap: 10px; }
+        .floating-progress .fp-label { font-size: 0.7rem; }
+        .modal-preview .modal-body { max-height: 60vh; }
+        .modal-preview .modal-footer { flex-direction: column; }
+        .modal-preview .modal-footer .btn { width: 100%; }
+    }
+    @media (max-width: 576px) {
+        .content-area { padding-left: 10px; padding-right: 10px; }
+        .form-body { padding: 12px; }
+        .form-section { padding: 14px; }
     }
 </style>
 {% endblock %}
@@ -595,7 +668,7 @@
 
                 <div class="banner-collab">
                     <span class="collab-tag">NIELIT</span>
-                    <span class="collab-x">×</span>
+                    <span class="collab-x">-</span>
                     <span class="collab-tag kyndryl-tag">KYNDRYL</span>
                     <span class="free-badge">FREE</span>
                 </div>
@@ -645,6 +718,7 @@
         </div>
         {% endif %}
 
+        <!-- Form Errors -->
         {% if form.errors %}
         <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>
@@ -660,390 +734,325 @@
         </div>
         {% endif %}
 
-        <div class="registration-grid">
+        <!-- ── FORM CARD ── -->
+        <div class="form-card">
 
-            <!-- ── LEFT: FORM ── -->
-            <div class="form-card">
-
-                <div class="form-card-header">
-                    <div>
-                        <h4>
-                            <i class="fas fa-user-edit me-2" style="color:#be0000;"></i>
-                            Applicant Registration Form
-                        </h4>
-                        <p>Fields marked <span style="color:#dc2626;">*</span> are mandatory &nbsp;·&nbsp; All information is kept confidential</p>
+            <div class="form-card-header">
+                <div>
+                    <h4>
+                        <i class="fas fa-user-edit me-2"></i>
+                        Applicant Registration Form
+                    </h4>
+                    <p>Fields marked <span style="color:var(--danger);">*</span> are mandatory &nbsp;·&nbsp; </p>
+                </div>
+                <div style="min-width:160px;">
+                    <div class="progress" style="height:7px; border-radius:50px; background:var(--gray-200);">
+                        <div class="progress-bar" id="formProgressBar" style="width:0%; background:linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius:50px;"></div>
                     </div>
-                    <div class="progress-wrap">
-                        <div class="progress">
-                            <div class="progress-bar" id="formProgressBar" style="width:0%"></div>
-                        </div>
-                        <div class="progress-label">
-                            <span>Progress</span>
-                            <span id="progressText">0%</span>
-                        </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.72rem; color:var(--gray-500);">
+                        <span>Progress</span>
+                        <span id="progressText" style="font-weight:700; color:var(--accent);">0%</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-body">
-                    <form method="post" enctype="multipart/form-data" id="registrationForm" novalidate>
-                        {% csrf_token %}
+            <div class="form-body">
+                <form method="post" enctype="multipart/form-data" id="registrationForm" novalidate>
+                    {% csrf_token %}
 
-                        <!-- 1. Personal Information -->
-                        <div class="form-section">
-                            <div class="section-divider">
-                                <div class="section-divider-icon">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div class="section-divider-text">
-                                    <h6>Personal Information</h6>
-                                    <small>Basic applicant details</small>
-                                </div>
-                                <div class="section-divider-line"></div>
+                    <!-- 1. Personal Information -->
+                    <div class="form-section">
+                        <div class="section-divider">
+                            <div class="section-divider-icon">
+                                <i class="fas fa-user"></i>
                             </div>
-
-             <div class="row g-3">
-    <div class="col-12">
-        <label class="form-label">Full Name <span class="required">*</span></label>
-        {{ form.name }}
-        {% if form.name.errors %}<ul class="errorlist">{{ form.name.errors }}</ul>{% endif %}
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Father's Name</label>
-        {{ form.father_name }}
-        {% if form.father_name.errors %}<ul class="errorlist">{{ form.father_name.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Father's Occupation</label>
-        {{ form.father_occupation }}
-        {% if form.father_occupation.errors %}<ul class="errorlist">{{ form.father_occupation.errors }}</ul>{% endif %}
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Mother's Name</label>
-        {{ form.mother_name }}
-        {% if form.mother_name.errors %}<ul class="errorlist">{{ form.mother_name.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Mother's Occupation</label>
-        {{ form.mother_occupation }}
-        {% if form.mother_occupation.errors %}<ul class="errorlist">{{ form.mother_occupation.errors }}</ul>{% endif %}
-    </div>
-
-    <div class="col-md-5">
-        <label class="form-label">Date of Birth <span class="required">*</span></label>
-        {{ form.date_of_birth }}
-        {% if form.date_of_birth.errors %}<ul class="errorlist">{{ form.date_of_birth.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Gender <span class="required">*</span></label>
-        {{ form.gender }}
-        {% if form.gender.errors %}<ul class="errorlist">{{ form.gender.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Category <span class="required">*</span></label>
-        {{ form.category }}
-        {% if form.category.errors %}<ul class="errorlist">{{ form.category.errors }}</ul>{% endif %}
-    </div>
-</div>
+                            <div class="section-divider-text">
+                                <h6>Personal Information</h6>
+                                <small>Basic applicant details</small>
+                            </div>
+                            <div class="section-divider-line"></div>
                         </div>
 
-                        <!-- 2. Contact & Address -->
-                        <div class="form-section">
-                            <div class="section-divider">
-                                <div class="section-divider-icon blue">
-                                    <i class="fas fa-address-card"></i>
-                                </div>
-                                <div class="section-divider-text">
-                                    <h6>Contact & Address</h6>
-                                    <small>Communication and location details</small>
-                                </div>
-                                <div class="section-divider-line"></div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" for="id_name">Full Name <span class="required">*</span></label>
+                                {{ form.name }}
+                                {% if form.name.errors %}<ul class="errorlist">{{ form.name.errors }}</ul>{% endif %}
                             </div>
 
-                           <div class="row g-3">
-    <div class="col-md-6">
-        <label class="form-label">Email Address <span class="required">*</span></label>
-        {{ form.email_id }}
-        <div class="field-hint"><i class="fas fa-info-circle me-1"></i>One registration per email address</div>
-        {% if form.email_id.errors %}<ul class="errorlist">{{ form.email_id.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Mobile Number <span class="required">*</span></label>
-        {{ form.mobile_number }}
-        <div class="field-hint"><i class="fas fa-info-circle me-1"></i>10-digit Indian mobile number</div>
-        {% if form.mobile_number.errors %}<ul class="errorlist">{{ form.mobile_number.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-12">
-        <label class="form-label">Address</label>
-        {{ form.address }}
-        {% if form.address.errors %}<ul class="errorlist">{{ form.address.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-5">
-        <label class="form-label">State / UT <span class="required">*</span></label>
-        {{ form.state }}
-        {% if form.state.errors %}<ul class="errorlist">{{ form.state.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">City <span class="required">*</span></label>
-        {{ form.city }}
-        {% if form.city.errors %}<ul class="errorlist">{{ form.city.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">PIN Code <span class="required">*</span></label>
-        {{ form.pin_code }}
-        {% if form.pin_code.errors %}<ul class="errorlist">{{ form.pin_code.errors }}</ul>{% endif %}
-    </div>
-</div>
-                        </div>
-
-                        <!-- 3. Identity & Qualifications -->
-                        <div class="form-section">
-                            <div class="section-divider">
-                                <div class="section-divider-icon green">
-                                    <i class="fas fa-graduation-cap"></i>
-                                </div>
-                                <div class="section-divider-text">
-                                    <h6>Identity & Qualifications</h6>
-                                    <small>Aadhaar, education and employment status</small>
-                                </div>
-                                <div class="section-divider-line"></div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_father_name">Father's Name</label>
+                                {{ form.father_name }}
+                                {% if form.father_name.errors %}<ul class="errorlist">{{ form.father_name.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_father_occupation">Father's Occupation</label>
+                                {{ form.father_occupation }}
+                                {% if form.father_occupation.errors %}<ul class="errorlist">{{ form.father_occupation.errors }}</ul>{% endif %}
                             </div>
 
-                            <div class="row g-3">
-    <div class="col-md-6">
-        <label class="form-label">Aadhaar Number <span class="required">*</span></label>
-        {{ form.aadhar_number }}
-        <div class="field-hint"><i class="fas fa-shield-alt me-1"></i>12-digit Aadhaar number</div>
-        {% if form.aadhar_number.errors %}<ul class="errorlist">{{ form.aadhar_number.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Highest Qualification <span class="required">*</span></label>
-        {{ form.highest_qualification }}
-        {% if form.highest_qualification.errors %}<ul class="errorlist">{{ form.highest_qualification.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Current Employment Status</label>
-        {{ form.current_employment_status }}
-        {% if form.current_employment_status.errors %}<ul class="errorlist">{{ form.current_employment_status.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Expertise in Cloud Computing</label>
-        {{ form.expertise_in_cloud_computing }}
-        {% if form.expertise_in_cloud_computing.errors %}<ul class="errorlist">{{ form.expertise_in_cloud_computing.errors }}</ul>{% endif %}
-    </div>
-</div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_mother_name">Mother's Name</label>
+                                {{ form.mother_name }}
+                                {% if form.mother_name.errors %}<ul class="errorlist">{{ form.mother_name.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_mother_occupation">Mother's Occupation</label>
+                                {{ form.mother_occupation }}
+                                {% if form.mother_occupation.errors %}<ul class="errorlist">{{ form.mother_occupation.errors }}</ul>{% endif %}
+                            </div>
 
+                            <div class="col-md-5">
+                                <label class="form-label" for="id_date_of_birth">Date of Birth <span class="required">*</span></label>
+                                {{ form.date_of_birth }}
+                                {% if form.date_of_birth.errors %}<ul class="errorlist">{{ form.date_of_birth.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_gender">Gender <span class="required">*</span></label>
+                                {{ form.gender }}
+                                {% if form.gender.errors %}<ul class="errorlist">{{ form.gender.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="id_category">Category <span class="required">*</span></label>
+                                {{ form.category }}
+                                {% if form.category.errors %}<ul class="errorlist">{{ form.category.errors }}</ul>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Contact & Address -->
+                    <div class="form-section">
+                        <div class="section-divider">
+                            <div class="section-divider-icon">
+                                <i class="fas fa-address-card"></i>
+                            </div>
+                            <div class="section-divider-text">
+                                <h6>Contact & Address</h6>
+                                <small>Communication and location details</small>
+                            </div>
+                            <div class="section-divider-line"></div>
                         </div>
 
-                        <!-- 4. Beneficiary Category -->
-<div class="form-section">
-    <div class="section-divider">
-        <div class="section-divider-icon purple">
-            <i class="fas fa-hands-helping"></i>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_email_id">Email Address <span class="required">*</span></label>
+                                {{ form.email_id }}
+                                <div class="field-hint"><i class="fas fa-info-circle"></i>One registration per email address</div>
+                                {% if form.email_id.errors %}<ul class="errorlist">{{ form.email_id.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_mobile_number">Mobile Number <span class="required">*</span></label>
+                                {{ form.mobile_number }}
+                                <div class="field-hint"><i class="fas fa-info-circle"></i>10-digit Indian mobile number</div>
+                                {% if form.mobile_number.errors %}<ul class="errorlist">{{ form.mobile_number.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="id_address">Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}<ul class="errorlist">{{ form.address.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label" for="id_state">State / UT <span class="required">*</span></label>
+                                {{ form.state }}
+                                {% if form.state.errors %}<ul class="errorlist">{{ form.state.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_city">City <span class="required">*</span></label>
+                                {{ form.city }}
+                                {% if form.city.errors %}<ul class="errorlist">{{ form.city.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" for="id_pin_code">PIN Code <span class="required">*</span></label>
+                                {{ form.pin_code }}
+                                {% if form.pin_code.errors %}<ul class="errorlist">{{ form.pin_code.errors }}</ul>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Identity & Qualifications -->
+                    <div class="form-section">
+                        <div class="section-divider">
+                            <div class="section-divider-icon green">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="section-divider-text">
+                                <h6>Identity & Qualifications</h6>
+                                <small>Aadhaar, education and employment status</small>
+                            </div>
+                            <div class="section-divider-line"></div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_aadhar_number">Aadhaar Number <span class="required">*</span></label>
+                                {{ form.aadhar_number }}
+                                <div class="field-hint"><i class="fas fa-shield-alt"></i>12-digit Aadhaar number</div>
+                                {% if form.aadhar_number.errors %}<ul class="errorlist">{{ form.aadhar_number.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_highest_qualification">Highest Qualification <span class="required">*</span></label>
+                                {{ form.highest_qualification }}
+                                {% if form.highest_qualification.errors %}<ul class="errorlist">{{ form.highest_qualification.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_current_employment_status">Current Employment Status</label>
+                                {{ form.current_employment_status }}
+                                {% if form.current_employment_status.errors %}<ul class="errorlist">{{ form.current_employment_status.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_expertise_in_cloud_computing">Expertise in Cloud Computing</label>
+                                {{ form.expertise_in_cloud_computing }}
+                                {% if form.expertise_in_cloud_computing.errors %}<ul class="errorlist">{{ form.expertise_in_cloud_computing.errors }}</ul>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Beneficiary Category -->
+                    <div class="form-section">
+                        <div class="section-divider">
+                            <div class="section-divider-icon purple">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <div class="section-divider-text">
+                                <h6>Beneficiary Category</h6>
+                                <small>Select the category you belong to (if applicable)</small>
+                            </div>
+                            <div class="section-divider-line"></div>
+                        </div>
+
+          
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label" for="id_beneficiary_belonging">Beneficiary Category</label>
+                                {{ form.beneficiary_belonging }}
+                                {% if form.beneficiary_belonging.errors %}
+                                <ul class="errorlist mt-1">{{ form.beneficiary_belonging.errors }}</ul>
+                                {% endif %}
+                                <div class="field-hint mt-2">
+                                    <i class="fas fa-info-circle"></i>
+                                    Applicable to: EWS · Tier 2/3 City · Minority Community · Women · Middle Class Jobseeker
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Document Upload -->
+                    <div class="form-section">
+                        <div class="section-divider">
+                            <div class="section-divider-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="section-divider-text">
+                                <h6>Document Upload</h6>
+                                <small>Upload required documents and photo</small>
+                            </div>
+                            <div class="section-divider-line"></div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_photo">Passport Size Photo <span class="required">*</span></label>
+                                <div class="file-upload-wrapper">
+                                    {{ form.photo }}
+                                </div>
+                                <div class="file-hint"><i class="fas fa-info-circle"></i> JPG / JPEG / PNG &nbsp;·&nbsp; <span class="file-error">Max 1 MB</span></div>
+                                {% if form.photo.errors %}<ul class="errorlist">{{ form.photo.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_aadhaar_card">Aadhaar Card <span class="required">*</span></label>
+                                <div class="file-upload-wrapper">
+                                    {{ form.aadhaar_card }}
+                                </div>
+                                <div class="file-hint"><i class="fas fa-info-circle"></i> JPG / PNG / PDF &nbsp;·&nbsp; <span class="file-error">Max 1 MB</span></div>
+                                {% if form.aadhaar_card.errors %}<ul class="errorlist">{{ form.aadhaar_card.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label" for="id_highest_qualification_certificate">Highest Qualification Certificate <span class="required">*</span></label>
+                                <div class="file-upload-wrapper">
+                                    {{ form.highest_qualification_certificate }}
+                                </div>
+                                <div class="file-hint"><i class="fas fa-info-circle"></i> JPG / PNG / PDF &nbsp;·&nbsp; <span class="file-error">Max 1 MB</span></div>
+                                {% if form.highest_qualification_certificate.errors %}<ul class="errorlist">{{ form.highest_qualification_certificate.errors }}</ul>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_highest_qualification_certificate_name">Certificate Name <span class="required">*</span></label>
+                                {{ form.highest_qualification_certificate_name }}
+                                <div class="field-hint"><i class="fas fa-info-circle"></i>e.g. B.Tech Degree</div>
+                                {% if form.highest_qualification_certificate_name.errors %}<ul class="errorlist">{{ form.highest_qualification_certificate_name.errors }}</ul>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+                <!-- Instructions Box -->
+                <div class="instructions-box">
+                    <h6><i class="fas fa-info-circle"></i> Important Instructions</h6>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Ensure all details match your official documents</li>
+                        <li><i class="fas fa-check-circle"></i> Use a valid <strong>email address</strong> for communication</li>
+                        <li><i class="fas fa-check-circle"></i> Enter correct 10-digit <strong>mobile number</strong></li>
+                        <li><i class="fas fa-check-circle"></i> Aadhaar number must be <strong>12 digits</strong></li>
+                        <li><i class="fas fa-check-circle"></i> <span class="highlight">All file uploads must be under 1 MB</span></li>
+                        <li><i class="fas fa-check-circle"></i> Supported formats: JPG, PNG, JPEG, PDF</li>
+                        <li><i class="fas fa-check-circle"></i> Upload clear, legible documents</li>
+                        <li><i class="fas fa-check-circle"></i> Double-check before previewing & submitting</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <a href="{% url 'public:home' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Go Back
+                </a>
+                <button type="button" class="btn btn-preview" id="previewBtn">
+                    <i class="fas fa-eye me-2"></i>Preview Application
+                </button>
+            </div>
+
         </div>
-        <div class="section-divider-text">
-            <h6>Beneficiary Category</h6>
-            <small>Select the category you belong to (if applicable)</small>
-        </div>
-        <div class="section-divider-line"></div>
-    </div>
 
-    <div class="field-hint mb-3">
-        <i class="fas fa-info-circle me-1" style="color:#7c3aed;"></i>
-        This program prioritises candidates from the groups below. Select the one most applicable to you.
     </div>
+</div>
 
-    <div class="row g-3">
-        <div class="col-12">
-            <label class="form-label">Beneficiary Category</label>
-            {{ form.beneficiary_belonging }}
-            {% if form.beneficiary_belonging.errors %}
-            <ul class="errorlist mt-1">{{ form.beneficiary_belonging.errors }}</ul>
-            {% endif %}
-            <div class="field-hint mt-2">
-                <i class="fas fa-info-circle me-1"></i>
-                Applicable to: EWS · Tier 2/3 City · Minority Community · Women · Middle Class Jobseeker
+<!-- ── PREVIEW MODAL ── -->
+<div class="modal fade modal-preview" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-alt me-2"></i>Application Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="previewBody">
+                <!-- Preview content will be injected here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-edit-form" data-bs-dismiss="modal">
+                    <i class="fas fa-edit me-2"></i>Edit Form
+                </button>
+                <button type="button" class="btn-submit-final" id="finalSubmitBtn" disabled>
+                    <i class="fas fa-paper-plane me-2"></i>Submit Application
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-                        <!-- 5. Document Upload -->
-                        <div class="form-section">
-                            <div class="section-divider">
-                                <div class="section-divider-icon">
-                                    <i class="fas fa-upload"></i>
-                                </div>
-                                <div class="section-divider-text">
-                                    <h6>Document Upload</h6>
-                                    <small>Upload required documents and photo</small>
-                                </div>
-                                <div class="section-divider-line"></div>
-                            </div>
-
-                            <div class="row g-3">
-    <div class="col-md-6">
-        <label class="form-label">Passport Size Photo <span class="required">*</span></label>
-        <div class="file-upload-wrapper">
-            {{ form.photo }}
-        </div>
-        <div class="file-hint"><i class="fas fa-info-circle"></i> JPG / JPEG / PNG &nbsp;·&nbsp; Max 5 MB</div>
-        {% if form.photo.errors %}<ul class="errorlist">{{ form.photo.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-6">
-        <label class="form-label">Aadhaar Card <span class="required">*</span></label>
-        <div class="file-upload-wrapper">
-            {{ form.aadhaar_card }}
-        </div>
-        <div class="file-hint"><i class="fas fa-info-circle"></i> JPG / PNG / PDF &nbsp;·&nbsp; Max 5 MB</div>
-        {% if form.aadhaar_card.errors %}<ul class="errorlist">{{ form.aadhaar_card.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-8">
-        <label class="form-label">Highest Qualification Certificate <span class="required">*</span></label>
-        <div class="file-upload-wrapper">
-            {{ form.highest_qualification_certificate }}
-        </div>
-        <div class="file-hint"><i class="fas fa-info-circle"></i> JPG / PNG / PDF &nbsp;·&nbsp; Max 5 MB</div>
-        {% if form.highest_qualification_certificate.errors %}<ul class="errorlist">{{ form.highest_qualification_certificate.errors }}</ul>{% endif %}
-    </div>
-    <div class="col-md-4">
-        <label class="form-label">Certificate Name <span class="required">*</span></label>
-        {{ form.highest_qualification_certificate_name }}
-        <div class="field-hint"><i class="fas fa-info-circle me-1"></i>e.g. B.Tech Degree</div>
-        {% if form.highest_qualification_certificate_name.errors %}<ul class="errorlist">{{ form.highest_qualification_certificate_name.errors }}</ul>{% endif %}
-    </div>
-</div>
-
-                        </div>
-
-                    </form>
-                </div>
-
-                <div class="form-footer">
-                    <a href="{% url 'public:home' %}" class="btn btn-back">
-                        <i class="fas fa-arrow-left me-2"></i>Go Back
-                    </a>
-                    <button type="submit" form="registrationForm" class="btn btn-register" id="submitBtn">
-                        <i class="fas fa-paper-plane me-2"></i>Submit Application
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- ── RIGHT: SIDEBAR ── -->
-            <div class="course-sidebar">
-
-                <!-- Course Card -->
-                <div class="sidebar-card">
-                    <div class="course-header-card">
-                        <div class="c-collab">
-                            <span class="c-collab-tag nielit">NIELIT</span>
-                            <span class="c-collab-tag kyndryl">KYNDRYL</span>
-                        </div>
-                        <div class="c-free-tag">FREE PROGRAM</div>
-                        <div class="c-name">DevSecOps<br>Training Program</div>
-                        <p class="c-subtitle">Online Instructor-Led Certification Course</p>
-                    </div>
-
-                    <div class="course-info-body">
-                        <div class="info-row">
-                            <div class="info-row-icon"><i class="fas fa-laptop-code"></i></div>
-                            <div>
-                                <small>Mode</small>
-                                <strong>Online · Instructor-Led</strong>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-row-icon"><i class="fas fa-clock"></i></div>
-                            <div>
-                                <small>Duration</small>
-                                <strong>120 Hours</strong>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-row-icon"><i class="fas fa-certificate"></i></div>
-                            <div>
-                                <small>Certification</small>
-                                <strong>NIELIT Certified</strong>
-                            </div>
-                        </div>
-                        <div class="info-row">
-                            <div class="info-row-icon"><i class="fas fa-building"></i></div>
-                            <div>
-                                <small>Corporate Exposure</small>
-                                <strong>Kyndryl Office Visit</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="batch-pill">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Batch Starts: 15th July 2026</span>
-                    </div>
-                </div>
-
-                <!-- Eligibility Card -->
-                <div class="sidebar-card">
-                    <div class="eligibility-card">
-                        <h6><i class="fas fa-user-check"></i> Eligibility Criteria</h6>
-                        <div class="eligibility-block">
-                            <div class="elig-label">A</div>
-                            BE / BTech (completed or pursuing from 3rd year onwards) or any Graduation / Pursuing (3rd year onwards) or higher qualification.
-                        </div>
-                        <div class="eligibility-block">
-                            <div class="elig-label">B</div>
-                            Candidate must have programming skills and working knowledge of cloud computing.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Key Features Card -->
-                <div class="sidebar-card">
-                    <div class="features-card">
-                        <h6><i class="fas fa-star"></i> Key Features & Topics</h6>
-                        <div class="features-grid">
-                            <div class="feature-chip"><i class="fas fa-cloud"></i> Cloud</div>
-                            <div class="feature-chip"><i class="fab fa-linux"></i> Linux</div>
-                            <div class="feature-chip"><i class="fab fa-docker"></i> Docker</div>
-                            <div class="feature-chip"><i class="fas fa-tools"></i> Jenkins</div>
-                            <div class="feature-chip"><i class="fas fa-dharmachakra"></i> Kubernetes</div>
-                            <div class="feature-chip"><i class="fas fa-code-branch"></i> CI/CD Pipeline</div>
-                            <div class="feature-chip"><i class="fas fa-certificate"></i> NIELIT Cert.</div>
-                            <div class="feature-chip"><i class="fas fa-flask"></i> Virtual Labs</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Target Beneficiaries Card -->
-                <div class="sidebar-card">
-                    <div class="target-card">
-                        <h6><i class="fas fa-users"></i> Who Should Apply</h6>
-                        <ul class="target-list">
-                            <li><i class="fas fa-chevron-right"></i><span>Economically Weaker Section (EWS)</span></li>
-                            <li><i class="fas fa-chevron-right"></i><span>Candidates from Tier 2 / Tier 3 cities</span></li>
-                            <li><i class="fas fa-chevron-right"></i><span>Women of any category</span></li>
-                            <li><i class="fas fa-chevron-right"></i><span>Minority community candidates</span></li>
-                            <li><i class="fas fa-chevron-right"></i><span>Jobseekers from middle class families</span></li>
-                        </ul>
-                    </div>
-
-                    <div class="sidebar-divider"></div>
-
-                    <div class="info-card">
-                        <h6><i class="fas fa-circle-info"></i> Important Notes</h6>
-                        <ul class="info-list">
-                            <li><i class="fas fa-check-circle"></i><span>All submitted information must be accurate and valid.</span></li>
-                            <li><i class="fas fa-check-circle"></i><span>NIELIT is a Govt. of India autonomous body under MeitY.</span></li>
-                            <li><i class="fas fa-check-circle"></i><span>Confirmation will be sent via email after review.</span></li>
-                            <li><i class="fas fa-check-circle"></i><span>Seats are limited. Apply at the earliest.</span></li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
+<!-- ── FLOATING PROGRESS BAR ── -->
+<div class="floating-progress" id="floatingProgress">
+    <span class="fp-label"><i class="fas fa-spinner fa-pulse me-1"></i>Progress</span>
+    <div class="fp-bar-wrap">
+        <div class="fp-bar">
+            <div class="fp-bar-inner" id="fpBarInner" style="width:0%;"></div>
         </div>
     </div>
+    <span class="fp-pct" id="fpPct">0%</span>
+    <button type="button" class="fp-close" id="fpClose" title="Hide progress">
+        <i class="fas fa-times"></i>
+    </button>
 </div>
 
 <script>
@@ -1051,48 +1060,428 @@ document.addEventListener('DOMContentLoaded', function () {
     const form         = document.getElementById('registrationForm');
     const progressBar  = document.getElementById('formProgressBar');
     const progressText = document.getElementById('progressText');
-    const submitBtn    = document.getElementById('submitBtn');
-    const fields       = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
+    const fpBarInner   = document.getElementById('fpBarInner');
+    const fpPct        = document.getElementById('fpPct');
+    const previewBtn   = document.getElementById('previewBtn');
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    const previewBody  = document.getElementById('previewBody');
+    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+    const floatingProgress = document.getElementById('floatingProgress');
+    const fpClose = document.getElementById('fpClose');
 
+    // ── Fields to track ──
+    const textFields = form.querySelectorAll('input:not([type="hidden"]):not([type="file"]):not([type="checkbox"]), select, textarea');
+    const fileFields = form.querySelectorAll('input[type="file"]');
+    const checkboxFields = form.querySelectorAll('input[type="checkbox"]');
+
+    // ── Field label mapping ──
+    const fieldLabels = {
+        'id_name': 'Full Name',
+        'id_father_name': 'Father\'s Name',
+        'id_father_occupation': 'Father\'s Occupation',
+        'id_mother_name': 'Mother\'s Name',
+        'id_mother_occupation': 'Mother\'s Occupation',
+        'id_date_of_birth': 'Date of Birth',
+        'id_gender': 'Gender',
+        'id_category': 'Category',
+        'id_email_id': 'Email Address',
+        'id_mobile_number': 'Mobile Number',
+        'id_address': 'Address',
+        'id_state': 'State / UT',
+        'id_city': 'City',
+        'id_pin_code': 'PIN Code',
+        'id_aadhar_number': 'Aadhaar Number',
+        'id_highest_qualification': 'Highest Qualification',
+        'id_current_employment_status': 'Current Employment Status',
+        'id_expertise_in_cloud_computing': 'Expertise in Cloud Computing',
+        'id_beneficiary_belonging': 'Beneficiary Category',
+        'id_photo': 'Passport Size Photo',
+        'id_aadhaar_card': 'Aadhaar Card',
+        'id_highest_qualification_certificate': 'Highest Qualification Certificate',
+        'id_highest_qualification_certificate_name': 'Certificate Name'
+    };
+
+    // ── File validation config ──
+    const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/jpg'];
+    const ALLOWED_PDF_TYPES = ['application/pdf'];
+    const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_PDF_TYPES];
+
+    function validateFile(file) {
+        if (!file) return { valid: true };
+        if (file.size > MAX_FILE_SIZE) {
+            return { valid: false, message: `File "${file.name}" exceeds 1 MB limit (${(file.size / 1024 / 1024).toFixed(2)} MB)` };
+        }
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            return { valid: false, message: `File "${file.name}" has unsupported format. Use JPG, PNG, JPEG, or PDF` };
+        }
+        return { valid: true };
+    }
+
+    function getFileDisplayName(file) {
+        if (!file) return 'Not uploaded';
+        const size = (file.size / 1024).toFixed(1);
+        return `${file.name} (${size} KB)`;
+    }
+
+    // ── Get field label ──
+    function getFieldLabel(field) {
+        if (field.id && fieldLabels[field.id]) {
+            return fieldLabels[field.id];
+        }
+        // Fallback: try to find label element
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label) {
+            return label.textContent.replace(/\s*\*\s*$/, '').trim();
+        }
+        return field.name?.replace(/_/g, ' ')?.replace(/\b\w/g, l => l.toUpperCase()) || 'Field';
+    }
+
+    // ── Get field value for preview ──
+    function getFieldValue(field) {
+        if (!field) return 'Not provided';
+        if (field.tagName === 'SELECT') {
+            return field.options[field.selectedIndex]?.text || 'Not selected';
+        }
+        if (field.type === 'file') {
+            if (field.files && field.files.length > 0) {
+                const file = field.files[0];
+                return `<span class="file-badge">${file.name} (${(file.size/1024).toFixed(1)} KB)</span>`;
+            }
+            return '<span class="file-badge">Not uploaded</span>';
+        }
+        if (field.type === 'checkbox') {
+            return field.checked ? 'Yes' : 'No';
+        }
+        return field.value || 'Not provided';
+    }
+
+    // ── Update progress ──
     function updateProgress() {
         let filled = 0, total = 0;
-        fields.forEach(f => {
+
+        textFields.forEach(f => {
             if (f.disabled) return;
-            if (f.type === 'checkbox') return; // handled separately
             total++;
             if (f.value && f.value.trim() !== '') filled++;
         });
-        // Count beneficiary checkboxes as a single "field"
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-        if (checkboxes.length > 0) {
+
+        fileFields.forEach(f => {
+            if (f.disabled) return;
             total++;
-            const anyChecked = [...checkboxes].some(c => c.checked);
+            if (f.files && f.files.length > 0) filled++;
+        });
+
+        if (checkboxFields.length > 0) {
+            total++;
+            const anyChecked = [...checkboxFields].some(c => c.checked);
             if (anyChecked) filled++;
         }
+
         const pct = total ? Math.round((filled / total) * 100) : 0;
-        progressBar.style.width = pct + '%';
-        progressText.textContent = pct + '%';
+        const pctDisplay = Math.min(pct, 100);
+
+        progressBar.style.width = pctDisplay + '%';
+        progressText.textContent = pctDisplay + '%';
+        fpBarInner.style.width = pctDisplay + '%';
+        fpPct.textContent = pctDisplay + '%';
     }
 
-    fields.forEach(f => {
+    // ── Attach events ──
+    textFields.forEach(f => {
         f.addEventListener('input', updateProgress);
         f.addEventListener('change', updateProgress);
     });
-    form.querySelectorAll('input[type="checkbox"]').forEach(c => {
+    fileFields.forEach(f => {
+        f.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                const result = validateFile(file);
+                if (!result.valid) {
+                    this.setCustomValidity(result.message);
+                    this.classList.add('is-invalid');
+                    const hint = this.closest('.file-upload-wrapper').nextElementSibling;
+                    if (hint && hint.classList.contains('file-hint')) {
+                        hint.innerHTML = `<i class="fas fa-exclamation-circle"></i> <span class="file-error">${result.message}</span>`;
+                    }
+                } else {
+                    this.setCustomValidity('');
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    const hint = this.closest('.file-upload-wrapper').nextElementSibling;
+                    if (hint && hint.classList.contains('file-hint')) {
+                        hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> File uploaded: ${getFileDisplayName(file)}`;
+                    }
+                }
+            } else {
+                this.setCustomValidity('');
+                this.classList.remove('is-invalid', 'is-valid');
+                const hint = this.closest('.file-upload-wrapper').nextElementSibling;
+                if (hint && hint.classList.contains('file-hint')) {
+                    hint.innerHTML = `<i class="fas fa-info-circle"></i> JPG / PNG / PDF &nbsp;·&nbsp; <span class="file-error">Max 1 MB</span>`;
+                }
+            }
+            updateProgress();
+        });
+    });
+    checkboxFields.forEach(c => {
         c.addEventListener('change', updateProgress);
     });
+
+    // Initial progress
     updateProgress();
 
-    // Submit guard
-    let submitting = false;
-    submitBtn.addEventListener('click', function (e) {
-        if (submitting) return;
-        if (!form.checkValidity()) { form.reportValidity(); return; }
-        submitting         = true;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="loading-spinner"></span>Submitting...';
+    // ── Floating progress bar ──
+    let fpHidden = false;
+
+    window.addEventListener('scroll', function() {
+        const formCard = document.querySelector('.form-card');
+        if (!formCard) return;
+        const rect = formCard.getBoundingClientRect();
+        const top = rect.top;
+
+        if (top < -60 && !fpHidden) {
+            floatingProgress.classList.add('visible');
+        } else {
+            floatingProgress.classList.remove('visible');
+        }
+    });
+
+    fpClose.addEventListener('click', function() {
+        fpHidden = true;
+        floatingProgress.classList.remove('visible');
+    });
+
+    // ── Preview Modal ──
+    function buildPreviewHTML() {
+        // Get all form fields with their labels
+        const allFields = [];
+        
+        // Text fields
+        textFields.forEach(f => {
+            if (f.id && f.id !== '') {
+                allFields.push({
+                    label: getFieldLabel(f),
+                    value: getFieldValue(f),
+                    field: f
+                });
+            }
+        });
+
+        // File fields
+        fileFields.forEach(f => {
+            if (f.id && f.id !== '') {
+                allFields.push({
+                    label: getFieldLabel(f),
+                    value: getFieldValue(f),
+                    field: f
+                });
+            }
+        });
+
+        // Checkbox fields - group them if they're in a group
+        const checkboxGroup = form.querySelector('.checkbox-group');
+        if (checkboxGroup) {
+            const checkboxes = checkboxGroup.querySelectorAll('input[type="checkbox"]');
+            const checked = [...checkboxes].filter(c => c.checked).map(c => {
+                const label = c.closest('.checkbox-item')?.textContent?.trim() || c.value;
+                return label;
+            });
+            allFields.push({
+                label: 'Beneficiary Categories Selected',
+                value: checked.length ? checked.join(', ') : 'None selected',
+                isCheckboxGroup: true
+            });
+        } else {
+            // Individual checkboxes
+            checkboxFields.forEach(c => {
+                if (c.id && c.id !== '') {
+                    allFields.push({
+                        label: getFieldLabel(c),
+                        value: getFieldValue(c),
+                        field: c
+                    });
+                }
+            });
+        }
+
+        // Build HTML
+        let html = '';
+        
+        // Group fields by section (using the section dividers)
+        const sections = [];
+        const sectionDivs = form.querySelectorAll('.form-section');
+        
+        sectionDivs.forEach((section) => {
+            const title = section.querySelector('.section-divider-text h6')?.textContent || 'Section';
+            const icon = section.querySelector('.section-divider-icon i')?.className || 'fas fa-file';
+            const sectionFields = [];
+            
+            // Find all labeled fields in this section
+            const labels = section.querySelectorAll('.form-label');
+            labels.forEach(label => {
+                const forId = label.getAttribute('for');
+                if (forId) {
+                    const field = document.getElementById(forId);
+                    if (field) {
+                        // Find the matching field in allFields
+                        const fieldData = allFields.find(f => f.field && f.field.id === forId);
+                        if (fieldData) {
+                            sectionFields.push({
+                                label: fieldData.label,
+                                value: fieldData.value
+                            });
+                        }
+                    }
+                }
+            });
+
+            // Check for checkbox group in this section
+            const chkGroup = section.querySelector('.checkbox-group');
+            if (chkGroup) {
+                const chkData = allFields.find(f => f.isCheckboxGroup);
+                if (chkData) {
+                    sectionFields.push({
+                        label: chkData.label,
+                        value: chkData.value,
+                        full: true
+                    });
+                }
+            }
+
+            if (sectionFields.length > 0) {
+                sections.push({
+                    title: title,
+                    icon: icon,
+                    fields: sectionFields
+                });
+            }
+        });
+
+        // Render sections
+        sections.forEach(section => {
+            html += `
+                <div class="preview-section">
+                    <h6><i class="${section.icon}"></i> ${section.title}</h6>
+                    <div class="preview-grid">
+            `;
+            section.fields.forEach(field => {
+                const fullClass = field.full ? 'preview-full' : '';
+                html += `
+                    <div class="preview-item ${fullClass}">
+                        <span class="label">${field.label}</span>
+                        <span class="value">${field.value}</span>
+                    </div>
+                `;
+            });
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+
+        // Add undertaking section
+        html += `
+            <div class="undertaking-section">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="undertakingCheck">
+                    <label class="form-check-label" for="undertakingCheck">
+                        <strong>I hereby declare that:</strong><br>
+                        • All information provided in this application is true, correct, and complete to the best of my knowledge.<br>
+                        • All uploaded documents (photo, Aadhaar, qualification certificate) are genuine and belong to me.<br>
+                        • I understand that providing false information may lead to disqualification from the program.<br>
+                        • I agree to the terms and conditions of this training program.
+                    </label>
+                </div>
+            </div>
+        `;
+
+        return html;
+    }
+
+    // ── Preview button click ──
+    previewBtn.addEventListener('click', function() {
+        // Validate all fields first
+        let hasError = false;
+        form.querySelectorAll('.form-control, .form-select').forEach(f => {
+            if (f.hasAttribute('required') && !f.value) {
+                f.classList.add('is-invalid');
+                hasError = true;
+            } else {
+                f.classList.remove('is-invalid');
+            }
+        });
+
+        // Check file fields
+        fileFields.forEach(f => {
+            if (f.hasAttribute('required') && (!f.files || f.files.length === 0)) {
+                f.classList.add('is-invalid');
+                hasError = true;
+            } else if (f.files && f.files.length > 0) {
+                const result = validateFile(f.files[0]);
+                if (!result.valid) {
+                    f.classList.add('is-invalid');
+                    hasError = true;
+                }
+            }
+        });
+
+        if (hasError) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>Please fill in all required fields and ensure files are valid (max 1 MB).</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            const formBody = document.querySelector('.form-body');
+            const existingAlert = formBody.querySelector('.alert-danger');
+            if (existingAlert) existingAlert.remove();
+            formBody.insertBefore(alertDiv, formBody.firstChild);
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // Build preview
+        previewBody.innerHTML = buildPreviewHTML();
+
+        // Reset final submit button
+        finalSubmitBtn.disabled = true;
+        finalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Application';
+
+        // Attach checkbox event
+        const check = document.getElementById('undertakingCheck');
+        if (check) {
+            check.addEventListener('change', function() {
+                finalSubmitBtn.disabled = !this.checked;
+            });
+        }
+
+        // Show modal
+        previewModal.show();
+    });
+
+    // ── Final Submit ──
+    finalSubmitBtn.addEventListener('click', function() {
+        if (this.disabled) return;
+        const check = document.getElementById('undertakingCheck');
+        if (!check || !check.checked) {
+            this.disabled = true;
+            return;
+        }
+
+        this.disabled = true;
+        this.innerHTML = '<span class="loading-spinner"></span>Submitting...';
         form.submit();
     });
+
+    // ── Modal cleanup ──
+    document.getElementById('previewModal').addEventListener('hidden.bs.modal', function() {
+        finalSubmitBtn.disabled = true;
+        finalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Application';
+    });
+
 });
 </script>
 {% endblock %}

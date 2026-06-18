@@ -464,24 +464,47 @@
 
 <!-- ── Detail Modal ── -->
 <div class="modal fade detail-modal" id="detailModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">
-                    <i class="fas fa-id-card me-2"></i>Applicant Details
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body px-4 py-3" id="modalBody">
-                <div class="text-center py-4">
-                    <div class="spinner-border" style="color:#be0000;" role="status"></div>
-                    <div class="text-muted small mt-2">Loading details...</div>
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:20px;overflow:hidden;">
+
+            <!-- Modal Header -->
+            <div class="modal-header border-0 p-0">
+                <div style="background:linear-gradient(135deg,#0f172a 0%,#1a1a2e 50%,#be0000 100%);width:100%;padding:20px 28px;position:relative;overflow:hidden;">
+                    <div style="position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(190,0,0,0.15);top:-70px;right:-50px;pointer-events:none;"></div>
+                    <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <div id="modalAvatarWrap">
+                                <!-- Photo or initials injected by JS -->
+                            </div>
+                            <div>
+                                <div style="display:flex;gap:6px;margin-bottom:6px;">
+                                    <span style="font-size:0.62rem;font-weight:800;letter-spacing:0.8px;padding:2px 9px;border-radius:5px;background:rgba(255,255,255,0.15);color:white;">NIELIT</span>
+                                    <span style="font-size:0.62rem;font-weight:800;letter-spacing:0.8px;padding:2px 9px;border-radius:5px;background:rgba(190,0,0,0.45);color:#fca5a5;border:1px solid rgba(190,0,0,0.5);">KYNDRYL</span>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-white" id="modalStudentName">—</h5>
+                                <div style="font-size:0.75rem;opacity:0.7;color:white;margin-top:3px;" id="modalRegNum">—</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="opacity:0.8;"></button>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer border-top">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-0" id="modalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border" style="color:#be0000;" role="status"></div>
+                    <div class="text-muted small mt-2">Loading applicant details...</div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-top bg-light" style="padding:14px 24px;">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="border-radius:8px;padding:7px 18px;">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
                 <a href="#" class="btn btn-sm fw-semibold" id="modalEditBtn"
-                   style="background:#be0000;color:white;border-radius:8px;">
+                   style="background:linear-gradient(135deg,#8b0000,#be0000);color:white;border-radius:8px;padding:7px 18px;">
                     <i class="fas fa-edit me-1"></i>Edit Applicant
                 </a>
             </div>
@@ -492,11 +515,11 @@
 <!-- ── Delete Confirm Modal ── -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
             <div class="modal-header border-0 pb-0">
-                <div class="w-100 text-center pt-2">
-                    <div style="width:56px;height:56px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
-                        <i class="fas fa-trash" style="color:#dc2626;font-size:1.2rem;"></i>
+                <div class="w-100 text-center pt-3">
+                    <div style="width:60px;height:60px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                        <i class="fas fa-trash" style="color:#dc2626;font-size:1.3rem;"></i>
                     </div>
                     <h5 class="fw-bold text-dark mb-1">Delete Applicant</h5>
                     <p class="text-muted small mb-0" id="deleteModalName"></p>
@@ -505,27 +528,196 @@
             <div class="modal-body text-center pb-0">
                 <p class="text-muted small">This will permanently delete the registration and all uploaded documents. This action cannot be undone.</p>
             </div>
-            <div class="modal-footer border-0 justify-content-center gap-2">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="border-radius:8px;min-width:80px;">Cancel</button>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-3">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="border-radius:8px;min-width:90px;">Cancel</button>
                 <form id="deleteForm" method="post" action="">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-danger fw-semibold" style="border-radius:8px;min-width:80px;">Delete</button>
+                    <button type="submit" class="btn btn-sm btn-danger fw-semibold" style="border-radius:8px;min-width:90px;">Delete</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+/* ── Detail modal internals ── */
+.dm-section-title {
+    font-size: 0.66rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #be0000;
+    padding: 14px 24px 8px;
+    border-bottom: 1px solid #fee2e2;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff9f9;
+}
+.dm-section-title i { font-size: 0.72rem; }
+
+.dm-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 4px 24px 12px;
+}
+.dm-grid.cols-1 { grid-template-columns: 1fr; }
+
+.dm-row {
+    padding: 9px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.82rem;
+}
+.dm-row:nth-child(even) { padding-left: 16px; border-left: 1px solid #f1f5f9; }
+.dm-label {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 3px;
+}
+.dm-value {
+    font-size: 0.84rem;
+    color: #1e293b;
+    font-weight: 500;
+}
+.dm-value code {
+    font-size: 0.78rem;
+    background: #f1f5f9;
+    padding: 2px 7px;
+    border-radius: 5px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+}
+
+/* Status / badge chips in modal */
+.dm-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 50px;
+    font-size: 0.72rem; font-weight: 700;
+}
+.dm-chip.green  { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+.dm-chip.blue   { background: #eff6ff; color: #1e3a8a; border: 1px solid #bfdbfe; }
+.dm-chip.yellow { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.dm-chip.red    { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.dm-chip.purple { background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+.dm-chip.gray   { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+
+/* Avatar in header */
+.modal-avatar {
+    width: 58px; height: 58px;
+    border-radius: 14px;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+}
+.modal-avatar-initials {
+    width: 58px; height: 58px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.25);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Document preview cards */
+.doc-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 14px 24px 18px;
+}
+.doc-preview-card {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+    transition: all 0.2s;
+}
+.doc-preview-card:hover { border-color: #be0000; box-shadow: 0 4px 12px rgba(190,0,0,0.1); }
+.doc-preview-card .doc-thumb {
+    height: 120px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f1f5f9;
+    overflow: hidden;
+    position: relative;
+}
+.doc-preview-card .doc-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+.doc-preview-card .doc-thumb .doc-icon {
+    font-size: 2.5rem;
+    color: #94a3b8;
+}
+.doc-preview-card .doc-thumb .doc-overlay {
+    position: absolute; inset: 0;
+    background: rgba(15,23,42,0.5);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+}
+.doc-preview-card:hover .doc-overlay { opacity: 1; }
+.doc-preview-card .doc-info {
+    padding: 10px 12px;
+}
+.doc-preview-card .doc-info .doc-name {
+    font-size: 0.75rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 4px;
+}
+.doc-preview-card .doc-info .doc-meta {
+    font-size: 0.68rem; color: #94a3b8;
+}
+.doc-preview-card .doc-info .doc-actions {
+    margin-top: 8px; display: flex; gap: 6px;
+}
+.doc-btn {
+    font-size: 0.7rem; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px;
+    text-decoration: none; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 4px;
+    border: none; cursor: pointer;
+}
+.doc-btn.view  { background: #dbeafe; color: #1e3a8a; }
+.doc-btn.view:hover  { background: #1e3a8a; color: white; }
+.doc-btn.download { background: #d1fae5; color: #065f46; }
+.doc-btn.download:hover { background: #059669; color: white; }
+.doc-btn.pdf { background: #fee2e2; color: #991b1b; }
+.doc-btn.pdf:hover { background: #dc2626; color: white; }
+
+/* No file placeholder */
+.doc-no-file {
+    height: 120px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: #f8fafc; color: #cbd5e1;
+    font-size: 0.72rem;
+    gap: 6px;
+}
+.doc-no-file i { font-size: 1.8rem; }
+
+@media (max-width: 640px) {
+    .dm-grid { grid-template-columns: 1fr; }
+    .dm-row:nth-child(even) { padding-left: 0; border-left: none; }
+    .doc-preview-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
     // ── Checkbox / bulk selection ──────────────────────────────────────
-    const selectAll   = document.getElementById('selectAll');
-    const checkboxes  = document.querySelectorAll('.student-cb');
-    const bulkBar     = document.getElementById('bulkBar');
-    const countSpan   = document.getElementById('selectedCount');
-    const bulkInputs  = document.getElementById('bulkInputs');
-    const bulkForm    = document.getElementById('bulkDeleteForm');
+    const selectAll  = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.student-cb');
+    const bulkBar    = document.getElementById('bulkBar');
+    const countSpan  = document.getElementById('selectedCount');
+    const bulkInputs = document.getElementById('bulkInputs');
+    const bulkForm   = document.getElementById('bulkDeleteForm');
 
     function syncBulkBar() {
         const checked = [...checkboxes].filter(c => c.checked);
@@ -549,13 +741,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     checkboxes.forEach(cb => cb.addEventListener('change', syncBulkBar));
-
-    document.getElementById('clearSelBtn')?.addEventListener('click', function () {
+    document.getElementById('clearSelBtn')?.addEventListener('click', () => {
         checkboxes.forEach(cb => cb.checked = false);
         syncBulkBar();
     });
 
-    // Bulk delete
     document.getElementById('bulkDeleteBtn')?.addEventListener('click', function () {
         const ids = [...checkboxes].filter(c => c.checked).map(c => c.value);
         if (!ids.length) return;
@@ -567,76 +757,280 @@ document.addEventListener('DOMContentLoaded', function () {
     syncBulkBar();
 
 
+    // ── Helpers ───────────────────────────────────────────────────────
+    function getInitials(name) {
+        return (name || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    }
+
+    function cloudChip(val) {
+        if (!val || val === '—') return '<span class="dm-chip gray">—</span>';
+        const map = {
+            'Basic Level':    ['blue',   'fa-seedling',   'Basic'],
+            'Middle Level':   ['yellow', 'fa-chart-line', 'Middle'],
+            'Advance Level':  ['green',  'fa-rocket',     'Advanced'],
+        };
+        const [cls, icon, label] = map[val] || ['gray', 'fa-circle', val];
+        return `<span class="dm-chip ${cls}"><i class="fas ${icon}"></i>${label}</span>`;
+    }
+
+    function categoryChip(val) {
+        const map = {
+            'General': 'gray', 'SC': 'yellow', 'ST': 'red',
+            'EWS': 'green', 'OBC': 'purple', 'PWD': 'blue',
+        };
+        return `<span class="dm-chip ${map[val] || 'gray'}">${val}</span>`;
+    }
+
+    function isImage(url) {
+        return url && /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+    }
+
+    function isPdf(url) {
+        return url && /\.pdf$/i.test(url);
+    }
+
+    function docCard(label, url, certName) {
+        const subLabel = certName ? `<div class="doc-meta">${certName}</div>` : '';
+        if (!url) {
+            return `
+            <div class="doc-preview-card">
+                <div class="doc-no-file">
+                    <i class="fas fa-file-slash"></i>
+                    <span>Not uploaded</span>
+                </div>
+                <div class="doc-info">
+                    <div class="doc-name">${label}</div>
+                    ${subLabel}
+                    <div class="doc-actions">
+                        <span style="font-size:0.7rem;color:#cbd5e1;">No file available</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        let thumbHtml = '';
+        if (isImage(url)) {
+            thumbHtml = `
+                <div class="doc-thumb">
+                    <img src="${url}" alt="${label}">
+                    <div class="doc-overlay">
+                        <a href="${url}" target="_blank" style="color:white;font-size:0.75rem;font-weight:600;text-decoration:none;">
+                            <i class="fas fa-expand me-1"></i>View Full
+                        </a>
+                    </div>
+                </div>`;
+        } else if (isPdf(url)) {
+            thumbHtml = `
+                <div class="doc-thumb" style="background:#fff0f0;">
+                    <i class="fas fa-file-pdf doc-icon" style="color:#dc2626;"></i>
+                    <div class="doc-overlay">
+                        <a href="${url}" target="_blank" style="color:white;font-size:0.75rem;font-weight:600;text-decoration:none;">
+                            <i class="fas fa-external-link-alt me-1"></i>Open PDF
+                        </a>
+                    </div>
+                </div>`;
+        } else {
+            thumbHtml = `
+                <div class="doc-thumb">
+                    <i class="fas fa-file doc-icon"></i>
+                </div>`;
+        }
+
+        const viewBtn     = `<a href="${url}" target="_blank" class="doc-btn view"><i class="fas fa-eye"></i>View</a>`;
+        const downloadBtn = `<a href="${url}" download class="doc-btn download"><i class="fas fa-download"></i>Download</a>`;
+
+        return `
+        <div class="doc-preview-card">
+            ${thumbHtml}
+            <div class="doc-info">
+                <div class="doc-name">${label}</div>
+                ${subLabel}
+                <div class="doc-actions">
+                    ${viewBtn}
+                    ${downloadBtn}
+                </div>
+            </div>
+        </div>`;
+    }
+
+
     // ── View Detail Modal ──────────────────────────────────────────────
-    const detailModal  = new bootstrap.Modal(document.getElementById('detailModal'));
-    const modalBody    = document.getElementById('modalBody');
-    const modalEditBtn = document.getElementById('modalEditBtn');
+    const detailModalEl = document.getElementById('detailModal');
+    const detailModal   = new bootstrap.Modal(detailModalEl);
+    const modalBody     = document.getElementById('modalBody');
+    const modalEditBtn  = document.getElementById('modalEditBtn');
+    const modalName     = document.getElementById('modalStudentName');
+    const modalRegNum   = document.getElementById('modalRegNum');
+    const modalAvatar   = document.getElementById('modalAvatarWrap');
 
     document.querySelectorAll('.view-student').forEach(btn => {
         btn.addEventListener('click', function () {
             const id = this.dataset.id;
+
+            // Reset header
+            modalName.textContent   = 'Loading...';
+            modalRegNum.textContent = '';
+            modalAvatar.innerHTML   = `<div class="modal-avatar-initials"><i class="fas fa-spinner fa-spin" style="font-size:1rem;"></i></div>`;
+
             modalBody.innerHTML = `
-                <div class="text-center py-4">
+                <div class="text-center py-5">
                     <div class="spinner-border" style="color:#be0000;" role="status"></div>
-                    <div class="text-muted small mt-2">Loading details...</div>
+                    <div class="text-muted small mt-2">Loading applicant details...</div>
                 </div>`;
+
             modalEditBtn.href = `/dashboard/kyndryl/students/${id}/edit/`;
             detailModal.show();
 
             fetch(`/dashboard/kyndryl/students/${id}/detail/`)
                 .then(r => r.json())
                 .then(d => {
-                    const benef = d.beneficiary_belonging || '—';
+
+                    // ── Populate header ──
+                    modalName.textContent   = d.name;
+                    modalRegNum.textContent = d.registration_number;
+
+                    if (d.photo_url) {
+                        modalAvatar.innerHTML = `<img src="${d.photo_url}" class="modal-avatar" alt="${d.name}">`;
+                    } else {
+                        modalAvatar.innerHTML = `<div class="modal-avatar-initials">${getInitials(d.name)}</div>`;
+                    }
+
+                    // ── Populate body ──
                     modalBody.innerHTML = `
-                        ${d.photo_url ? `<div class="text-center mb-3"><img src="${d.photo_url}" class="detail-photo" alt="Photo"></div>` : ''}
 
-                        <div class="detail-section-title"><i class="fas fa-id-badge me-2"></i>Registration</div>
-                        <div class="detail-row"><div class="detail-label">Reg. Number</div><div class="detail-value"><code>${d.registration_number}</code></div></div>
-                        <div class="detail-row"><div class="detail-label">Registration Date</div><div class="detail-value">${d.registration_date}</div></div>
+                        <!-- Registration -->
+                        <div class="dm-section-title"><i class="fas fa-id-badge"></i>Registration Info</div>
+                        <div class="dm-grid">
+                            <div class="dm-row">
+                                <div class="dm-label">Registration Number</div>
+                                <div class="dm-value"><code>${d.registration_number}</code></div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Registered On</div>
+                                <div class="dm-value">${d.registration_date}</div>
+                            </div>
+                        </div>
 
-                        <div class="detail-section-title"><i class="fas fa-user me-2"></i>Personal</div>
-                        <div class="detail-row"><div class="detail-label">Full Name</div><div class="detail-value"><strong>${d.name}</strong></div></div>
-                        <div class="detail-row"><div class="detail-label">Father's Name</div><div class="detail-value">${d.father_name}</div></div>
-                        <div class="detail-row"><div class="detail-label">Mother's Name</div><div class="detail-value">${d.mother_name}</div></div>
-                        <div class="detail-row"><div class="detail-label">Father's Occupation</div><div class="detail-value">${d.father_occupation}</div></div>
-                        <div class="detail-row"><div class="detail-label">Date of Birth</div><div class="detail-value">${d.date_of_birth}</div></div>
-                        <div class="detail-row"><div class="detail-label">Gender</div><div class="detail-value">${d.gender}</div></div>
-                        <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">${d.category}</div></div>
-                        <div class="detail-row"><div class="detail-label">Aadhaar Number</div><div class="detail-value"><code>${d.aadhar_number}</code></div></div>
+                        <!-- Personal -->
+                        <div class="dm-section-title"><i class="fas fa-user"></i>Personal Information</div>
+                        <div class="dm-grid">
+                            <div class="dm-row">
+                                <div class="dm-label">Full Name</div>
+                                <div class="dm-value"><strong>${d.name}</strong></div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Date of Birth</div>
+                                <div class="dm-value">${d.date_of_birth}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Gender</div>
+                                <div class="dm-value">${d.gender}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Category</div>
+                                <div class="dm-value">${categoryChip(d.category)}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Father's Name</div>
+                                <div class="dm-value">${d.father_name}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Father's Occupation</div>
+                                <div class="dm-value">${d.father_occupation}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Mother's Name</div>
+                                <div class="dm-value">${d.mother_name}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Mother's Occupation</div>
+                                <div class="dm-value">${d.mother_occupation || '—'}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Aadhaar Number</div>
+                                <div class="dm-value"><code>XXXX-XXXX-${d.aadhar_number.slice(-4)}</code></div>
+                            </div>
+                        </div>
 
-                        <div class="detail-section-title"><i class="fas fa-address-card me-2"></i>Contact & Address</div>
-                        <div class="detail-row"><div class="detail-label">Mobile</div><div class="detail-value">${d.mobile_number}</div></div>
-                        <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${d.email_id}</div></div>
-                        <div class="detail-row"><div class="detail-label">Address</div><div class="detail-value">${d.address}</div></div>
-                        <div class="detail-row"><div class="detail-label">City</div><div class="detail-value">${d.city}</div></div>
-                        <div class="detail-row"><div class="detail-label">State</div><div class="detail-value">${d.state}</div></div>
-                        <div class="detail-row"><div class="detail-label">PIN Code</div><div class="detail-value">${d.pin_code}</div></div>
+                        <!-- Contact -->
+                        <div class="dm-section-title"><i class="fas fa-address-card"></i>Contact & Address</div>
+                        <div class="dm-grid">
+                            <div class="dm-row">
+                                <div class="dm-label">Mobile</div>
+                                <div class="dm-value">${d.mobile_number}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Email</div>
+                                <div class="dm-value" style="word-break:break-all;">${d.email_id}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">City</div>
+                                <div class="dm-value">${d.city}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">State / UT</div>
+                                <div class="dm-value">${d.state}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">PIN Code</div>
+                                <div class="dm-value">${d.pin_code}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Address</div>
+                                <div class="dm-value">${d.address}</div>
+                            </div>
+                        </div>
 
-                        <div class="detail-section-title"><i class="fas fa-graduation-cap me-2"></i>Qualification & Profile</div>
-                        <div class="detail-row"><div class="detail-label">Highest Qualification</div><div class="detail-value">${d.highest_qualification}</div></div>
-                        <div class="detail-row"><div class="detail-label">Employment Status</div><div class="detail-value">${d.current_employment_status}</div></div>
-                        <div class="detail-row"><div class="detail-label">Cloud Expertise</div><div class="detail-value">${d.expertise_in_cloud_computing}</div></div>
-                        <div class="detail-row"><div class="detail-label">Beneficiary Category</div><div class="detail-value">${benef}</div></div>
+                        <!-- Qualification -->
+                        <div class="dm-section-title"><i class="fas fa-graduation-cap"></i>Qualification & Profile</div>
+                        <div class="dm-grid">
+                            <div class="dm-row">
+                                <div class="dm-label">Highest Qualification</div>
+                                <div class="dm-value">${d.highest_qualification}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Employment Status</div>
+                                <div class="dm-value">${d.current_employment_status}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Cloud Expertise</div>
+                                <div class="dm-value">${cloudChip(d.expertise_in_cloud_computing)}</div>
+                            </div>
+                            <div class="dm-row">
+                                <div class="dm-label">Beneficiary Category</div>
+                                <div class="dm-value">${d.beneficiary_belonging || '—'}</div>
+                            </div>
+                        </div>
+
+                        <!-- Documents -->
+                        <div class="dm-section-title"><i class="fas fa-paperclip"></i>Uploaded Documents</div>
+                        <div class="doc-preview-grid">
+                            ${docCard('Passport Photo', d.photo_url)}
+                            ${docCard('Aadhaar Card', d.aadhaar_card_url)}
+                            ${docCard('Qualification Certificate', d.certificate_url, d.certificate_name)}
+                        </div>
                     `;
                 })
                 .catch(() => {
-                    modalBody.innerHTML = '<div class="alert alert-danger m-3">Failed to load details. Please try again.</div>';
+                    modalBody.innerHTML = `
+                        <div class="alert alert-danger m-4" style="border-radius:12px;">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Failed to load applicant details. Please try again.
+                        </div>`;
                 });
         });
     });
 
 
     // ── Delete Single ──────────────────────────────────────────────────
-    const deleteModal   = new bootstrap.Modal(document.getElementById('deleteModal'));
-    const deleteForm    = document.getElementById('deleteForm');
+    const deleteModal     = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteForm      = document.getElementById('deleteForm');
     const deleteModalName = document.getElementById('deleteModalName');
 
     document.querySelectorAll('.delete-single').forEach(btn => {
         btn.addEventListener('click', function () {
-            const id   = this.dataset.id;
-            const name = this.dataset.name;
-            deleteModalName.textContent = name;
-            deleteForm.action = `/dashboard/kyndryl/students/${id}/delete/`;
+            deleteModalName.textContent = this.dataset.name;
+            deleteForm.action = `/dashboard/kyndryl/students/${this.dataset.id}/delete/`;
             deleteModal.show();
         });
     });

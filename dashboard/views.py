@@ -911,35 +911,45 @@ def kyndryl_student_list(request):
 
 
 def kyndryl_student_detail_api(request, pk):
-    """AJAX endpoint — returns student JSON for the modal."""
     student = get_object_or_404(KyndrylRegistration, pk=pk)
     beneficiary_display = dict(KyndrylRegistration.BENEFICIARY_BELONGING_CHOICES).get(
         student.beneficiary_belonging, student.beneficiary_belonging or '—'
     )
+
+    def file_url(field):
+        try:
+            return field.url if field and field.name else None
+        except Exception:
+            return None
+
     data = {
-        'id':                               str(student.id),
-        'registration_number':              student.registration_number,
-        'name':                             student.name,
-        'father_name':                      student.father_name or '—',
-        'mother_name':                      student.mother_name or '—',
-        'father_occupation':                student.father_occupation or '—',
-        'mother_occupation':                student.mother_occupation or '—',
-        'date_of_birth':                    student.date_of_birth.strftime('%d %b %Y') if student.date_of_birth else '—',
-        'gender':                           student.get_gender_display() if student.gender else '—',
-        'category':                         student.get_category_display(),
-        'mobile_number':                    student.mobile_number,
-        'email_id':                         student.email_id,
-        'address':                          student.address or '—',
-        'city':                             student.city or '—',
-        'state':                            student.state or '—',
-        'pin_code':                         student.pin_code,
-        'aadhar_number':                    student.aadhar_number,
-        'highest_qualification':            student.get_highest_qualification_display() if student.highest_qualification else '—',
-        'current_employment_status':        student.get_current_employment_status_display() if student.current_employment_status else '—',
-        'expertise_in_cloud_computing':     student.get_expertise_in_cloud_computing_display() if student.expertise_in_cloud_computing else '—',
-        'beneficiary_belonging':            beneficiary_display,
-        'registration_date':                student.registration_date.strftime('%d %b %Y, %I:%M %p'),
-        'photo_url':                        student.photo.url if student.photo else None,
+        'id':                           str(student.id),
+        'registration_number':          student.registration_number,
+        'name':                         student.name,
+        'father_name':                  student.father_name or '—',
+        'mother_name':                  student.mother_name or '—',
+        'father_occupation':            student.father_occupation or '—',
+        'mother_occupation':            student.mother_occupation or '—',
+        'date_of_birth':                student.date_of_birth.strftime('%d %b %Y') if student.date_of_birth else '—',
+        'gender':                       student.get_gender_display() if student.gender else '—',
+        'category':                     student.get_category_display(),
+        'mobile_number':                student.mobile_number,
+        'email_id':                     student.email_id,
+        'address':                      student.address or '—',
+        'city':                         student.city or '—',
+        'state':                        student.state or '—',
+        'pin_code':                     student.pin_code,
+        'aadhar_number':                student.aadhar_number,
+        'highest_qualification':        student.get_highest_qualification_display() if student.highest_qualification else '—',
+        'current_employment_status':    student.get_current_employment_status_display() if student.current_employment_status else '—',
+        'expertise_in_cloud_computing': student.get_expertise_in_cloud_computing_display() if student.expertise_in_cloud_computing else '—',
+        'beneficiary_belonging':        beneficiary_display,
+        'registration_date':            student.registration_date.strftime('%d %b %Y, %I:%M %p'),
+        # Documents
+        'photo_url':                    file_url(student.photo),
+        'aadhaar_card_url':             file_url(student.aadhaar_card),
+        'certificate_url':              file_url(student.highest_qualification_certificate),
+        'certificate_name':             student.highest_qualification_certificate_name or '',
     }
     return JsonResponse(data)
 
