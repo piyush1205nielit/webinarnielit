@@ -24,33 +24,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create .env file for testing
-        run: |
-          cat > .env << EOF
-          DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
-          DEBUG=False
-          ALLOWED_HOSTS=localhost,127.0.0.1
-          SESSION_COOKIE_SECURE=False
-          CSRF_COOKIE_SECURE=False
-          USE_S3=False
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_STORAGE_BUCKET_NAME=${{ secrets.AWS_STORAGE_BUCKET_NAME }}
-          AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME }}
-          EOF
-          cat .env  # Optional: Verify .env file (remove in production)
-
       - name: Run Tests
+        env:
+          DJANGO_SECRET_KEY: test-secret-key-not-for-production
+          DEBUG: 'True'
+          ALLOWED_HOSTS: 'localhost,127.0.0.1'
+          USE_S3: 'False'
+          AWS_ACCESS_KEY_ID: dummy
+          AWS_SECRET_ACCESS_KEY: dummy
+          AWS_STORAGE_BUCKET_NAME: dummy-bucket
+          AWS_S3_REGION_NAME: ap-south-1
         run: |
           python manage.py test
-        env:
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DEBUG: 'False'
-          USE_S3: 'False'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_STORAGE_BUCKET_NAME: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
-          AWS_S3_REGION_NAME: ${{ secrets.AWS_S3_REGION_NAME }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -81,24 +66,15 @@ jobs:
             echo "=== Commit AFTER sync ==="
             git log --oneline -1
 
-            echo "=== Creating/Updating .env file with secrets ==="
-            cat > /home/ubuntu/webinarnielit/.env << 'EOF'
-            # Django Settings
-            DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
-            DEBUG=False
-            ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}
-            
-            # AWS S3 Settings
+            echo "=== Updating AWS S3 variables in existing .env ==="
+            sed -i '/^USE_S3=/d; /^AWS_ACCESS_KEY_ID=/d; /^AWS_SECRET_ACCESS_KEY=/d; /^AWS_STORAGE_BUCKET_NAME=/d; /^AWS_S3_REGION_NAME=/d' .env
+            cat >> .env << 'ENVEOF'
             USE_S3=True
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_STORAGE_BUCKET_NAME=${{ secrets.AWS_STORAGE_BUCKET_NAME }}
             AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME }}
-            
-            # Security Settings
-            SESSION_COOKIE_SECURE=True
-            CSRF_COOKIE_SECURE=True
-            EOF
+            ENVEOF
 
             echo "=== Activating venv ==="
             source /home/ubuntu/venv/bin/activate
