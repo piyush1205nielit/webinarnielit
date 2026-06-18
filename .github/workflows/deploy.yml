@@ -24,14 +24,29 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Create .env file for testing
+        run: |
+          cat > .env << EOF
+          DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+          DEBUG=False
+          ALLOWED_HOSTS=localhost,127.0.0.1
+          SESSION_COOKIE_SECURE=False
+          CSRF_COOKIE_SECURE=False
+          USE_S3=False
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_STORAGE_BUCKET_NAME=${{ secrets.AWS_STORAGE_BUCKET_NAME }}
+          AWS_S3_REGION_NAME=${{ secrets.AWS_S3_REGION_NAME }}
+          EOF
+          cat .env  # Optional: Verify .env file (remove in production)
+
       - name: Run Tests
         run: |
           python manage.py test
         env:
-          # Minimal env for tests (use dummy values or test settings)
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
           DEBUG: 'False'
-          USE_S3: 'False'  # Disable S3 for tests to avoid credential issues
+          USE_S3: 'False'
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_STORAGE_BUCKET_NAME: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
@@ -67,7 +82,7 @@ jobs:
             git log --oneline -1
 
             echo "=== Creating/Updating .env file with secrets ==="
-            cat > /home/ubuntu/webinarnielit/.env << EOF
+            cat > /home/ubuntu/webinarnielit/.env << 'EOF'
             # Django Settings
             DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
             DEBUG=False
@@ -83,13 +98,6 @@ jobs:
             # Security Settings
             SESSION_COOKIE_SECURE=True
             CSRF_COOKIE_SECURE=True
-            
-            # Database (if using environment variables for DB)
-            # DB_NAME=${{ secrets.DB_NAME }}
-            # DB_USER=${{ secrets.DB_USER }}
-            # DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            # DB_HOST=${{ secrets.DB_HOST }}
-            # DB_PORT=${{ secrets.DB_PORT }}
             EOF
 
             echo "=== Activating venv ==="
