@@ -81,11 +81,13 @@
         border-radius: 40px;
         box-shadow: 0 30px 60px rgba(0,0,0,0.2);
         overflow: hidden;
-        max-width: 550px;
+        max-width: 850px;
         width: 90%;
         position: relative;
         z-index: 10;
         animation: slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        margin-top: 40px;
+        margin-bottom: 40px;
     }
     
     @keyframes slideIn {
@@ -440,15 +442,16 @@
         
         <!-- Number Section -->
         <div class="number-section">
-            <div class="error-number">404</div>
+            <div class="error-number"> ERROR 404</div>
             <div class="error-title">
                 <i class="fas fa-map-signs text-primary me-2"></i>
                 Oops! Page Not Found
             </div>
             <div class="error-message">
-                <p>Looks like this page took a little detour!<br>
-                Don't worry, we'll help you find your way back.</p>
+                <p> The page you are looking for does not exist or it might have been moved to a different URL. <br> We cannot find the page you want, but you are not lost. You can easily <a href="{% url 'public:home' %}" >
+                    click here </a> to return Home.</p>
             </div>
+            
             
             <!-- Action Buttons -->
             <div class="action-buttons">
@@ -462,17 +465,7 @@
                 </a>
             </div>
             
-            <!-- Fun Fact Section -->
-            <div class="fun-fact">
-                <div class="fun-fact-title">
-                    <i class="fas fa-lightbulb"></i> DID YOU KNOW?
-                </div>
-                <div class="fun-fact-text">
-                    <i class="fas fa-smile-wink"></i>
-                    <span>NIELIT has trained over 1 million students across India since its establishment!</span>
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-            </div>
+           
         </div>
     </div>
 </div>
