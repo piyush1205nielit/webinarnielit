@@ -921,7 +921,7 @@
 
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label" for="id_beneficiary_belonging">Beneficiary Category</label>
+                                <label class="form-label" for="id_beneficiary_belonging">Beneficiary Category <span class="required">*</span></label>
                                 {{ form.beneficiary_belonging }}
                                 {% if form.beneficiary_belonging.errors %}
                                 <ul class="errorlist mt-1">{{ form.beneficiary_belonging.errors }}</ul>

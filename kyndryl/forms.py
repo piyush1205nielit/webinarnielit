@@ -18,7 +18,7 @@ class KyndrylRegistrationForm(forms.ModelForm):
 
     beneficiary_belonging = forms.ChoiceField(
         choices=BENEFICIARY_CHOICES_WITH_EMPTY,
-        required=False,
+        required=True,
         label='Beneficiary Category',
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
@@ -108,7 +108,6 @@ class KyndrylRegistrationForm(forms.ModelForm):
                            'current_employment_status', 'expertise_in_cloud_computing']:
             if field_name in self.fields:
                 self.fields[field_name].empty_label = '-- Select --'
-                self.fields[field_name].required = False
 
         # Pre-populate beneficiary on edit
         if self.instance and self.instance.pk:
