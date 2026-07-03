@@ -132,28 +132,18 @@ class KyndrylRegistration(models.Model):
 
     photo = models.ImageField(
         upload_to='kyndryl_registration/photos/',
-        validators=[
-            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png']),
-            validate_file_size,
-        ]
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png']),validate_file_size,]
     )
     aadhaar_card = models.FileField(
         upload_to='kyndryl_registration/aadhaar/',
-        validators=[
-            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf']),
-            validate_file_size,
-        ]
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf']),validate_file_size,]
     )
     highest_qualification_certificate_name = models.CharField(
-        max_length=200, null=True, blank=True,
-        help_text='Name of the certificate e.g. B.Tech Degree, Class 12 Marksheet'
+        max_length=200, null=True, blank=True, help_text='Name of the certificate e.g. B.Tech Degree, Class 12 Marksheet'
     )
     highest_qualification_certificate = models.FileField(
         upload_to='kyndryl_registration/certificates/',
-        validators=[
-            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf']),
-            validate_file_size,
-        ]
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'pdf']), validate_file_size,]
     )
 
     registration_date = models.DateTimeField(auto_now_add=True)

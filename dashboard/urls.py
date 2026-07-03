@@ -34,9 +34,16 @@ urlpatterns = [
     path('carousel/<uuid:pk>/delete/', views.carousel_delete, name='carousel_delete'),
     path('carousel/reorder/', views.carousel_reorder, name='carousel_reorder'),
 
+    #Kyndryl Urls
     path('kyndryl/students/', views.kyndryl_student_list, name='kyndryl_students'),
     path('kyndryl/students/<uuid:pk>/detail/', views.kyndryl_student_detail_api,    name='kyndryl_student_detail'),
     path('kyndryl/students/<uuid:pk>/edit/',         views.kyndryl_student_edit,          name='kyndryl_student_edit'),
     path('kyndryl/students/<uuid:pk>/delete/',       views.kyndryl_student_delete_single, name='kyndryl_student_delete'),
     path('kyndryl/students/delete-bulk/',            views.kyndryl_student_delete_bulk,   name='kyndryl_student_delete_bulk'),
+
+    #EVENT Cards
+    path("event/list", views.event_list, name="event_list"),
+    path("event/create/", views.event_create, name="event_create"),
+    path("event/<uuid:pk>/edit/", views.event_update, name="event_update"),
+    path("event/<uuid:pk>/delete/", views.event_delete, name="event_delete"),
 ]

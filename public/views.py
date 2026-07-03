@@ -9,6 +9,8 @@ from django.http import HttpResponse, Http404
 from django.conf import settings
 from django.views.static import serve
 import os
+from event.forms import EventForm
+from event.models import Event, EventDisplaySettings
 
 def home(request):
     """Public home page with hero section and featured content"""
@@ -186,6 +188,8 @@ def home_page_2(request):
     
     # Get active carousel images ordered by order field
     carousel_images = CarouselImage.objects.filter(is_active=True)
+
+    display_settings = EventDisplaySettings.get_solo()
     
     context = {
         'featured_courses': featured_courses,
@@ -196,5 +200,8 @@ def home_page_2(request):
         'total_centres': total_centres,
         'announcements': announcements,
         'carousel_images': carousel_images,
+        "events": Event.objects.filter(is_active=True),
+        "event_display_mode": display_settings.display_mode,
     }
     return render(request, 'public/home2.html', context)
+

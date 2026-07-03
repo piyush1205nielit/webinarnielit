@@ -24,7 +24,9 @@ from reportlab.platypus import ( SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.styles import getSampleStyleSheet
-
+from django.contrib.admin.views.decorators import staff_member_required
+from event.forms import EventForm
+from event.models import Event
 
 
 def is_admin(user):
@@ -1128,3 +1130,50 @@ def _export_pdf(qs):
     story.append(table)
     doc.build(story)
     return response
+
+
+
+#Event Cards
+
+
+def event_list(request):
+    """Public list of active event cards. Also usable as a standalone page."""
+    events = Event.objects.filter(is_active=True)
+    return render(request, "event/event_list.html", {"events": events})
+
+
+@staff_member_required
+def event_create(request):
+    if request.method == "POST":
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event created successfully.")
+            return redirect("event:event_list")
+    else:
+        form = EventForm()
+    return render(request, "event/event_form.html", {"form": form, "title": "Create Event"})
+
+
+@staff_member_required
+def event_update(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    if request.method == "POST":
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event updated successfully.")
+            return redirect("event:event_list")
+    else:
+        form = EventForm(instance=event)
+    return render(request, "event/event_form.html", {"form": form, "title": "Update Event"})
+
+
+@staff_member_required
+def event_delete(request, pk):
+    event = get_object_or_404(Event, pk=pk)
+    if request.method == "POST":
+        event.delete()
+        messages.success(request, "Event deleted.")
+        return redirect("event:event_list")
+    return render(request, "event/event_confirm_delete.html", {"event": event})

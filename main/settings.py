@@ -88,6 +88,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    #Created Apps
     'account',
     'course',
     'registration',
@@ -95,12 +97,18 @@ INSTALLED_APPS = [
     "public",
     'certificate',
     'kyndryl',
+    'event',
+    
+    #Required
     'storages',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+
+    #Production and CICD Middleware
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

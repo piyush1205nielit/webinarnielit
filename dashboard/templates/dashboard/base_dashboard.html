@@ -505,6 +505,18 @@
             <i class="fas fa-images"></i>
             <span>Carousel Images</span>
           </a>
+          
+          <!-- ── Event Cards Management Management ── -->
+          <a
+            class="nav-link {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}"
+            href="{% url 'event:event_list' %}"
+          >
+            <i class="fas fa-images"></i>
+            <span>Event Cards</span>
+          </a>
+
+         
+
 
           <!-- ── Admin Management ── -->
           <div class="sidebar-section-label">Admin Management</div>

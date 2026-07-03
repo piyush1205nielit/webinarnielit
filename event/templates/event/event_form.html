@@ -1,0 +1,585 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Event Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .preview-container {
+        background: #f5f5f5;
+        padding: 20px;
+        border-radius: 12px;
+        position: sticky;
+        top: 20px;
+    }
+    .preview-card-outer {
+        background: #eef2f7;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 5px 20px rgba(0,0,0,.1);
+    }
+    .logo-preview {
+        max-width: 100px;
+        max-height: 100px;
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        padding: 5px;
+        border-radius: 8px;
+        object-fit: contain;
+        display: block;
+    }
+    .section-card {
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .section-header {
+        background: #f8fafc;
+        padding: 12px 20px;
+        border-bottom: 2px solid #e2e8f0;
+        border-radius: 12px 12px 0 0;
+        font-weight: 600;
+        color: #1e3a8a;
+    }
+    .form-hint { font-size: 12px; color: #6b7280; }
+    .color-input { width: 60px; height: 38px; padding: 2px; }
+
+    /* ===== Live preview card (mirrors event_card.html / event_card.css) ===== */
+    .ecp-wrap { width: 100%; display: flex; justify-content: center; }
+    .ecp-width-full .ecp-card { width: 100%; }
+    .ecp-width-80 .ecp-card { width: 92%; } /* scaled down for the sidebar */
+
+    .ecp-card {
+        background: #fff;
+        box-shadow: 0 12px 30px rgba(15,23,42,.12);
+        border: 1px solid #dbe4f0;
+        overflow: hidden;
+        font-family: inherit;
+    }
+    .ecp-corner-sharp { border-radius: 4px; }
+    .ecp-corner-round { border-radius: 20px; }
+
+    .ecp-header { padding: 20px 22px 16px; position: relative; overflow: hidden; }
+    .ecp-header::after {
+        content: ''; position: absolute; width: 200px; height: 200px; border-radius: 50%;
+        background: rgba(255,255,255,.08); top: -100px; right: -60px; pointer-events: none;
+    }
+
+    .ecp-logos { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .ecp-logo-pos-center { justify-content: center; }
+    .ecp-logo-pos-left   { justify-content: flex-start; }
+    .ecp-logo-pos-right  { justify-content: flex-end; }
+    .ecp-logo-img {
+        height: 34px; width: auto; background: rgba(255,255,255,.95);
+        border-radius: 6px; padding: 4px 8px; object-fit: contain;
+    }
+
+    .ecp-title { font-size: 1.25rem; font-weight: 800; margin: 0 0 6px; position: relative; z-index: 1; line-height: 1.25; }
+    .ecp-subtitle { font-size: .82rem; margin: 0 0 12px; line-height: 1.5; position: relative; z-index: 1; }
+
+    .ecp-meta { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .ecp-meta-pill { padding: 4px 11px; border-radius: 50px; font-size: .68rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+
+    .ecp-body { padding: 20px 22px; }
+    .ecp-image { margin-bottom: 14px; border-radius: 10px; overflow: hidden; }
+    .ecp-image img { width: 100%; height: auto; display: block; max-height: 160px; object-fit: cover; }
+    .ecp-text { font-size: .82rem; line-height: 1.6; margin-bottom: 14px; }
+
+    .ecp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ecp-chip {
+        background: #f1f5f9; border: 1.5px solid #e2e8f0; color: #334155;
+        font-size: .7rem; font-weight: 600; padding: 5px 12px; border-radius: 50px;
+    }
+
+    .ecp-footer {
+        padding: 16px 22px; border-top: 1px solid #e2e8f0; display: flex;
+        align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #fafbfd;
+    }
+    .ecp-cta-btn {
+        display: inline-flex; align-items: center; gap: 7px; color: #fff; text-decoration: none;
+        padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: .8rem;
+    }
+    .ecp-qr-block { display: flex; align-items: center; gap: 8px; font-size: .68rem; font-weight: 600; }
+    .ecp-qr-img {
+        width: 48px; height: 48px; border: 1px solid #e2e8f0; border-radius: 6px;
+        padding: 3px; background: #fff; display: flex; align-items: center; justify-content: center;
+        color: #94a3b8; font-size: 9px; text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'event:event_list' %}" class="btn btn-outline-secondary me-3">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <h1 class="h3 fw-bold text-dark mb-0">
+            <i class="fas fa-calendar-star text-primary me-2"></i>{{ title }}
+        </h1>
+    </div>
+
+    <div class="row">
+        <!-- ==================== FORM COLUMN ==================== -->
+        <div class="col-lg-7">
+            <form method="post" enctype="multipart/form-data" id="eventForm">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Please correct the following errors:</strong>
+                    <ul class="mb-0 mt-2">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field|title }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- ==================== BASIC INFO ==================== -->
+                <div class="section-card">
+                    <div class="section-header"><i class="fas fa-heading me-2"></i>Basic Info</div>
+                    <div class="p-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Event Title <span class="text-danger">*</span></label>
+                            {{ form.title }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Subtitle</label>
+                            {{ form.subtitle }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Body Text</label>
+                            {{ form.body }}
+                        </div>
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label fw-bold">Active (show on site)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== DATES ==================== -->
+                <div class="section-card">
+                    <div class="section-header"><i class="fas fa-calendar-alt me-2"></i>Dates</div>
+                    <div class="p-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Event Date</label>
+                                {{ form.event_date }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Registration Deadline</label>
+                                {{ form.registration_deadline }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== IMAGE & KEYWORDS ==================== -->
+                <div class="section-card">
+                    <div class="section-header"><i class="fas fa-image me-2"></i>Image &amp; Keywords</div>
+                    <div class="p-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Event Image</label>
+                            {{ form.image }}
+                            <div class="form-hint">PNG / JPG / JPEG, max 1 MB</div>
+                            {% if form.instance.image %}
+                            <img src="{{ form.instance.image.url }}" class="logo-preview">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Image Max Height (px)</label>
+                            {{ form.image_size }}
+                            <div class="form-hint">Recommended 250-450px</div>
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label fw-bold">Keywords</label>
+                            {{ form.keywords }}
+                            <div class="form-hint">Comma-separated, e.g. HTML, CSS, Python</div>
+                        </div>
+                        <div id="keywordsChipPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- ==================== LINK & QR ==================== -->
+                <div class="section-card">
+                    <div class="section-header"><i class="fas fa-qrcode me-2"></i>Link &amp; QR Code</div>
+                    <div class="p-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">URL</label>
+                            {{ form.url }}
+                            <div class="form-hint">Shown as the CTA button link</div>
+                        </div>
+                        <div class="form-check mb-2">
+                            {{ form.show_qr }}
+                            <label class="form-check-label fw-bold">Show QR Code</label>
+                        </div>
+                        <div class="form-hint">
+                            QR code is generated automatically from the URL the first time this event is saved.
+                        </div>
+                        {% if form.instance.qr_code %}
+                        <div class="mt-2">
+                            <img src="{{ form.instance.qr_code.url }}" class="logo-preview">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- ==================== LOGOS ==================== -->
+                <div class="section-card">
+                    <div class="section-header"><i class="fas fa-building me-2"></i>Logos</div>
+                    <div class="p-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Logo Count</label>
+                                {{ form.logo_count }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Logo Position</label>
+                                {{ form.logo_position }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Logo 1</label>
+                            {{ form.logo1 }}
+                            <div class="form-hint">PNG / JPG / JPEG, max 1 MB</div>
+                            {% if form.instance.logo1 %}
+                            <img src="{{ form.instance.logo1.url }}" class="logo-preview">
+                            {% endif %}
+                        </div>
+                        <div class="mb-3" id="logo2Wrapper">
+                            <label class="form-label fw-bold">Logo 2</label>
+                            {{ form.logo2 }}
+                            <div class="form-hint">Only shown when Logo Count = 2</div>
+                            {% if form.instance.logo2 %}
+                            <img src="{{ form.instance.logo2.url }}" class="logo-preview">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Logo Size (px)</label>
+                            {{ form.logo_size }}
+                            <div class="form-hint">Recommended 80-120px</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== CARD STYLE ==================== -->
+                <div class="section-card">
+                    <div class="section-header"><i class="fas fa-palette me-2"></i>Card Style</div>
+                    <div class="p-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Card Width</label>
+                                {{ form.card_width }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Corner Style</label>
+                                {{ form.corner_style }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Background Type</label>
+                            {{ form.bg_type }}
+                        </div>
+
+                        <div class="row" id="solidBgRow">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Background Color</label><br>
+                                {{ form.bg_color }}
+                            </div>
+                        </div>
+
+                        <div class="row" id="gradientBgRow">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Gradient Start</label><br>
+                                {{ form.gradient_start }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Gradient End</label><br>
+                                {{ form.gradient_end }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Accent</label><br>
+                                {{ form.accent_color }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Title Color</label><br>
+                                {{ form.title_color }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Subtitle Color</label><br>
+                                {{ form.subtitle_color }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Text Color</label><br>
+                                {{ form.text_color }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Button Color</label><br>
+                                {{ form.button_color }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Date Badge Color</label><br>
+                                {{ form.date_badge_color }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Deadline Badge Color</label><br>
+                                {{ form.deadline_badge_color }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 mb-4">
+                    <a href="{% url 'event:event_list' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Event
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ==================== LIVE PREVIEW COLUMN ==================== -->
+        <div class="col-lg-5">
+            <div class="preview-container">
+                <h5 class="mb-3"><i class="fas fa-eye me-2"></i>Live Preview</h5>
+                <div class="preview-card-outer">
+                    <div class="ecp-wrap ecp-width-80" id="ecpWrap">
+                        <div class="ecp-card ecp-corner-round" id="ecpCard">
+
+                            <div class="ecp-header" id="ecpHeader">
+                                <div class="ecp-logos ecp-logo-pos-center" id="ecpLogos"></div>
+                                <div class="ecp-title" id="ecpTitle">Event Title</div>
+                                <div class="ecp-subtitle" id="ecpSubtitle"></div>
+                                <div class="ecp-meta" id="ecpMeta"></div>
+                            </div>
+
+                            <div class="ecp-body" id="ecpBodyWrap">
+                                <div id="ecpImageWrap"></div>
+                                <div class="ecp-text" id="ecpText"></div>
+                                <div class="ecp-chips" id="ecpChips"></div>
+                            </div>
+
+                            <div class="ecp-footer" id="ecpFooterWrap" style="display:none;">
+                                <a href="#" class="ecp-cta-btn" id="ecpCtaBtn" onclick="return false;">
+                                    <i class="fas fa-paper-plane"></i> Apply / Visit
+                                </a>
+                                <div class="ecp-qr-block" id="ecpQrBlock" style="display:none;">
+                                    <div class="ecp-qr-img">QR</div>
+                                    <span>Scan to open</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3 small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Approximate preview. The real QR code is generated after saving.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const $ = (id) => document.getElementById(id);
+
+    const title            = $('id_title');
+    const subtitle         = $('id_subtitle');
+    const body             = $('id_body');
+    const eventDate        = $('id_event_date');
+    const regDeadline      = $('id_registration_deadline');
+    const image            = $('id_image');
+    const keywords         = $('id_keywords');
+    const url              = $('id_url');
+    const showQr           = $('id_show_qr');
+    const logoCount        = $('id_logo_count');
+    const logoPosition     = $('id_logo_position');
+    const logo1            = $('id_logo1');
+    const logo2            = $('id_logo2');
+    const cardWidth        = $('id_card_width');
+    const cornerStyle      = $('id_corner_style');
+    const bgType           = $('id_bg_type');
+    const bgColor          = $('id_bg_color');
+    const gradientStart    = $('id_gradient_start');
+    const gradientEnd      = $('id_gradient_end');
+    const accentColor      = $('id_accent_color');
+    const titleColor       = $('id_title_color');
+    const subtitleColor    = $('id_subtitle_color');
+    const textColor        = $('id_text_color');
+    const buttonColor      = $('id_button_color');
+
+    const logo2Wrapper  = $('logo2Wrapper');
+    const solidBgRow    = $('solidBgRow');
+    const gradientBgRow = $('gradientBgRow');
+    const chipPreview   = $('keywordsChipPreview');
+
+    /* ---------- Toggle Logo 2 field ---------- */
+    function toggleLogo2() {
+        if (!logoCount) return;
+        logo2Wrapper.style.display = logoCount.value === '2' ? 'block' : 'none';
+    }
+    if (logoCount) { logoCount.addEventListener('change', toggleLogo2); toggleLogo2(); }
+
+    /* ---------- Toggle solid vs gradient rows ---------- */
+    function toggleBgType() {
+        if (!bgType) return;
+        const isGradient = bgType.value === 'gradient';
+        gradientBgRow.style.display = isGradient ? 'flex' : 'none';
+        solidBgRow.style.display = isGradient ? 'none' : 'flex';
+    }
+    if (bgType) { bgType.addEventListener('change', toggleBgType); toggleBgType(); }
+
+    /* ---------- Keyword chip preview ---------- */
+    function renderKeywordChips() {
+        const val = keywords ? keywords.value : '';
+        const list = val.split(',').map(s => s.trim()).filter(Boolean);
+        chipPreview.innerHTML = list.map(
+            k => `<span class="ecp-chip" style="font-size:.72rem;">${escapeHtml(k)}</span>`
+        ).join('');
+        // also update the live preview chips
+        $('ecpChips').innerHTML = list.map(
+            k => `<span class="ecp-chip">${escapeHtml(k)}</span>`
+        ).join('');
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    /* ---------- File -> preview image helper ---------- */
+    function readFileAsDataUrl(fileInput, callback) {
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => callback(e.target.result);
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    }
+
+    function fmtDate(value, label) {
+        if (!value) return '';
+        const d = new Date(value);
+        if (isNaN(d)) return '';
+        const formatted = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        return `<span class="ecp-meta-pill">${label} ${formatted}</span>`;
+    }
+
+    /* ---------- Main live preview updater ---------- */
+    function updatePreview() {
+        // Text content
+        $('ecpTitle').textContent = (title && title.value) ? title.value : 'Event Title';
+
+        $('ecpSubtitle').textContent = subtitle ? subtitle.value : '';
+        $('ecpSubtitle').style.display = (subtitle && subtitle.value) ? 'block' : 'none';
+
+        $('ecpText').textContent = body ? body.value : '';
+        $('ecpText').style.display = (body && body.value) ? 'block' : 'none';
+
+        // Meta pills
+        let metaHtml = '';
+        if (eventDate) metaHtml += fmtDate(eventDate.value, '<i class="fas fa-calendar-alt"></i>');
+        if (regDeadline) metaHtml += fmtDate(regDeadline.value, '<i class="fas fa-hourglass-half"></i> Apply by');
+        $('ecpMeta').innerHTML = metaHtml;
+
+        // Keywords
+        renderKeywordChips();
+
+        // Width / corners
+        $('ecpWrap').className = 'ecp-wrap ecp-width-' + (cardWidth ? cardWidth.value : '80');
+        $('ecpCard').className = 'ecp-card ecp-corner-' + (cornerStyle ? cornerStyle.value : 'round');
+
+        // Background
+        const isGradient = !bgType || bgType.value === 'gradient';
+        if (isGradient) {
+            const gs = gradientStart ? gradientStart.value : '#0f172a';
+            const ge = gradientEnd ? gradientEnd.value : '#1d4ed8';
+            $('ecpHeader').style.background = `linear-gradient(135deg, ${gs} 0%, ${ge} 100%)`;
+            $('ecpTitle').style.color = '#ffffff';
+            $('ecpSubtitle').style.color = '#ffffff';
+            $('ecpSubtitle').style.opacity = '0.88';
+        } else {
+            $('ecpHeader').style.background = bgColor ? bgColor.value : '#ffffff';
+            $('ecpTitle').style.color = titleColor ? titleColor.value : '#0f172a';
+            $('ecpSubtitle').style.color = subtitleColor ? subtitleColor.value : '#1d4ed8';
+            $('ecpSubtitle').style.opacity = '1';
+        }
+
+        // Meta pill colors
+        document.querySelectorAll('#ecpMeta .ecp-meta-pill').forEach(pill => {
+            if (isGradient) {
+                pill.style.background = 'rgba(255,255,255,.15)';
+                pill.style.border = '1px solid rgba(255,255,255,.25)';
+                pill.style.color = '#ffffff';
+            } else {
+                pill.style.background = 'rgba(29,78,216,.07)';
+                pill.style.border = '1px solid rgba(29,78,216,.15)';
+                pill.style.color = textColor ? textColor.value : '#334155';
+            }
+        });
+
+        $('ecpText').style.color = textColor ? textColor.value : '#334155';
+
+        // Logos
+        const positionClass = 'ecp-logo-pos-' + (logoPosition ? logoPosition.value : 'center');
+        const ecpLogos = $('ecpLogos');
+        ecpLogos.className = 'ecp-logos ' + positionClass;
+        ecpLogos.innerHTML = '';
+
+        function addLogoPreview(dataUrl) {
+            if (!dataUrl) return;
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.className = 'ecp-logo-img';
+            ecpLogos.appendChild(img);
+        }
+        readFileAsDataUrl(logo1, addLogoPreview);
+        if (logoCount && logoCount.value === '2') {
+            readFileAsDataUrl(logo2, addLogoPreview);
+        }
+
+        // Event image
+        const ecpImageWrap = $('ecpImageWrap');
+        ecpImageWrap.innerHTML = '';
+        readFileAsDataUrl(image, (dataUrl) => {
+            ecpImageWrap.innerHTML = `<div class="ecp-image"><img src="${dataUrl}"></div>`;
+        });
+
+        // Footer (CTA + QR)
+        const hasUrl = url && url.value;
+        const wantsQr = showQr && showQr.checked;
+        $('ecpFooterWrap').style.display = (hasUrl || wantsQr) ? 'flex' : 'none';
+        $('ecpCtaBtn').style.display = hasUrl ? 'inline-flex' : 'none';
+        $('ecpCtaBtn').style.background = buttonColor ? buttonColor.value : '#1d4ed8';
+        $('ecpQrBlock').style.display = wantsQr ? 'flex' : 'none';
+        $('ecpQrBlock').style.color = textColor ? textColor.value : '#334155';
+
+        // Meta pill icon / accent color
+        document.querySelectorAll('#ecpMeta i').forEach(i => {
+            i.style.color = accentColor ? accentColor.value : '#eab308';
+        });
+    }
+
+    /* ---------- Wire up listeners ---------- */
+    const formEl = document.getElementById('eventForm');
+    formEl.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('input', updatePreview);
+        el.addEventListener('change', updatePreview);
+    });
+
+    updatePreview();
+})();
+</script>
+{% endblock %}

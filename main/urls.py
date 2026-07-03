@@ -14,6 +14,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('certificate/', include('certificate.urls')),
     path('kyndryl/', include('kyndryl.urls')),
+    path("events/", include("event.urls")),
 ]
 
 if settings.DEBUG:
