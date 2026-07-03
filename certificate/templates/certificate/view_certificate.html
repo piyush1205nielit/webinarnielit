@@ -10,6 +10,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
+    /* ═══════════════════════════════════════════
+       CERTIFICATE STYLES — DO NOT MODIFY
+    ═══════════════════════════════════════════ */
     .cert-shell {
         font-family: 'Montserrat', 'Georgia', 'Times New Roman', serif;
     }
@@ -102,20 +105,12 @@
     .cert-line-5 { font-size: 14px; color: {{ design.line_5_color|default:"#333" }}; margin-bottom: 8px; }
 
     /* ── Single signatory ── */
-     .cert-sig-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0 8px; width: 100%; }
+    .cert-sig-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0 8px; width: 100%; }
     .cert-sig-row.single-sig { justify-content: center; }
     .cert-sig-block { display: flex; flex-direction: column; flex: 1; }
-    .cert-sig-block.single-sig-left { 
-        align-items: flex-start; 
-        width: 200px; 
-        margin-left: 50px;
-    }
+    .cert-sig-block.single-sig-left { align-items: flex-start; width: 200px; margin-left: 50px; }
     .cert-sig-block.single-sig-center { align-items: center; width: 200px; }
-    .cert-sig-block.single-sig-right { 
-        align-items: flex-end; 
-        width: 200px;
-        margin-right: 50px; 
-    }
+    .cert-sig-block.single-sig-right { align-items: flex-end; width: 200px; margin-right: 50px; }
 
     /* ── Dual signatory ── */
     .cert-sig-row-dual {
@@ -126,22 +121,8 @@
         width: 100%;
         padding: 0 10px;
     }
-
-    .cert-sig-block-dual-left {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        width: 200px;
-        margin-left: 40px;
-    }
-
-    .cert-sig-block-dual-right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        width: 200px;
-        margin-right: 40px;
-    }
+    .cert-sig-block-dual-left { display: flex; flex-direction: column; align-items: flex-start; width: 200px; margin-left: 40px; }
+    .cert-sig-block-dual-right { display: flex; flex-direction: column; align-items: flex-end; width: 200px; margin-right: 40px; }
 
     /* ── Shared sig elements ── */
     .cert-sig-img { max-height: 45px; margin-bottom: 3px; }
@@ -166,163 +147,482 @@
     .mx-auto { margin-left: auto !important; margin-right: auto !important; }
     .ms-auto { margin-left: auto !important; }
 
-    @media (max-width: 600px) {
-        .cert-inner { padding: 12px; }
-        .cert-title { font-size: 16px; }
-        .cert-line-2 { font-size: 20px; }
-        .cert-logo-img { max-height: 45px; }
+    /* ═══════════════════════════════════════════
+       OFF-SCREEN CAPTURE ELEMENT
+       Always hidden from view, used for PDF capture
+       on small screens
+    ═══════════════════════════════════════════ */
+    #certCaptureContainer {
+        position: fixed;
+        top: 0;
+        left: -9999px;
+        width: 1000px;
+        z-index: -9999;
+        pointer-events: none;
+        visibility: hidden;
+        opacity: 0;
     }
+
+    /* Force capture shell to exact 1000px — no max-width */
+    #certCaptureContainer .cert-shell {
+        width: 1000px;
+        max-width: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       LARGE SCREEN (≥1040px): show preview
+    ═══════════════════════════════════════════ */
+    @media (min-width: 1040px) {
+        #certPreviewWrapper  { display: block; }
+        #mobileDownloadCard  { display: none; }
+    }
+
+    /* ═══════════════════════════════════════════
+       SMALL SCREEN (<1040px): hide preview, show card
+    ═══════════════════════════════════════════ */
+    @media (max-width: 1039px) {
+        #certPreviewWrapper { display: none; }
+        #mobileDownloadCard { display: flex; }
+    }
+
+    /* ── Mobile download card ── */
+    #mobileDownloadCard {
+        max-width: 420px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        overflow: hidden;
+        flex-direction: column;
+    }
+    .mobile-card-header {
+        background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+        color: white;
+        padding: 28px 24px 22px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .mobile-card-header::before {
+        content: '';
+        position: absolute;
+        width: 160px; height: 160px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.07);
+        top: -60px; right: -50px;
+    }
+    .mobile-card-header .cert-icon {
+        width: 64px; height: 64px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 14px;
+        font-size: 1.6rem;
+        position: relative; z-index: 1;
+    }
+    .mobile-card-header h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; position: relative; z-index: 1; }
+    .mobile-card-header p  { font-size: 0.8rem; opacity: 0.8; margin: 0; position: relative; z-index: 1; }
+
+    .mobile-card-body { padding: 20px 24px 4px; }
+    .cert-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.82rem;
+    }
+    .cert-meta-row:last-child { border-bottom: none; }
+    .cert-meta-label { color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+    .cert-meta-value { font-weight: 600; color: #1e293b; text-align: right; max-width: 60%; }
+
+    .mobile-card-footer {
+        padding: 16px 24px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn-download-mobile {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white; border: none;
+        border-radius: 12px; padding: 14px;
+        font-weight: 700; font-size: 0.95rem;
+        width: 100%;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .btn-download-mobile:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.3); }
+    .btn-download-mobile:disabled { opacity: 0.7; transform: none; cursor: not-allowed; }
+    .btn-back-mobile {
+        background: white; color: #475569;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px; padding: 12px;
+        font-weight: 600; font-size: 0.88rem;
+        width: 100%;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-back-mobile:hover { background: #f8fafc; color: #1e293b; }
+
+    .generating-note {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: none;
+        padding: 4px 0;
+    }
+    .generating-note .spin {
+        display: inline-block; width: 12px; height: 12px;
+        border: 2px solid #e2e8f0; border-top-color: #2563eb;
+        border-radius: 50%;
+        animation: mspin 0.7s linear infinite;
+        margin-right: 5px; vertical-align: middle;
+    }
+    @keyframes mspin { to { transform: rotate(360deg); } }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="page-wrapper">
 
-    <div class="action-buttons no-print">
-        <button onclick="downloadCertificateAsPDF()" class="btn btn-success btn-lg px-5">
-            <i class="fas fa-download me-2"></i>Download Certificate
-        </button>
-        <a href="{% url 'registration:user_profile' %}" class="btn btn-outline-secondary btn-lg px-5">
-            <i class="fas fa-arrow-left me-2"></i>Back to Profile
-        </a>
-    </div>
+    <!-- ══════════════════════════════════════
+         LARGE SCREEN: visible preview + buttons
+    ══════════════════════════════════════ -->
+    <div id="certPreviewWrapper">
+        <div class="action-buttons no-print">
+            <button onclick="downloadCertificateAsPDF()" class="btn btn-success btn-lg px-5" id="desktopDownloadBtn">
+                <i class="fas fa-download me-2"></i>Download Certificate
+            </button>
+            <a href="{% url 'registration:user_profile' %}" class="btn btn-outline-secondary btn-lg px-5">
+                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+            </a>
+        </div>
 
-    <div class="cert-shell" id="certificateContent">
-        <div class="cert-inner">
+        <!-- The visible certificate on large screens -->
+        <div class="cert-shell" id="certificateContent">
+            <div class="cert-inner">
 
-            <div class="cert-header">
-                <div class="cert-institute-name">{{ design.header_title|default:"NIELIT Delhi" }}</div>
-                {% if design.header_subtitle %}
-                <div class="cert-institute-subtitle">"{{ design.header_subtitle }}"</div>
-                {% endif %}
-            </div>
+                <div class="cert-header">
+                    <div class="cert-institute-name">{{ design.header_title|default:"NIELIT Delhi" }}</div>
+                    {% if design.header_subtitle %}
+                    <div class="cert-institute-subtitle">"{{ design.header_subtitle }}"</div>
+                    {% endif %}
+                </div>
 
-            <div class="cert-logo-section">
-                <div class="cert-logo-container">
-                    {% if design.logo_position == 'both' %}
-                        {% if design.institute_logo %}
-                            <img src="{{ design.institute_logo.url }}" class="cert-logo-img" alt="Institute Logo">
+                <div class="cert-logo-section">
+                    <div class="cert-logo-container">
+                        {% if design.logo_position == 'both' %}
+                            {% if design.institute_logo %}
+                                <img src="{{ design.institute_logo.url }}" class="cert-logo-img" alt="Institute Logo">
+                            {% else %}
+                                <div class="cert-logo-placeholder">Logo Here</div>
+                            {% endif %}
+                            {% if design.secondary_logo %}
+                                <img src="{{ design.secondary_logo.url }}" class="cert-logo-img" alt="Secondary Logo">
+                            {% else %}
+                                <div class="cert-logo-placeholder">Logo Here</div>
+                            {% endif %}
                         {% else %}
-                            <div class="cert-logo-placeholder">Logo Here</div>
+                            {% if design.institute_logo %}
+                                <img src="{{ design.institute_logo.url }}" class="cert-logo-img" alt="Institute Logo">
+                            {% else %}
+                                <div class="cert-logo-placeholder">Logo Here</div>
+                            {% endif %}
                         {% endif %}
-                        {% if design.secondary_logo %}
-                            <img src="{{ design.secondary_logo.url }}" class="cert-logo-img" alt="Secondary Logo">
-                        {% else %}
-                            <div class="cert-logo-placeholder">Logo Here</div>
-                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cert-divider"></div>
+
+                <div class="cert-title">{{ design.certificate_title|default:"CERTIFICATE OF PARTICIPATION" }}</div>
+
+                <div class="cert-line cert-line-1">{{ design.line_1_text|default:"This certificate is proudly presented to" }}</div>
+                <div class="cert-line cert-line-2">
+                    {% if design.line_2_student_name %}{{ student.name }}{% else %}{{ design.line_2_custom_text }}{% endif %}
+                </div>
+                <div class="cert-line cert-line-3">{{ design.line_3_text|default:"for participating in the" }}</div>
+                <div class="cert-line cert-line-4">
+                    {% if design.line_4_show_course %}{{ student.course_enrolled.course_name }}{% else %}{{ design.line_4_custom_text }}{% endif %}
+                </div>
+                <div class="cert-line cert-line-5">
+                    {% if design.line_5_date_range %}
+                        on {% if student.course_enrolled.event_date %}{{ student.course_enrolled.event_date|date:"d-m-Y" }}{% elif student.course_enrolled.start_date %}{{ student.course_enrolled.start_date|date:"d-m-Y" }}{% else %}{{ certificate.issue_date|date:"d-m-Y" }}{% endif %}
+                        organised by NIELIT Delhi Inderlok Centre
                     {% else %}
-                        {% if design.institute_logo %}
-                            <img src="{{ design.institute_logo.url }}" class="cert-logo-img" alt="Institute Logo">
-                        {% else %}
-                            <div class="cert-logo-placeholder">Logo Here</div>
-                        {% endif %}
+                        {{ design.line_5_custom_text }}
                     {% endif %}
                 </div>
-            </div>
 
-            <div class="cert-divider"></div>
-
-            <div class="cert-title">{{ design.certificate_title|default:"CERTIFICATE OF PARTICIPATION" }}</div>
-
-            <div class="cert-line cert-line-1">{{ design.line_1_text|default:"This certificate is proudly presented to" }}</div>
-            <div class="cert-line cert-line-2">
-                {% if design.line_2_student_name %}{{ student.name }}{% else %}{{ design.line_2_custom_text }}{% endif %}
-            </div>
-            <div class="cert-line cert-line-3">{{ design.line_3_text|default:"for participating in the" }}</div>
-            <div class="cert-line cert-line-4">
-                {% if design.line_4_show_course %}{{ student.course_enrolled.course_name }}{% else %}{{ design.line_4_custom_text }}{% endif %}
-            </div>
-            <div class="cert-line cert-line-5">
-                {% if design.line_5_date_range %}
-                    on {% if student.course_enrolled.event_date %}{{ student.course_enrolled.event_date|date:"d-m-Y" }}{% elif student.course_enrolled.start_date %}{{ student.course_enrolled.start_date|date:"d-m-Y" }}{% else %}{{ certificate.issue_date|date:"d-m-Y" }}{% endif %}
-                    organised by NIELIT Delhi Inderlok Centre
-                {% else %}
-                    {{ design.line_5_custom_text }}
-                {% endif %}
-            </div>
-
-            {% if design.signatory_count == 1 %}
-                <!-- Single signatory -->
-              <div class="cert-sig-row single-sig">
-                    <div class="cert-sig-block single-sig-{{ design.signature_1_position|default:'center' }}">
-                        {% if design.signature_1_image %}
-                            <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
-                        {% else %}
-                            <div class="cert-sig-line {% if design.signature_1_position == 'center' %}mx-auto{% elif design.signature_1_position == 'right' %}ms-auto{% endif %}"></div>
-                        {% endif %}
-                        <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
-                        <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
-                    </div>
-                </div>
-
-            {% else %}
-                <!-- Dual signatory: left and right -->
-                <div class="cert-sig-row-dual">
-
-                    <!-- Left signatory -->
-                    <div class="cert-sig-block-dual-left">
-                        {% if design.signature_1_image %}
-                            <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
-                        {% else %}
-                            <div class="cert-sig-line"></div>
-                        {% endif %}
-                        <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
-                        <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
-                    </div>
-
-                    <!-- Right signatory -->
-                    <div class="cert-sig-block-dual-right">
-                        {% if design.signature_2_image %}
-                            <img src="{{ design.signature_2_image.url }}" class="cert-sig-img">
-                        {% else %}
-                            <div class="cert-sig-line-right"></div>
-                        {% endif %}
-                        <div class="cert-sig-name">{{ design.signature_2_name|default:"Authorized Signatory" }}</div>
-                        <div class="cert-sig-desig">{{ design.signature_2_designation|default:"Director" }}</div>
-                    </div>
-
-                </div>
-            {% endif %}
-
-            <div class="cert-divider-dashed"></div>
-
-            <div class="footer-info-row">
-                <div class="d-flex align-items-center gap-2">
-                    {% if design.show_qr_code and certificate.certificate_number %}
-                        <div class="cert-qr-section">
-                            <img src="{% url 'certificate:certificate_qr_code' certificate.certificate_number %}"
-                                alt="QR Code"
-                                style="width: {{ design.qr_code_size|default:55 }}px; height: {{ design.qr_code_size|default:55 }}px;
-                                        border: 1px solid #ddd; padding: 3px; background: white; border-radius: 5px;">
-                            <div style="font-size: 8px; color: #666;">Scan to Verify</div>
+                {% if design.signatory_count == 1 %}
+                    <div class="cert-sig-row single-sig">
+                        <div class="cert-sig-block single-sig-{{ design.signature_1_position|default:'center' }}">
+                            {% if design.signature_1_image %}
+                                <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
+                            {% else %}
+                                <div class="cert-sig-line {% if design.signature_1_position == 'center' %}mx-auto{% elif design.signature_1_position == 'right' %}ms-auto{% endif %}"></div>
+                            {% endif %}
+                            <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
+                            <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
                         </div>
-                    {% endif %}
-                    <div class="issue-date-box">
-                        <div class="issue-date-label">ISSUE DATE</div>
-                        <div class="issue-date-value">{{ certificate.issue_date|date:"d-m-Y" }}</div>
+                    </div>
+                {% else %}
+                    <div class="cert-sig-row-dual">
+                        <div class="cert-sig-block-dual-left">
+                            {% if design.signature_1_image %}
+                                <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
+                            {% else %}
+                                <div class="cert-sig-line"></div>
+                            {% endif %}
+                            <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
+                            <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
+                        </div>
+                        <div class="cert-sig-block-dual-right">
+                            {% if design.signature_2_image %}
+                                <img src="{{ design.signature_2_image.url }}" class="cert-sig-img">
+                            {% else %}
+                                <div class="cert-sig-line-right"></div>
+                            {% endif %}
+                            <div class="cert-sig-name">{{ design.signature_2_name|default:"Authorized Signatory" }}</div>
+                            <div class="cert-sig-desig">{{ design.signature_2_designation|default:"Director" }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="cert-divider-dashed"></div>
+
+                <div class="footer-info-row">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if design.show_qr_code and certificate.certificate_number %}
+                            <div class="cert-qr-section">
+                                <img src="{% url 'certificate:certificate_qr_code' certificate.certificate_number %}"
+                                    alt="QR Code"
+                                    style="width: {{ design.qr_code_size|default:55 }}px; height: {{ design.qr_code_size|default:55 }}px;
+                                            border: 1px solid #ddd; padding: 3px; background: white; border-radius: 5px;">
+                                <div style="font-size: 8px; color: #666;">Scan to Verify</div>
+                            </div>
+                        {% endif %}
+                        <div class="issue-date-box">
+                            <div class="issue-date-label">ISSUE DATE</div>
+                            <div class="issue-date-value">{{ certificate.issue_date|date:"d-m-Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="cert-details-box">
+                        {% if design.show_certificate_number %}<div class="cert-detail-row"><span class="cert-detail-label">Certificate No:</span><span class="cert-detail-value">{{ certificate.certificate_number }}</span></div>{% endif %}
+                        {% if design.show_registration_number %}<div class="cert-detail-row"><span class="cert-detail-label">Registration No:</span><span class="cert-detail-value">{{ student.registration_number }}</span></div>{% endif %}
+                        {% if design.show_student_id %}<div class="cert-detail-row"><span class="cert-detail-label">Student ID:</span><span class="cert-detail-value">{{ student.id|slice:"-8" }}</span></div>{% endif %}
                     </div>
                 </div>
-                <div class="cert-details-box">
-                    {% if design.show_certificate_number %}<div class="cert-detail-row"><span class="cert-detail-label">Certificate No:</span><span class="cert-detail-value">{{ certificate.certificate_number }}</span></div>{% endif %}
-                    {% if design.show_registration_number %}<div class="cert-detail-row"><span class="cert-detail-label">Registration No:</span><span class="cert-detail-value">{{ student.registration_number }}</span></div>{% endif %}
-                    {% if design.show_student_id %}<div class="cert-detail-row"><span class="cert-detail-label">Student ID:</span><span class="cert-detail-value">{{ student.id|slice:"-8" }}</span></div>{% endif %}
-                </div>
-            </div>
 
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-3 text-center small no-print">
+            Click <strong>Download Certificate</strong> to save your certificate as PDF.
         </div>
     </div>
 
-    <div class="alert alert-info mt-3 text-center small no-print">Click <strong>Download Certificate</strong> to save your certificate as PDF.</div>
+
+    <!-- ══════════════════════════════════════
+         SMALL SCREEN: compact info card
+    ══════════════════════════════════════ -->
+    <div id="mobileDownloadCard">
+        <div class="mobile-card-header">
+            <div class="cert-icon"><i class="fas fa-certificate"></i></div>
+            <h4>Your Certificate is Ready</h4>
+            <p>Download your official NIELIT certificate as PDF</p>
+        </div>
+        <div class="mobile-card-body">
+            <div class="cert-meta-row">
+                <span class="cert-meta-label">Student Name</span>
+                <span class="cert-meta-value">{{ student.name }}</span>
+            </div>
+            <div class="cert-meta-row">
+                <span class="cert-meta-label">Course</span>
+                <span class="cert-meta-value">{{ student.course_enrolled.course_name }}</span>
+            </div>
+            <div class="cert-meta-row">
+                <span class="cert-meta-label">Certificate No.</span>
+                <span class="cert-meta-value" style="font-family:monospace; font-size:0.72rem; color:#1e3a8a;">{{ certificate.certificate_number }}</span>
+            </div>
+            <div class="cert-meta-row">
+                <span class="cert-meta-label">Issue Date</span>
+                <span class="cert-meta-value">{{ certificate.issue_date|date:"d F Y" }}</span>
+            </div>
+            <div class="cert-meta-row">
+                <span class="cert-meta-label">Registration No.</span>
+                <span class="cert-meta-value" style="font-family:monospace; font-size:0.72rem;">{{ student.registration_number }}</span>
+            </div>
+        </div>
+        <div class="mobile-card-footer">
+            <div class="generating-note" id="generatingNote">
+                <span class="spin"></span>Generating certificate, please wait…
+            </div>
+            <button class="btn-download-mobile" id="mobileDownloadBtn" onclick="downloadCertificateAsPDF()">
+                <i class="fas fa-download"></i> Download Certificate as PDF
+            </button>
+            <a href="{% url 'registration:user_profile' %}" class="btn-back-mobile">
+                <i class="fas fa-arrow-left"></i> Back to Profile
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════
+         OFF-SCREEN CERTIFICATE FOR MOBILE CAPTURE
+         Always invisible — only used by html2canvas
+         Contains identical certificate HTML at fixed 1000px
+    ══════════════════════════════════════ -->
+    <div id="certCaptureContainer">
+        <div class="cert-shell" id="certificateCapture">
+            <div class="cert-inner">
+
+                <div class="cert-header">
+                    <div class="cert-institute-name">{{ design.header_title|default:"NIELIT Delhi" }}</div>
+                    {% if design.header_subtitle %}
+                    <div class="cert-institute-subtitle">"{{ design.header_subtitle }}"</div>
+                    {% endif %}
+                </div>
+
+                <div class="cert-logo-section">
+                    <div class="cert-logo-container">
+                        {% if design.logo_position == 'both' %}
+                            {% if design.institute_logo %}
+                                <img src="{{ design.institute_logo.url }}" class="cert-logo-img" alt="Institute Logo">
+                            {% else %}
+                                <div class="cert-logo-placeholder">Logo Here</div>
+                            {% endif %}
+                            {% if design.secondary_logo %}
+                                <img src="{{ design.secondary_logo.url }}" class="cert-logo-img" alt="Secondary Logo">
+                            {% else %}
+                                <div class="cert-logo-placeholder">Logo Here</div>
+                            {% endif %}
+                        {% else %}
+                            {% if design.institute_logo %}
+                                <img src="{{ design.institute_logo.url }}" class="cert-logo-img" alt="Institute Logo">
+                            {% else %}
+                                <div class="cert-logo-placeholder">Logo Here</div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="cert-divider"></div>
+
+                <div class="cert-title">{{ design.certificate_title|default:"CERTIFICATE OF PARTICIPATION" }}</div>
+
+                <div class="cert-line cert-line-1">{{ design.line_1_text|default:"This certificate is proudly presented to" }}</div>
+                <div class="cert-line cert-line-2">
+                    {% if design.line_2_student_name %}{{ student.name }}{% else %}{{ design.line_2_custom_text }}{% endif %}
+                </div>
+                <div class="cert-line cert-line-3">{{ design.line_3_text|default:"for participating in the" }}</div>
+                <div class="cert-line cert-line-4">
+                    {% if design.line_4_show_course %}{{ student.course_enrolled.course_name }}{% else %}{{ design.line_4_custom_text }}{% endif %}
+                </div>
+                <div class="cert-line cert-line-5">
+                    {% if design.line_5_date_range %}
+                        on {% if student.course_enrolled.event_date %}{{ student.course_enrolled.event_date|date:"d-m-Y" }}{% elif student.course_enrolled.start_date %}{{ student.course_enrolled.start_date|date:"d-m-Y" }}{% else %}{{ certificate.issue_date|date:"d-m-Y" }}{% endif %}
+                        organised by NIELIT Delhi Inderlok Centre
+                    {% else %}
+                        {{ design.line_5_custom_text }}
+                    {% endif %}
+                </div>
+
+                {% if design.signatory_count == 1 %}
+                    <div class="cert-sig-row single-sig">
+                        <div class="cert-sig-block single-sig-{{ design.signature_1_position|default:'center' }}">
+                            {% if design.signature_1_image %}
+                                <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
+                            {% else %}
+                                <div class="cert-sig-line {% if design.signature_1_position == 'center' %}mx-auto{% elif design.signature_1_position == 'right' %}ms-auto{% endif %}"></div>
+                            {% endif %}
+                            <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
+                            <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="cert-sig-row-dual">
+                        <div class="cert-sig-block-dual-left">
+                            {% if design.signature_1_image %}
+                                <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
+                            {% else %}
+                                <div class="cert-sig-line"></div>
+                            {% endif %}
+                            <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
+                            <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
+                        </div>
+                        <div class="cert-sig-block-dual-right">
+                            {% if design.signature_2_image %}
+                                <img src="{{ design.signature_2_image.url }}" class="cert-sig-img">
+                            {% else %}
+                                <div class="cert-sig-line-right"></div>
+                            {% endif %}
+                            <div class="cert-sig-name">{{ design.signature_2_name|default:"Authorized Signatory" }}</div>
+                            <div class="cert-sig-desig">{{ design.signature_2_designation|default:"Director" }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="cert-divider-dashed"></div>
+
+                <div class="footer-info-row">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if design.show_qr_code and certificate.certificate_number %}
+                            <div class="cert-qr-section">
+                                <img src="{% url 'certificate:certificate_qr_code' certificate.certificate_number %}"
+                                    alt="QR Code"
+                                    style="width: {{ design.qr_code_size|default:55 }}px; height: {{ design.qr_code_size|default:55 }}px;
+                                            border: 1px solid #ddd; padding: 3px; background: white; border-radius: 5px;">
+                                <div style="font-size: 8px; color: #666;">Scan to Verify</div>
+                            </div>
+                        {% endif %}
+                        <div class="issue-date-box">
+                            <div class="issue-date-label">ISSUE DATE</div>
+                            <div class="issue-date-value">{{ certificate.issue_date|date:"d-m-Y" }}</div>
+                        </div>
+                    </div>
+                    <div class="cert-details-box">
+                        {% if design.show_certificate_number %}<div class="cert-detail-row"><span class="cert-detail-label">Certificate No:</span><span class="cert-detail-value">{{ certificate.certificate_number }}</span></div>{% endif %}
+                        {% if design.show_registration_number %}<div class="cert-detail-row"><span class="cert-detail-label">Registration No:</span><span class="cert-detail-value">{{ student.registration_number }}</span></div>{% endif %}
+                        {% if design.show_student_id %}<div class="cert-detail-row"><span class="cert-detail-label">Student ID:</span><span class="cert-detail-value">{{ student.id|slice:"-8" }}</span></div>{% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
 function downloadCertificateAsPDF() {
-    const certEl = document.getElementById('certificateContent');
+    const isMobile = window.innerWidth < 1040;
 
-    const btn = document.querySelector('button[onclick="downloadCertificateAsPDF()"]');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
-    btn.disabled = true;
+    // On mobile use the off-screen fixed-width capture element
+    // On desktop use the visible certificate
+    const certEl = isMobile
+        ? document.getElementById('certificateCapture')
+        : document.getElementById('certificateContent');
+
+    // Button references
+    const desktopBtn  = document.getElementById('desktopDownloadBtn');
+    const mobileBtn   = document.getElementById('mobileDownloadBtn');
+    const genNote     = document.getElementById('generatingNote');
+    const spinnerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
+
+    // Disable buttons, show feedback
+    if (desktopBtn) { desktopBtn.disabled = true; desktopBtn.innerHTML = spinnerHTML; }
+    if (mobileBtn)  { mobileBtn.disabled  = true; mobileBtn.innerHTML  = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:mspin 0.6s linear infinite;margin-right:7px;vertical-align:middle;"></span>Generating...'; }
+    if (genNote)    { genNote.style.display = 'block'; }
+
+    // Briefly make off-screen element renderable for html2canvas
+    const captureWrap = document.getElementById('certCaptureContainer');
+    if (isMobile && captureWrap) {
+        captureWrap.style.visibility = 'visible';
+        captureWrap.style.opacity    = '1';
+        captureWrap.style.left       = '-9999px'; // stays off-screen
+    }
 
     html2canvas(certEl, {
         scale: 3,
@@ -331,36 +631,49 @@ function downloadCertificateAsPDF() {
         backgroundColor: '#ffffff',
         logging: false,
         scrollX: 0,
-        scrollY: -window.scrollY,
-        windowWidth: document.documentElement.scrollWidth,
+        scrollY: 0,
+        // Always capture at 1000px width regardless of device screen
+        windowWidth: 1000,
+        width: certEl.offsetWidth,
+        height: certEl.offsetHeight,
     }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
+        // Hide capture wrapper again
+        if (isMobile && captureWrap) {
+            captureWrap.style.visibility = 'hidden';
+            captureWrap.style.opacity    = '0';
+        }
+
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
         const { jsPDF } = window.jspdf;
 
-        const certWidthPx  = certEl.offsetWidth;
+        // Use 1000px as canonical width on mobile, actual offsetWidth on desktop
+        const certWidthPx  = isMobile ? 1000 : certEl.offsetWidth;
         const certHeightPx = certEl.offsetHeight;
         const pxToMm = px => (px * 25.4) / 96;
-        const certWidthMm  = pxToMm(certWidthPx);
-        const certHeightMm = pxToMm(certHeightPx);
 
         const pdf = new jsPDF({
-            orientation: certWidthMm > certHeightMm ? 'landscape' : 'portrait',
+            orientation: 'landscape',
             unit: 'mm',
-            format: [certWidthMm, certHeightMm],
+            format: [pxToMm(certWidthPx), pxToMm(certHeightPx)],
         });
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, certWidthMm, certHeightMm);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pxToMm(certWidthPx), pxToMm(certHeightPx));
 
         const certificateNumber = "{{ certificate.certificate_number }}";
         pdf.save(`Certificate_${certificateNumber}.pdf`);
 
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        // Restore buttons
+        if (desktopBtn) { desktopBtn.disabled = false; desktopBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download Certificate'; }
+        if (mobileBtn)  { mobileBtn.disabled  = false; mobileBtn.innerHTML  = '<i class="fas fa-download"></i> Download Certificate as PDF'; }
+        if (genNote)    { genNote.style.display = 'none'; }
+
     }).catch(err => {
         console.error('PDF generation failed:', err);
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        if (isMobile && captureWrap) { captureWrap.style.visibility = 'hidden'; captureWrap.style.opacity = '0'; }
+        if (desktopBtn) { desktopBtn.disabled = false; desktopBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download Certificate'; }
+        if (mobileBtn)  { mobileBtn.disabled  = false; mobileBtn.innerHTML  = '<i class="fas fa-download"></i> Download Certificate as PDF'; }
+        if (genNote)    { genNote.style.display = 'none'; }
         alert('Could not generate PDF. Please try again.');
     });
 }

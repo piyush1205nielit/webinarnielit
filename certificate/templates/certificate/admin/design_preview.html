@@ -55,7 +55,7 @@
     /* ── Inner ── */
     .cert-inner {
         width: 100%;
-        padding: 18px 25px 28px;
+        padding: 18px 25px 18px;
         display: flex;
         flex-direction: column;
         position: relative;
@@ -99,8 +99,11 @@
         color: #999;
     }
 
-    /* ── Dividers ── */
- 
+    /* ── Dividers — exactly matching view_certificate ── */
+    .cert-divider {
+        border-top: 2px solid {{ design.border_color|default:"#1e3a8a" }};
+        margin: 6px 0;
+    }
     .cert-divider-dashed { border-top: 1px dashed #999; margin: 6px 0; }
 
     /* ── Title ── */
@@ -138,31 +141,15 @@
     }
     .cert-line-5 { font-size: 14px; color: {{ design.line_5_color|default:"#333" }}; margin-bottom: 8px; }
 
-    /* ── Single signatory ── */
-    .cert-sig-row-single {
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-        margin: 8px 0;
-        width: 100%;
-    }
-    .cert-sig-block-single-left {
-        display: flex; flex-direction: column;
-        align-items: flex-start;
-        width: 200px; margin-left: 50px;
-    }
-    .cert-sig-block-single-center {
-        display: flex; flex-direction: column;
-        align-items: center;
-        width: 200px;
-    }
-    .cert-sig-block-single-right {
-        display: flex; flex-direction: column;
-        align-items: flex-end;
-        width: 200px; margin-right: 50px;
-    }
+    /* ── Single signatory — EXACTLY matching view_certificate ── */
+    .cert-sig-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 8px 0 8px; width: 100%; }
+    .cert-sig-row.single-sig { justify-content: center; }
+    .cert-sig-block { display: flex; flex-direction: column; flex: 1; }
+    .cert-sig-block.single-sig-left { align-items: flex-start; width: 200px; margin-left: 50px; }
+    .cert-sig-block.single-sig-center { align-items: center; width: 200px; }
+    .cert-sig-block.single-sig-right { align-items: flex-end; width: 200px; margin-right: 50px; }
 
-    /* ── Dual signatory ── */
+    /* ── Dual signatory — EXACTLY matching view_certificate ── */
     .cert-sig-row-dual {
         display: flex;
         justify-content: space-between;
@@ -171,27 +158,19 @@
         width: 100%;
         padding: 0 10px;
     }
-    .cert-sig-block-dual-left {
-        display: flex; flex-direction: column;
-        align-items: flex-start;
-        width: 200px; margin-left: 40px;
-    }
-    .cert-sig-block-dual-right {
-        display: flex; flex-direction: column;
-        align-items: flex-end;
-        width: 200px; margin-right: 40px;
-    }
+    .cert-sig-block-dual-left  { display: flex; flex-direction: column; align-items: flex-start; width: 200px; margin-left: 40px; }
+    .cert-sig-block-dual-right { display: flex; flex-direction: column; align-items: flex-end;   width: 200px; margin-right: 40px; }
 
     /* ── Shared sig elements ── */
-    .cert-sig-img { max-height: 45px; margin-bottom: 3px; }
-    .cert-sig-line { width: 140px; height: 1px; background: #222; margin-bottom: 3px; }
+    .cert-sig-img        { max-height: 45px; margin-bottom: 3px; }
+    .cert-sig-line       { width: 140px; height: 1px; background: #222; margin-bottom: 3px; }
     .cert-sig-line-right { width: 140px; height: 1px; background: #222; margin-bottom: 3px; margin-left: auto; }
-    .cert-sig-name { font-size: 15px; font-weight: 600; color: #222; }
+    .cert-sig-name  { font-size: 15px; font-weight: 600; color: #222; }
     .cert-sig-desig { font-size: 13px; color: {{ design.line_5_color|default:"#555" }}; }
     .mx-auto { margin-left: auto !important; margin-right: auto !important; }
     .ms-auto { margin-left: auto !important; }
 
-    /* ── Footer ── */
+    /* ── Footer — EXACTLY matching view_certificate ── */
     .footer-info-row {
         display: flex;
         justify-content: space-between;
@@ -199,11 +178,11 @@
         margin-top: 2px;
         gap: 10px;
     }
-    .issue-date-box { display: flex; flex-direction: column; }
+    .issue-date-box  { display: flex; flex-direction: column; }
     .issue-date-label { font-size: 10px; color: {{ design.line_5_color|default:"#555" }}; }
     .issue-date-value { font-weight: 600; font-size: 12px; color: {{ design.title_color|default:"#1e3a8a" }}; }
     .cert-details-box { display: flex; flex-direction: column; gap: 3px; text-align: right; }
-    .cert-detail-row { display: flex; gap: 6px; font-size: 10px; }
+    .cert-detail-row  { display: flex; gap: 6px; font-size: 10px; }
     .cert-detail-label { color: {{ design.line_5_color|default:"#555" }}; }
     .cert-detail-value { font-weight: 600; color: #1e293b; }
 
@@ -285,7 +264,8 @@
                             </div>
                         </div>
 
-
+                        <!-- Divider — same as view_certificate -->
+                        <div class="cert-divider"></div>
 
                         <!-- Title -->
                         <div class="cert-title">{{ design.certificate_title|default:"CERTIFICATE OF PARTICIPATION" }}</div>
@@ -307,18 +287,14 @@
                             {% endif %}
                         </div>
 
-                        <!-- Signatures -->
+                        <!-- Signatures — EXACTLY matching view_certificate classes -->
                         {% if design.signatory_count == 1 %}
-                            <div class="cert-sig-row-single">
-                                <div class="cert-sig-block-single-{{ design.signature_1_position|default:'center' }}">
+                            <div class="cert-sig-row single-sig">
+                                <div class="cert-sig-block single-sig-{{ design.signature_1_position|default:'center' }}">
                                     {% if design.signature_1_image %}
                                         <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
                                     {% else %}
-                                        <div class="cert-sig-line
-                                            {% if design.signature_1_position == 'center' %}mx-auto
-                                            {% elif design.signature_1_position == 'right' %}ms-auto
-                                            {% endif %}">
-                                        </div>
+                                        <div class="cert-sig-line {% if design.signature_1_position == 'center' %}mx-auto{% elif design.signature_1_position == 'right' %}ms-auto{% endif %}"></div>
                                     {% endif %}
                                     <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
                                     <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
@@ -326,8 +302,6 @@
                             </div>
                         {% else %}
                             <div class="cert-sig-row-dual">
-
-                                <!-- Left signatory -->
                                 <div class="cert-sig-block-dual-left">
                                     {% if design.signature_1_image %}
                                         <img src="{{ design.signature_1_image.url }}" class="cert-sig-img">
@@ -337,8 +311,6 @@
                                     <div class="cert-sig-name">{{ design.signature_1_name|default:"Authorized Signatory" }}</div>
                                     <div class="cert-sig-desig">{{ design.signature_1_designation|default:"Joint Director" }}</div>
                                 </div>
-
-                                <!-- Right signatory -->
                                 <div class="cert-sig-block-dual-right">
                                     {% if design.signature_2_image %}
                                         <img src="{{ design.signature_2_image.url }}" class="cert-sig-img">
@@ -348,18 +320,16 @@
                                     <div class="cert-sig-name">{{ design.signature_2_name|default:"Authorized Signatory" }}</div>
                                     <div class="cert-sig-desig">{{ design.signature_2_designation|default:"Director" }}</div>
                                 </div>
-
                             </div>
                         {% endif %}
 
                         <div class="cert-divider-dashed"></div>
 
-                        <!-- Footer -->
+                        <!-- Footer — EXACTLY matching view_certificate structure -->
                         <div class="footer-info-row">
                             <div class="d-flex align-items-center gap-2">
                                 {% if design.show_qr_code %}
                                     <div class="cert-qr-section">
-                                        <!-- Placeholder QR for preview -->
                                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=55x55&data=PREVIEW-CERTIFICATE"
                                             alt="QR Code Preview"
                                             style="width: {{ design.qr_code_size|default:55 }}px; height: {{ design.qr_code_size|default:55 }}px;
