@@ -178,34 +178,16 @@ Usage in home.html:
         }
     }
 
-    /* ============================================================
-       ANIMATIONS
-    ============================================================ */
-    @keyframes fadeSlideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    #eventCardsCarousel .carousel-item.active .event-banner {
-        animation: fadeSlideUp 0.6s ease forwards;
-    }
+
 </style>
 
 <!-- ============================================================
      CAROUSEL MARKUP
   ============================================================ -->
 <div class="event-cards-carousel-section" style="--carousel-bg: {{ carousel_bg|default:'#f5f7fa' }};">
-    <div id="eventCardsCarousel"
-         class="carousel slide"
-         data-bs-ride="carousel"
-         data-bs-interval="4000"
-         data-bs-pause="hover"
-         data-bs-wrap="true">
+    <div id="eventCardsCarousel" class="carousel slide"
+         data-bs-ride="carousel" data-bs-interval="4000"
+         data-bs-pause="hover" data-bs-wrap="true">
 
         <!-- Indicators -->
         <div class="carousel-indicators event-carousel-custom-indicators">
