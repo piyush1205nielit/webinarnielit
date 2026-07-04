@@ -1,12 +1,12 @@
 # certificate/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.utils import timezone
-from django.urls import reverse  # Add this import
+from django.urls import reverse  
 from io import BytesIO
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
@@ -16,10 +16,11 @@ from .forms import CertificateDesignForm, IssueCertificateForm
 import qrcode
 from django.views.decorators.http import require_GET
 from django.views.decorators.cache import cache_control
+import requests
+from django.views.decorators.csrf import csrf_exempt
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
-
 
 # ==================== STUDENT VIEWS ====================
 
@@ -244,3 +245,33 @@ def issued_certificates_list(request):
         'page_obj': page_obj,
         'search': search or '',
     })
+
+
+@csrf_exempt
+def image_proxy(request):
+    """
+    Proxy images through Django to avoid CORS issues with S3 and other sources.
+    No auth required — only serves images, not sensitive data.
+    """
+    url = request.GET.get('url', '')
+
+    if not url:
+        return HttpResponse(status=400)
+
+    try:
+        resp = requests.get(
+            url,
+            timeout=15,
+            headers={
+                'User-Agent': 'Mozilla/5.0',
+            }
+        )
+        content_type = resp.headers.get('Content-Type', 'image/png')
+        response = HttpResponse(resp.content, content_type=content_type)
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Cache-Control'] = 'public, max-age=3600'
+        return response
+
+    except Exception as e:
+        print(f'Image proxy error: {e}')
+        return HttpResponse(status=500)

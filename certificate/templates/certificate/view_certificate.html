@@ -593,6 +593,7 @@
     </div>
 
 </div>
+
 <script>
 function downloadCertificateAsPDF() {
     const isMobile = window.innerWidth < 1040;
@@ -602,7 +603,6 @@ function downloadCertificateAsPDF() {
     const genNote     = document.getElementById('generatingNote');
     const captureWrap = document.getElementById('certCaptureContainer');
 
-    // ── Loading state ──
     if (desktopBtn) { desktopBtn.disabled = true; desktopBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...'; }
     if (mobileBtn)  { mobileBtn.disabled  = true; mobileBtn.innerHTML  = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:mspin 0.6s linear infinite;margin-right:7px;vertical-align:middle;"></span>Generating...'; }
     if (genNote)    { genNote.style.display = 'block'; }
@@ -629,78 +629,70 @@ function downloadCertificateAsPDF() {
         pdf.save(`Certificate_${certNum}.pdf`);
     }
 
-    // ── CORS fix: reload all images with crossOrigin=anonymous before capture ──
-    // This is required because S3 images cached without CORS headers
-    // won't have Access-Control-Allow-Origin, causing canvas taint
-    function reloadImagesWithCORS(certEl) {
-        const allImgs = Array.from(certEl.querySelectorAll('img'));
+    // ── Route ALL images through Django proxy ──
+    // This solves CORS for S3, QR codes, and localhost in one shot
+    function proxyImageSrc(src) {
+        if (!src || src.startsWith('data:')) return src;
 
+        const pageOrigin = window.location.origin;
+
+        // Already same-origin — check if it's a QR or relative URL
+        try {
+            const parsed = new URL(src, pageOrigin);
+            // If same origin, proxy it anyway so canvas can export it cleanly
+            // (QR code endpoint needs this too)
+            return pageOrigin + '/certificate/image-proxy/?url=' + encodeURIComponent(parsed.href);
+        } catch (e) {
+            return src;
+        }
+    }
+
+    function reloadAllImagesViaProxy(certEl) {
+        const allImgs = Array.from(certEl.querySelectorAll('img'));
         if (allImgs.length === 0) return Promise.resolve();
 
         const promises = allImgs.map(img => {
             return new Promise((resolve) => {
-
-                // Skip data URIs — already embedded, no CORS needed
                 if (!img.src || img.src.startsWith('data:')) {
                     resolve();
                     return;
                 }
 
-                // Skip same-origin images (like QR code from your own server)
-                try {
-                    const imgUrl = new URL(img.src);
-                    const pageUrl = new URL(window.location.href);
-                    if (imgUrl.origin === pageUrl.origin) {
-                        resolve();
-                        return;
-                    }
-                } catch(e) {
+                const proxiedSrc = proxyImageSrc(img.src);
+
+                // Already proxied — don't re-proxy
+                if (img.src.includes('/certificate/image-proxy/')) {
                     resolve();
                     return;
                 }
 
-                const originalSrc = img.src.split('?')[0]; // strip any existing params
-
-                // Set crossOrigin before changing src
                 img.crossOrigin = 'anonymous';
-
-                img.onload = () => {
-                    console.log('✅ CORS reload OK:', originalSrc);
-                    resolve();
-                };
-
+                img.onload  = () => resolve();
                 img.onerror = () => {
-                    // CORS still failing even after S3 config —
-                    // fall back to a proxy approach or resolve to not block the whole PDF
-                    console.warn('⚠️ CORS reload failed, image will be missing:', originalSrc);
-                    resolve();
+                    console.warn('Proxy load failed for:', img.src);
+                    resolve(); // resolve anyway — don't block PDF
                 };
-
-                // Add cache-buster so browser makes a fresh request
-                // (previously cached response without CORS headers won't work)
-                const cacheBuster = '_cors=' + Date.now();
-                const separator   = originalSrc.includes('?') ? '&' : '?';
-                img.src = originalSrc + separator + cacheBuster;
+                img.src = proxiedSrc;
             });
         });
 
         return Promise.all(promises);
     }
 
-    // ── Core capture function used by both desktop and mobile ──
     function captureElement(certEl, canvasOptions) {
-        return reloadImagesWithCORS(certEl).then(() => {
+        return reloadAllImagesViaProxy(certEl).then(() => {
             return html2canvas(certEl, {
                 ...canvasOptions,
                 useCORS: true,
                 allowTaint: false,
                 imageTimeout: 20000,
                 onclone: function(clonedDoc) {
-                    // Also apply crossOrigin on all cloned images
-                    // html2canvas works on a clone internally
                     clonedDoc.querySelectorAll('img').forEach(img => {
                         if (img.src && !img.src.startsWith('data:')) {
                             img.crossOrigin = 'anonymous';
+                            if (!img.src.includes('/certificate/image-proxy/')) {
+                                img.src = proxyImageSrc(img.src);
+                            }
                         }
                     });
                 }
@@ -708,10 +700,18 @@ function downloadCertificateAsPDF() {
         });
     }
 
-    if (!isMobile) {
-        // ══ DESKTOP: capture the visible certificate ══
-        const certEl = document.getElementById('certificateContent');
+    function hideCaptureWrap() {
+        captureWrap.style.position   = 'fixed';
+        captureWrap.style.top        = '0';
+        captureWrap.style.left       = '-9999px';
+        captureWrap.style.visibility = 'hidden';
+        captureWrap.style.opacity    = '0';
+        captureWrap.style.zIndex     = '-9999';
+    }
 
+    if (!isMobile) {
+        // ══ DESKTOP ══
+        const certEl = document.getElementById('certificateContent');
         window.scrollTo(0, 0);
 
         const W = certEl.offsetWidth;
@@ -739,9 +739,7 @@ function downloadCertificateAsPDF() {
         });
 
     } else {
-        // ══ MOBILE: use the off-screen 1000px element ══
-
-        // Bring into document flow so browser lays it out at 1000px
+        // ══ MOBILE ══
         captureWrap.style.position   = 'absolute';
         captureWrap.style.top        = document.documentElement.scrollHeight + 'px';
         captureWrap.style.left       = '0';
@@ -752,19 +750,8 @@ function downloadCertificateAsPDF() {
 
         const certEl = document.getElementById('certificateCapture');
 
-        function hideCaptureWrap() {
-            captureWrap.style.position   = 'fixed';
-            captureWrap.style.top        = '0';
-            captureWrap.style.left       = '-9999px';
-            captureWrap.style.visibility = 'hidden';
-            captureWrap.style.opacity    = '0';
-            captureWrap.style.zIndex     = '-9999';
-        }
-
-        // Wait 2 frames for browser to lay out at 1000px before measuring
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-
                 const W = 1000;
                 const H = certEl.scrollHeight;
 

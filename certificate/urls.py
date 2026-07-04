@@ -9,6 +9,7 @@ urlpatterns = [
     path('verify/<str:cert_number>/', views.verify_certificate, name='verify_certificate'),
 
     path('qr/<str:cert_number>/', views.certificate_qr_code, name='certificate_qr_code'), 
+    path('image-proxy/', views.image_proxy, name='image_proxy'),
     
     # Admin URLs
     path('admin/designs/', views.design_list, name='design_list'),
