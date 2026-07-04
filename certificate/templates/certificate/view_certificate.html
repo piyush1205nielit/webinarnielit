@@ -593,7 +593,6 @@
     </div>
 
 </div>
-
 <script>
 function downloadCertificateAsPDF() {
     const isMobile = window.innerWidth < 1040;
@@ -630,21 +629,96 @@ function downloadCertificateAsPDF() {
         pdf.save(`Certificate_${certNum}.pdf`);
     }
 
+    // ── CORS fix: reload all images with crossOrigin=anonymous before capture ──
+    // This is required because S3 images cached without CORS headers
+    // won't have Access-Control-Allow-Origin, causing canvas taint
+    function reloadImagesWithCORS(certEl) {
+        const allImgs = Array.from(certEl.querySelectorAll('img'));
+
+        if (allImgs.length === 0) return Promise.resolve();
+
+        const promises = allImgs.map(img => {
+            return new Promise((resolve) => {
+
+                // Skip data URIs — already embedded, no CORS needed
+                if (!img.src || img.src.startsWith('data:')) {
+                    resolve();
+                    return;
+                }
+
+                // Skip same-origin images (like QR code from your own server)
+                try {
+                    const imgUrl = new URL(img.src);
+                    const pageUrl = new URL(window.location.href);
+                    if (imgUrl.origin === pageUrl.origin) {
+                        resolve();
+                        return;
+                    }
+                } catch(e) {
+                    resolve();
+                    return;
+                }
+
+                const originalSrc = img.src.split('?')[0]; // strip any existing params
+
+                // Set crossOrigin before changing src
+                img.crossOrigin = 'anonymous';
+
+                img.onload = () => {
+                    console.log('✅ CORS reload OK:', originalSrc);
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    // CORS still failing even after S3 config —
+                    // fall back to a proxy approach or resolve to not block the whole PDF
+                    console.warn('⚠️ CORS reload failed, image will be missing:', originalSrc);
+                    resolve();
+                };
+
+                // Add cache-buster so browser makes a fresh request
+                // (previously cached response without CORS headers won't work)
+                const cacheBuster = '_cors=' + Date.now();
+                const separator   = originalSrc.includes('?') ? '&' : '?';
+                img.src = originalSrc + separator + cacheBuster;
+            });
+        });
+
+        return Promise.all(promises);
+    }
+
+    // ── Core capture function used by both desktop and mobile ──
+    function captureElement(certEl, canvasOptions) {
+        return reloadImagesWithCORS(certEl).then(() => {
+            return html2canvas(certEl, {
+                ...canvasOptions,
+                useCORS: true,
+                allowTaint: false,
+                imageTimeout: 20000,
+                onclone: function(clonedDoc) {
+                    // Also apply crossOrigin on all cloned images
+                    // html2canvas works on a clone internally
+                    clonedDoc.querySelectorAll('img').forEach(img => {
+                        if (img.src && !img.src.startsWith('data:')) {
+                            img.crossOrigin = 'anonymous';
+                        }
+                    });
+                }
+            });
+        });
+    }
+
     if (!isMobile) {
         // ══ DESKTOP: capture the visible certificate ══
         const certEl = document.getElementById('certificateContent');
 
-        // Scroll to top so html2canvas captures from position 0
         window.scrollTo(0, 0);
 
-        const rect = certEl.getBoundingClientRect();
         const W = certEl.offsetWidth;
         const H = certEl.offsetHeight;
 
-        html2canvas(certEl, {
+        captureElement(certEl, {
             scale: 3,
-            useCORS: true,
-            allowTaint: false,
             backgroundColor: '#ffffff',
             logging: false,
             x: 0,
@@ -667,10 +741,9 @@ function downloadCertificateAsPDF() {
     } else {
         // ══ MOBILE: use the off-screen 1000px element ══
 
-        // Step 1: bring it into normal document flow at a fixed 1000px width
-        // but keep it visually off-screen using a wrapper trick
+        // Bring into document flow so browser lays it out at 1000px
         captureWrap.style.position   = 'absolute';
-        captureWrap.style.top        = document.documentElement.scrollHeight + 'px'; // below all visible content
+        captureWrap.style.top        = document.documentElement.scrollHeight + 'px';
         captureWrap.style.left       = '0';
         captureWrap.style.width      = '1000px';
         captureWrap.style.visibility = 'visible';
@@ -679,17 +752,24 @@ function downloadCertificateAsPDF() {
 
         const certEl = document.getElementById('certificateCapture');
 
-        // Step 2: wait 2 frames for browser to lay out at 1000px
+        function hideCaptureWrap() {
+            captureWrap.style.position   = 'fixed';
+            captureWrap.style.top        = '0';
+            captureWrap.style.left       = '-9999px';
+            captureWrap.style.visibility = 'hidden';
+            captureWrap.style.opacity    = '0';
+            captureWrap.style.zIndex     = '-9999';
+        }
+
+        // Wait 2 frames for browser to lay out at 1000px before measuring
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
 
                 const W = 1000;
                 const H = certEl.scrollHeight;
 
-                html2canvas(certEl, {
+                captureElement(certEl, {
                     scale: 3,
-                    useCORS: true,
-                    allowTaint: false,
                     backgroundColor: '#ffffff',
                     logging: false,
                     x: 0,
@@ -701,21 +781,11 @@ function downloadCertificateAsPDF() {
                     windowWidth: 1000,
                     windowHeight: H,
                 }).then(canvas => {
-                    // Step 3: hide again immediately
-                    captureWrap.style.position   = 'fixed';
-                    captureWrap.style.top        = '0';
-                    captureWrap.style.left       = '-9999px';
-                    captureWrap.style.visibility = 'hidden';
-                    captureWrap.style.opacity    = '0';
-
+                    hideCaptureWrap();
                     savePDF(canvas, W, H);
                     restoreButtons();
                 }).catch(err => {
-                    captureWrap.style.position   = 'fixed';
-                    captureWrap.style.top        = '0';
-                    captureWrap.style.left       = '-9999px';
-                    captureWrap.style.visibility = 'hidden';
-                    captureWrap.style.opacity    = '0';
+                    hideCaptureWrap();
                     console.error('Mobile capture failed:', err);
                     restoreButtons();
                     alert('Could not generate PDF. Please try again.');
@@ -725,4 +795,5 @@ function downloadCertificateAsPDF() {
     }
 }
 </script>
+
 {% endblock %}
