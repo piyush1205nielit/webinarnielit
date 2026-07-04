@@ -19,6 +19,7 @@ from django.views.decorators.cache import cache_control
 import requests
 from django.views.decorators.csrf import csrf_exempt
 
+
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
