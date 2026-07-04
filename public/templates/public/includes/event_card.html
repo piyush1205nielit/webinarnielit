@@ -166,16 +166,22 @@ Logos only — no event image. Requires Font Awesome on the page.
     .event-banner-logos.eb-logo-center { justify-content: center; }
     .event-banner-logos.eb-logo-right { justify-content: flex-end; }
 
-    .event-banner-logo-img {
-        width: auto !important;
-        height: auto !important;
-        max-height: 32px !important; 
-        max-width: 140px;
-        object-fit: contain;
-        display: block;
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12));
-        transition: transform 0.3s ease;
-    }
+   .event-banner-logo-img {
+      width: auto !important;
+      height: auto !important;
+      max-height: 32px !important;
+      max-width: 140px;
+      object-fit: contain;
+      display: block;
+      background: #ffffff;
+
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
     @media (min-width: 768px) { .event-banner-logo-img { max-height: 44px !important; max-width: 190px; } }
     @media (min-width: 1000px) { .event-banner-logo-img { max-height: 56px !important; max-width: 220px; } }
     @media (min-width: 1200px) { .event-banner-logo-img { max-height: 68px !important; max-width: 250px; } }
