@@ -84,6 +84,8 @@
     .cert-logo-placeholder { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #ccc; background: #f4f4f4; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; color: #999; }
 
     .cert-divider-dashed { border-top: 1px dashed #999; margin: 6px 0; }
+
+    
     .cert-title {
         text-align: center;
         font-size: 20px;
@@ -334,8 +336,6 @@
                     </div>
                 </div>
 
-                <div class="cert-divider"></div>
-
                 <div class="cert-title">{{ design.certificate_title|default:"CERTIFICATE OF PARTICIPATION" }}</div>
 
                 <div class="cert-line cert-line-1">{{ design.line_1_text|default:"This certificate is proudly presented to" }}</div>
@@ -400,7 +400,6 @@
                                     alt="QR Code"
                                     style="width: {{ design.qr_code_size|default:55 }}px; height: {{ design.qr_code_size|default:55 }}px;
                                             border: 1px solid #ddd; padding: 3px; background: white; border-radius: 5px;">
-                                <div style="font-size: 8px; color: #666;">Scan to Verify</div>
                             </div>
                         {% endif %}
                         <div class="issue-date-box">
@@ -599,83 +598,131 @@
 function downloadCertificateAsPDF() {
     const isMobile = window.innerWidth < 1040;
 
-    // On mobile use the off-screen fixed-width capture element
-    // On desktop use the visible certificate
-    const certEl = isMobile
-        ? document.getElementById('certificateCapture')
-        : document.getElementById('certificateContent');
-
-    // Button references
     const desktopBtn  = document.getElementById('desktopDownloadBtn');
     const mobileBtn   = document.getElementById('mobileDownloadBtn');
     const genNote     = document.getElementById('generatingNote');
-    const spinnerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
+    const captureWrap = document.getElementById('certCaptureContainer');
 
-    // Disable buttons, show feedback
-    if (desktopBtn) { desktopBtn.disabled = true; desktopBtn.innerHTML = spinnerHTML; }
+    // ── Loading state ──
+    if (desktopBtn) { desktopBtn.disabled = true; desktopBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...'; }
     if (mobileBtn)  { mobileBtn.disabled  = true; mobileBtn.innerHTML  = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:mspin 0.6s linear infinite;margin-right:7px;vertical-align:middle;"></span>Generating...'; }
     if (genNote)    { genNote.style.display = 'block'; }
 
-    // Briefly make off-screen element renderable for html2canvas
-    const captureWrap = document.getElementById('certCaptureContainer');
-    if (isMobile && captureWrap) {
-        captureWrap.style.visibility = 'visible';
-        captureWrap.style.opacity    = '1';
-        captureWrap.style.left       = '-9999px'; // stays off-screen
+    function restoreButtons() {
+        if (desktopBtn) { desktopBtn.disabled = false; desktopBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download Certificate'; }
+        if (mobileBtn)  { mobileBtn.disabled  = false; mobileBtn.innerHTML  = '<i class="fas fa-download"></i> Download Certificate as PDF'; }
+        if (genNote)    { genNote.style.display = 'none'; }
     }
 
-    html2canvas(certEl, {
-        scale: 3,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#ffffff',
-        logging: false,
-        scrollX: 0,
-        scrollY: 0,
-        // Always capture at 1000px width regardless of device screen
-        windowWidth: 1000,
-        width: certEl.offsetWidth,
-        height: certEl.offsetHeight,
-    }).then(canvas => {
-
-        // Hide capture wrapper again
-        if (isMobile && captureWrap) {
-            captureWrap.style.visibility = 'hidden';
-            captureWrap.style.opacity    = '0';
-        }
-
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    function savePDF(canvas, widthPx, heightPx) {
+        const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
-
-        // Use 1000px as canonical width on mobile, actual offsetWidth on desktop
-        const certWidthPx  = isMobile ? 1000 : certEl.offsetWidth;
-        const certHeightPx = certEl.offsetHeight;
         const pxToMm = px => (px * 25.4) / 96;
-
+        const wMm = pxToMm(widthPx);
+        const hMm = pxToMm(heightPx);
         const pdf = new jsPDF({
-            orientation: 'landscape',
+            orientation: wMm > hMm ? 'landscape' : 'portrait',
             unit: 'mm',
-            format: [pxToMm(certWidthPx), pxToMm(certHeightPx)],
+            format: [wMm, hMm],
+        });
+        pdf.addImage(imgData, 'PNG', 0, 0, wMm, hMm);
+        const certNum = "{{ certificate.certificate_number }}";
+        pdf.save(`Certificate_${certNum}.pdf`);
+    }
+
+    if (!isMobile) {
+        // ══ DESKTOP: capture the visible certificate ══
+        const certEl = document.getElementById('certificateContent');
+
+        // Scroll to top so html2canvas captures from position 0
+        window.scrollTo(0, 0);
+
+        const rect = certEl.getBoundingClientRect();
+        const W = certEl.offsetWidth;
+        const H = certEl.offsetHeight;
+
+        html2canvas(certEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+            logging: false,
+            x: 0,
+            y: 0,
+            scrollX: -window.scrollX,
+            scrollY: -window.scrollY,
+            width: W,
+            height: H,
+            windowWidth: document.documentElement.scrollWidth,
+            windowHeight: document.documentElement.scrollHeight,
+        }).then(canvas => {
+            savePDF(canvas, W, H);
+            restoreButtons();
+        }).catch(err => {
+            console.error('Desktop capture failed:', err);
+            restoreButtons();
+            alert('Could not generate PDF. Please try again.');
         });
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, pxToMm(certWidthPx), pxToMm(certHeightPx));
+    } else {
+        // ══ MOBILE: use the off-screen 1000px element ══
 
-        const certificateNumber = "{{ certificate.certificate_number }}";
-        pdf.save(`Certificate_${certificateNumber}.pdf`);
+        // Step 1: bring it into normal document flow at a fixed 1000px width
+        // but keep it visually off-screen using a wrapper trick
+        captureWrap.style.position   = 'absolute';
+        captureWrap.style.top        = document.documentElement.scrollHeight + 'px'; // below all visible content
+        captureWrap.style.left       = '0';
+        captureWrap.style.width      = '1000px';
+        captureWrap.style.visibility = 'visible';
+        captureWrap.style.opacity    = '1';
+        captureWrap.style.zIndex     = '-1';
 
-        // Restore buttons
-        if (desktopBtn) { desktopBtn.disabled = false; desktopBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download Certificate'; }
-        if (mobileBtn)  { mobileBtn.disabled  = false; mobileBtn.innerHTML  = '<i class="fas fa-download"></i> Download Certificate as PDF'; }
-        if (genNote)    { genNote.style.display = 'none'; }
+        const certEl = document.getElementById('certificateCapture');
 
-    }).catch(err => {
-        console.error('PDF generation failed:', err);
-        if (isMobile && captureWrap) { captureWrap.style.visibility = 'hidden'; captureWrap.style.opacity = '0'; }
-        if (desktopBtn) { desktopBtn.disabled = false; desktopBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download Certificate'; }
-        if (mobileBtn)  { mobileBtn.disabled  = false; mobileBtn.innerHTML  = '<i class="fas fa-download"></i> Download Certificate as PDF'; }
-        if (genNote)    { genNote.style.display = 'none'; }
-        alert('Could not generate PDF. Please try again.');
-    });
+        // Step 2: wait 2 frames for browser to lay out at 1000px
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+
+                const W = 1000;
+                const H = certEl.scrollHeight;
+
+                html2canvas(certEl, {
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    x: 0,
+                    y: 0,
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: W,
+                    height: H,
+                    windowWidth: 1000,
+                    windowHeight: H,
+                }).then(canvas => {
+                    // Step 3: hide again immediately
+                    captureWrap.style.position   = 'fixed';
+                    captureWrap.style.top        = '0';
+                    captureWrap.style.left       = '-9999px';
+                    captureWrap.style.visibility = 'hidden';
+                    captureWrap.style.opacity    = '0';
+
+                    savePDF(canvas, W, H);
+                    restoreButtons();
+                }).catch(err => {
+                    captureWrap.style.position   = 'fixed';
+                    captureWrap.style.top        = '0';
+                    captureWrap.style.left       = '-9999px';
+                    captureWrap.style.visibility = 'hidden';
+                    captureWrap.style.opacity    = '0';
+                    console.error('Mobile capture failed:', err);
+                    restoreButtons();
+                    alert('Could not generate PDF. Please try again.');
+                });
+            });
+        });
+    }
 }
 </script>
 {% endblock %}
