@@ -86,7 +86,7 @@ AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_QUERYSTRING_AUTH = False
-AWS_DEFAULT_ACL = 'public-read'
+AWS_DEFAULT_ACL = None
 
 # This tells S3 to respond with CORS headers
 AWS_S3_CORS_RULES = [
