@@ -1,0 +1,243 @@
+{% extends "form_builder2/base.html" %}
+{% block title %}{% if mode == "edit" %}Edit form{% else %}New form{% endif %} · Form Builder{% endblock %}
+
+{% block extra_head %}
+<style>
+  .field-card{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;background:#fbfcff}
+  .field-card.removed{display:none}
+  .fc-head{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .fc-head .grip{color:var(--muted);font-weight:700;font-size:.8rem}
+  .fc-tools{display:flex;gap:6px}
+  .opts,.constraints{margin-top:8px}
+  .checkbox-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .checkbox-row input{width:auto}
+  .toolbar{position:sticky;bottom:0;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:14px 16px;display:flex;gap:10px;justify-content:flex-end;
+    margin-top:16px;box-shadow:var(--shadow)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% if mode == "edit" %}Edit form{% else %}Create a new form{% endif %}</h1>
+    <div class="sub">Define your fields, constraints and publish status.</div>
+  </div>
+  <a class="btn" href="{% url 'form_builder2:form_list' %}">← Back</a>
+</div>
+
+<form method="post" id="builder-form" novalidate>
+  {% csrf_token %}
+
+  <!-- Form meta -->
+  <div class="card card-pad" style="margin-bottom:18px">
+    <div class="field">
+      <label>Form title</label>
+      {{ form.title }}
+      {{ form.title.errors }}
+    </div>
+    <div class="field">
+      <label>Description</label>
+      {{ form.description }}
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Success message</label>
+        {{ form.success_message }}
+        <div class="hint">Shown after a visitor submits.</div>
+      </div>
+      <div class="field">
+        <label>Options</label>
+        <div class="checkbox-row">{{ form.is_published }} <span>Published (publicly accessible)</span></div>
+        <div class="checkbox-row">{{ form.allow_multiple }} <span>Allow multiple submissions</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fields -->
+  <div class="page-head" style="margin-bottom:10px">
+    <h2 style="font-size:1.15rem;margin:0">Fields</h2>
+    <button type="button" class="btn btn-primary btn-sm" id="add-field">+ Add field</button>
+  </div>
+
+  {{ formset.management_form }}
+  {% if formset.non_form_errors %}<div class="msg error">{{ formset.non_form_errors }}</div>{% endif %}
+
+  <div id="fields-container">
+    {% for subform in formset %}
+    <div class="field-card" data-form>
+      {{ subform.id }}
+      <div class="fc-head">
+        <span class="grip">☰ Field</span>
+        <div class="fc-tools">
+          <button type="button" class="btn btn-sm move-up" title="Move up">↑</button>
+          <button type="button" class="btn btn-sm move-down" title="Move down">↓</button>
+          <button type="button" class="btn btn-sm remove-field" style="color:var(--red)">Remove</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Label</label>
+          {{ subform.label }}
+          {{ subform.label.errors }}
+        </div>
+        <div class="field">
+          <label>Field type</label>
+          {{ subform.field_type }}
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Placeholder</label>
+          {{ subform.placeholder }}
+        </div>
+        <div class="field">
+          <label>Help text</label>
+          {{ subform.help_text }}
+        </div>
+      </div>
+
+      <div class="opts field">
+        <label>Options (one per line)</label>
+        {{ subform.options }}
+        {{ subform.options.errors }}
+      </div>
+
+      <div class="constraints grid-3">
+        <div class="field">
+          <label>Min length</label>
+          {{ subform.min_length }}
+        </div>
+        <div class="field">
+          <label>Max length</label>
+          {{ subform.max_length }}
+        </div>
+        <div class="field">
+          <label>Validation</label>
+          {{ subform.validation_type }}
+        </div>
+      </div>
+
+      <div class="checkbox-row">{{ subform.required }} <span>Required</span></div>
+
+      <span style="display:none">{{ subform.order }}{% if subform.instance.pk %}{{ subform.DELETE }}{% endif %}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- hidden empty-form template for cloning -->
+  <template id="empty-form-tpl">
+    <div class="field-card" data-form>
+      <div class="fc-head">
+        <span class="grip">☰ Field</span>
+        <div class="fc-tools">
+          <button type="button" class="btn btn-sm move-up" title="Move up">↑</button>
+          <button type="button" class="btn btn-sm move-down" title="Move down">↓</button>
+          <button type="button" class="btn btn-sm remove-field" style="color:var(--red)">Remove</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Label</label>{{ formset.empty_form.label }}</div>
+        <div class="field"><label>Field type</label>{{ formset.empty_form.field_type }}</div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Placeholder</label>{{ formset.empty_form.placeholder }}</div>
+        <div class="field"><label>Help text</label>{{ formset.empty_form.help_text }}</div>
+      </div>
+      <div class="opts field">
+        <label>Options (one per line)</label>{{ formset.empty_form.options }}
+      </div>
+      <div class="constraints grid-3">
+        <div class="field"><label>Min length</label>{{ formset.empty_form.min_length }}</div>
+        <div class="field"><label>Max length</label>{{ formset.empty_form.max_length }}</div>
+        <div class="field"><label>Validation</label>{{ formset.empty_form.validation_type }}</div>
+      </div>
+      <div class="checkbox-row">{{ formset.empty_form.required }} <span>Required</span></div>
+      <span style="display:none">{{ formset.empty_form.order }}</span>
+    </div>
+  </template>
+
+  <div class="toolbar">
+    <a class="btn" href="{% url 'form_builder2:form_list' %}">Cancel</a>
+    <button type="submit" class="btn btn-primary">{% if mode == "edit" %}Save changes{% else %}Create form{% endif %}</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  const prefix = "{{ formset.prefix }}";
+  const totalInput = document.getElementById("id_" + prefix + "-TOTAL_FORMS");
+  const container = document.getElementById("fields-container");
+  const tpl = document.getElementById("empty-form-tpl").innerHTML;
+
+  const CHOICE = ["select","radio","checkbox"];
+  const FILE = ["file","image"];
+
+  function typeToggle(card){
+    const sel = card.querySelector("select[name$='-field_type']");
+    if(!sel) return;
+    const t = sel.value;
+    const opts = card.querySelector(".opts");
+    const cons = card.querySelector(".constraints");
+    if(opts) opts.style.display = CHOICE.includes(t) ? "" : "none";
+    const textLike = !CHOICE.includes(t) && !FILE.includes(t) && !["date","datetime"].includes(t);
+    if(cons) cons.style.display = textLike ? "" : "none";
+  }
+
+  function wire(card){
+    const sel = card.querySelector("select[name$='-field_type']");
+    if(sel){ sel.addEventListener("change", ()=>typeToggle(card)); }
+    typeToggle(card);
+
+    card.querySelector(".remove-field").addEventListener("click", ()=>{
+      const del = card.querySelector("input[name$='-DELETE']");
+      if(del){ del.checked = true; card.classList.add("removed"); }
+      else {
+        // brand-new row: clear inputs so Django treats it as empty extra, then hide
+        card.querySelectorAll("input,select,textarea").forEach(el=>{
+          if(el.type === "checkbox") el.checked=false; else el.value="";
+        });
+        card.classList.add("removed");
+      }
+    });
+    card.querySelector(".move-up").addEventListener("click", ()=>{
+      const prev = card.previousElementSibling;
+      if(prev) container.insertBefore(card, prev);
+    });
+    card.querySelector(".move-down").addEventListener("click", ()=>{
+      const next = card.nextElementSibling;
+      if(next) container.insertBefore(next, card);
+    });
+  }
+
+  document.querySelectorAll("#fields-container .field-card").forEach(wire);
+
+  document.getElementById("add-field").addEventListener("click", ()=>{
+    const idx = parseInt(totalInput.value, 10);
+    const html = tpl.replace(/__prefix__/g, idx);
+    const div = document.createElement("div");
+    div.innerHTML = html.trim();
+    const card = div.firstElementChild;
+    container.appendChild(card);
+    totalInput.value = idx + 1;
+    wire(card);
+    card.querySelector("input[name$='-label']").focus();
+  });
+
+  // set order from DOM position on submit
+  document.getElementById("builder-form").addEventListener("submit", ()=>{
+    let i = 0;
+    container.querySelectorAll(".field-card").forEach(card=>{
+      const ord = card.querySelector("input[name$='-order']");
+      if(!ord) return;
+      if(card.classList.contains("removed")){ return; }
+      ord.value = i++;
+    });
+  });
+})();
+</script>
+{% endblock %}

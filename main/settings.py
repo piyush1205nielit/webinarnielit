@@ -116,6 +116,7 @@ INSTALLED_APPS = [
     'certificate',
     'kyndryl',
     'event',
+    'form_builder2',
     
     #Required
     'storages',

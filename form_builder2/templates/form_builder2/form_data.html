@@ -1,0 +1,114 @@
+{% extends "form_builder2/base.html" %}
+{% block title %}{{ object.title }} · Responses{% endblock %}
+
+{% block extra_head %}
+<style>
+  .bar{height:8px;background:#eef2ff;border-radius:999px;overflow:hidden;margin-top:4px}
+  .bar > span{display:block;height:100%;background:var(--brand)}
+  .an-item{margin-bottom:10px}
+  .an-item .row{display:flex;justify-content:space-between;font-size:.85rem}
+  a.file-link{font-size:.82rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ object.title }}</h1>
+    <div class="sub">Responses &amp; analytics</div>
+  </div>
+  <div class="row-actions">
+    <a class="btn" href="{% url 'form_builder2:form_list' %}">← Back</a>
+    <a class="btn" href="{% url 'form_builder2:form_edit' object.pk %}">Edit form</a>
+    <a class="btn btn-primary" href="{% url 'form_builder2:form_export' object.pk 'xlsx' %}">⬇ Excel</a>
+    <a class="btn" href="{% url 'form_builder2:form_export' object.pk 'pdf' %}">⬇ PDF</a>
+  </div>
+</div>
+
+<div class="stat-row">
+  <div class="card stat">
+    <div class="n">{{ count }}</div>
+    <div class="l">Total responses</div>
+  </div>
+  <div class="card stat">
+    <div class="n">{{ fields|length }}</div>
+    <div class="l">Fields</div>
+  </div>
+  <div class="card stat">
+    <div class="n">
+      {% if object.is_published %}<span style="color:var(--green)">Live</span>{% else %}<span style="color:var(--amber)">Draft</span>{% endif %}
+    </div>
+    <div class="l">Status</div>
+  </div>
+</div>
+
+{% if analytics %}
+<div class="card card-pad" style="margin-bottom:18px">
+  <h2 style="font-size:1.1rem;margin-top:0">Quick analysis</h2>
+  <div class="grid-2">
+    {% for a in analytics %}
+    <div>
+      <strong>{{ a.label }}</strong>
+      {% for it in a.items %}
+      <div class="an-item">
+        <div class="row"><span>{{ it.name }}</span><span>{{ it.count }} · {{ it.pct }}%</span></div>
+        <div class="bar"><span style="width:{{ it.pct }}%"></span></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  {% if rows %}
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Submitted</th>
+          {% for f in fields %}<th>{{ f.label }}</th>{% endfor %}
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td class="sub">{{ r.resp.submitted_at|date:"d M Y, H:i" }}</td>
+          {% for cell in r.cells %}
+            <td>
+              {% if cell.is_file and cell.value %}
+                <a class="file-link" href="{{ cell.value }}" target="_blank">View file</a>
+              {% else %}
+                {{ cell.value|default:"—" }}
+              {% endif %}
+            </td>
+          {% endfor %}
+          <td>
+            <form method="post" action="{% url 'form_builder2:response_delete' object.pk r.resp.pk %}"
+                  onsubmit="return confirm('Delete this response?')">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-ghost" style="color:var(--red)">✕</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <p style="font-size:1.05rem;font-weight:600">No responses yet</p>
+    {% if object.is_published %}
+      <p>Share the form link to start collecting responses.</p>
+      <a class="url-pill" href="{{ object.get_public_url }}" target="_blank">{{ request.get_host }}{{ object.get_public_url }}</a>
+    {% else %}
+      <p>Publish the form to make it accessible.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

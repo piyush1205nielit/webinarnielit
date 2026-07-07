@@ -1,0 +1,79 @@
+{% extends "form_builder2/base.html" %}
+{% block title %}Forms · Form Builder{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Forms</h1>
+    <div class="sub">Create, publish and collect responses.</div>
+  </div>
+  <a class="btn btn-primary" href="{% url 'form_builder2:form_create' %}">+ Create new form</a>
+</div>
+
+<div class="card">
+  {% if forms %}
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Responses</th>
+          <th>Public URL</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in forms %}
+        <tr>
+          <td>
+            <strong>{{ f.title }}</strong>
+            <div class="sub">{{ f.fields.count }} field{{ f.fields.count|pluralize }}</div>
+          </td>
+          <td>
+            {% if f.is_published %}
+              <span class="badge badge-on">● Published</span>
+            {% else %}
+              <span class="badge badge-off">● Draft</span>
+            {% endif %}
+          </td>
+          <td><span class="badge badge-mut">{{ f.response_count }}</span></td>
+          <td>
+            {% if f.is_published %}
+              <a class="url-pill" href="{{ f.get_public_url }}" target="_blank" title="{{ request.scheme }}://{{ request.get_host }}{{ f.get_public_url }}">
+                {{ request.get_host }}{{ f.get_public_url }}
+              </a>
+            {% else %}
+              <span class="sub">— not public —</span>
+            {% endif %}
+          </td>
+          <td class="sub">{{ f.updated_at|date:"d M Y, H:i" }}</td>
+          <td>
+            <div class="row-actions">
+              <form method="post" action="{% url 'form_builder2:form_toggle_publish' f.pk %}" style="display:inline">
+                {% csrf_token %}
+                {% if f.is_published %}
+                  <button class="btn btn-sm" title="Unpublish">Unpublish</button>
+                {% else %}
+                  <button class="btn btn-sm btn-primary" title="Publish">Publish</button>
+                {% endif %}
+              </form>
+              <a class="btn btn-sm" href="{% url 'form_builder2:form_data' f.pk %}">Data</a>
+              <a class="btn btn-sm" href="{% url 'form_builder2:form_edit' f.pk %}">Edit</a>
+              <a class="btn btn-sm btn-ghost" style="color:var(--red)" href="{% url 'form_builder2:form_delete' f.pk %}">Delete</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <p style="font-size:1.05rem;font-weight:600">No forms yet</p>
+    <p>Create your first form to start collecting responses.</p>
+    <a class="btn btn-primary" href="{% url 'form_builder2:form_create' %}">+ Create new form</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

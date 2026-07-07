@@ -15,6 +15,7 @@ urlpatterns = [
     path('certificate/', include('certificate.urls')),
     path('kyndryl/', include('kyndryl.urls')),
     path("events/", include("event.urls")),
+    path('form/', include('form_builder2.urls')),
 ]
 
 if settings.DEBUG:
