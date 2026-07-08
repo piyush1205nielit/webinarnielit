@@ -9,6 +9,8 @@ from django.utils.text import slugify
 class Form(models.Model):
     """A form definition (like a single Google Form)."""
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
@@ -64,6 +66,8 @@ class Form(models.Model):
 class FormField(models.Model):
     """A single configurable field belonging to a Form."""
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class FieldType(models.TextChoices):
         TEXT = "text", "Short text"
         TEXTAREA = "textarea", "Paragraph"
@@ -104,12 +108,10 @@ class FormField(models.Model):
     required = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
 
-    # For select / radio / checkbox — one option per line
     options = models.TextField(
         blank=True, help_text="One option per line (for dropdown / choice fields)."
     )
 
-    # Constraints (apply to text-like fields)
     min_length = models.PositiveIntegerField(null=True, blank=True)
     max_length = models.PositiveIntegerField(null=True, blank=True)
     validation_type = models.CharField(
@@ -153,6 +155,8 @@ class FormField(models.Model):
 class FormResponse(models.Model):
     """One submission for a Form. Answers are stored as a JSON map."""
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     form = models.ForeignKey(Form, related_name="responses", on_delete=models.CASCADE)
     data = models.JSONField(default=dict, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
@@ -178,6 +182,8 @@ class FormResponse(models.Model):
 class FormResponseFile(models.Model):
     """Uploaded file/image tied to a response. Uses the project's default
     storage backend, so this transparently lands in S3 when USE_S3=True."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     response = models.ForeignKey(
         FormResponse, related_name="files", on_delete=models.CASCADE

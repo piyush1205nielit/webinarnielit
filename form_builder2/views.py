@@ -6,7 +6,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-
+import json
 from .forms import DynamicForm, FormFieldFormSet, FormForm
 from .models import Form, FormResponse, FormResponseFile
 from .utils import export_excel, export_pdf
@@ -158,6 +158,7 @@ def form_data(request, pk):
                     ],
                 }
             )
+    analytics_json = json.dumps(analytics)
 
     return render(
         request,
@@ -168,6 +169,7 @@ def form_data(request, pk):
             "rows": rows,
             "count": responses.count(),
             "analytics": analytics,
+            "analytics_json": analytics_json, 
         },
     )
 
@@ -205,19 +207,27 @@ def form_fill(request, slug):
         return render(request, "form_builder2/public/form_closed.html", {"object": obj})
 
     if request.method == "POST":
-        dform = DynamicForm(
-            request.POST, request.FILES, form_instance=obj
-        )
+        dform = DynamicForm(request.POST, request.FILES, form_instance=obj)
         if dform.is_valid():
             _save_response(request, obj, dform)
             return redirect("form_builder2:form_success", slug=obj.slug)
     else:
         dform = DynamicForm(form_instance=obj)
 
+    constraints = {}
+    for f in obj.ordered_fields:
+        constraints[f.field_name] = {
+            "required": f.required,
+            "min_length": f.min_length,
+            "max_length": f.max_length,
+            "validation_type": f.validation_type,   # none | numeric | alpha | alphanumeric
+            "field_type": f.field_type,
+        }
+
     return render(
         request,
         "form_builder2/public/form_fill.html",
-        {"object": obj, "dform": dform},
+        {"object": obj, "dform": dform, "constraints_json": json.dumps(constraints)},
     )
 
 
