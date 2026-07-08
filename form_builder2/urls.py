@@ -14,4 +14,5 @@ urlpatterns = [
     path("manage/<uuid:pk>/data/<uuid:resp_pk>/delete/", views.response_delete,name="response_delete",),
     path("f/<slug:slug>/", views.form_fill, name="form_fill"),
     path("f/<slug:slug>/success/", views.form_success, name="form_success"),
+    path("manage/<uuid:pk>/pin/", views.form_toggle_pin, name="form_toggle_pin"),
 ]

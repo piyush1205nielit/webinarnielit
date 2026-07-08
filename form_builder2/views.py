@@ -255,3 +255,14 @@ def _save_response(request, obj, dform):
 def form_success(request, slug):
     obj = get_object_or_404(Form, slug=slug)
     return render(request, "form_builder2/public/form_success.html", {"object": obj})
+
+@login_required
+@staff_required
+@require_POST
+def form_toggle_pin(request, pk):
+    obj = get_object_or_404(Form, pk=pk)
+    obj.is_pinned = not obj.is_pinned
+    obj.save(update_fields=["is_pinned", "updated_at"])
+    state = "pinned" if obj.is_pinned else "unpinned"
+    messages.success(request, f"“{obj.title}” {state}.")
+    return redirect("form_builder2:form_list")

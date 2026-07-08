@@ -7,7 +7,6 @@ from django.utils.text import slugify
 
 
 class Form(models.Model):
-    """A form definition (like a single Google Form)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -18,6 +17,10 @@ class Form(models.Model):
     is_published = models.BooleanField(
         default=False,
         help_text="When ON the form is publicly accessible at its URL.",
+    )
+    is_pinned = models.BooleanField(
+        default=False,
+        help_text="Pin this form to the sidebar for quick access.",
     )
     allow_multiple = models.BooleanField(
         default=True,
