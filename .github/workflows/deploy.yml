@@ -27,7 +27,7 @@ jobs:
       - name: Run Tests
         env:
           DJANGO_SECRET_KEY: test-secret-key-not-for-production
-          DEBUG: 'True'
+          DEBUG: 'False'
           ALLOWED_HOSTS: 'localhost,127.0.0.1'
           USE_S3: 'False'
           AWS_ACCESS_KEY_ID: dummy
