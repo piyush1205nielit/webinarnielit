@@ -6,7 +6,7 @@ from .models import Event
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        exclude = ["id", "qr_code", "created_at", "updated_at"]
+        exclude = ["id", "qr_code", "created_at", "updated_at", "image", "image_size"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "subtitle": forms.TextInput(attrs={"class": "form-control"}),
@@ -20,9 +20,6 @@ class EventForm(forms.ModelForm):
             ),
             "registration_deadline": forms.DateTimeInput(
                 attrs={"type": "datetime-local", "class": "form-control"}
-            ),
-            "image_size": forms.NumberInput(
-                attrs={"class": "form-control", "min": 120, "max": 800, "step": 10}
             ),
             "logo_size": forms.NumberInput(
                 attrs={"class": "form-control", "min": 40, "max": 200, "step": 5}
@@ -38,9 +35,6 @@ class EventForm(forms.ModelForm):
             "text_color": forms.TextInput(attrs={"type": "color"}),
             "button_color": forms.TextInput(attrs={"type": "color"}),
         }
-
-    def clean_image(self):
-        return self._validate_image(self.cleaned_data.get("image"))
 
     def clean_logo1(self):
         return self._validate_image(self.cleaned_data.get("logo1"))

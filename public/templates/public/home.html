@@ -294,6 +294,13 @@
     </div>
 </section>
 
+{# EVENT CARD CAROUSELS #}
+{% if event_display_mode != "hidden" %}
+    {% include 'public/includes/event_cards_display.html' with events=events display_mode=event_display_mode %}
+{% endif %}
+
+{# EVENT CARD CAROUSELS ENDS ______ #}
+
 {% include 'public/includes/kyndryl_card.html' %}
 
 <!-- ── Admission Activities ───────────────────────── -->
