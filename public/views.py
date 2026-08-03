@@ -31,6 +31,8 @@ def home(request):
     
     # Get active carousel images ordered by order field
     carousel_images = CarouselImage.objects.filter(is_active=True)
+
+    display_settings = EventDisplaySettings.get_solo()
     
     context = {
         'featured_courses': featured_courses,
@@ -41,8 +43,11 @@ def home(request):
         'total_centres': total_centres,
         'announcements': announcements,
         'carousel_images': carousel_images,
+        "events": Event.objects.filter(is_active=True),
+        "event_display_mode": display_settings.display_mode,
     }
     return render(request, 'public/home.html', context)
+
 
 def courses(request):
     """Public courses listing page"""
